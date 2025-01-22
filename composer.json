@@ -1,0 +1,23 @@
+{
+    "name": "eagleeye/boilerplat",
+    "description": "Boilerplat for php project",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Golam Mahiuddin"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "vlucas/phpdotenv": "^5.6@dev"
+    },
+    "autoload":{
+        "psr-4":{
+            "Core\\":"core/"
+        },
+        "files": [
+            "helpers/PathHelper.php"
+        ]
+    }
+}
