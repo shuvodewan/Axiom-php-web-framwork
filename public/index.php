@@ -1,11 +1,11 @@
 <?php
 
 use Core\Application;
+use Core\Request;
 
 require __DIR__.'/../vendor/autoload.php';
 
+$app = new Application();
+$app->init()->send();
 
-
-var_dump((new Application())->value);
-
-var_dump(Application::getInstance()->value);
+echo json_encode(Request::setInstance()->getHeader('secChUa'));
