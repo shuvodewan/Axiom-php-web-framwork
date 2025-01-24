@@ -14,10 +14,13 @@
     },
     "autoload":{
         "psr-4":{
-            "Core\\":"core/"
+            "Core\\":"core/",
+            "Traits\\":"traits/",
+            "Facade\\":"facade/",
+            "Contract\\":"contract/"
         },
         "files": [
-            "helpers/PathHelper.php"
+            "helpers/helper.php"
         ]
     }
 }

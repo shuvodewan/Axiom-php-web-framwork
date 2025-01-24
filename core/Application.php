@@ -2,20 +2,21 @@
 
 namespace Core;
 
-use Dotenv\Dotenv;
+use Traits\EnvironmentTrait;
 
 class Application
 {
+
+    use EnvironmentTrait;
+
     static $instance;
-    public $value;
 
     public function __construct()
     {
-        $this->value = rand(1,10);
-        $this->loadEnv();
         self::setInstance($this);
+        $this->loadEnv()->setConfig();
+        return $this;
     }
-
 
     static function setInstance($instance){
         self::$instance = $instance;
@@ -25,10 +26,18 @@ class Application
         return self::$instance;
     }
 
+    public function setConfig(){
+        new Config();
+        return $this;
+    }
 
-    private function loadEnv(){
-        $dotenv = Dotenv::createImmutable(base_path());
-        $dotenv->safeLoad();
+    public function init(){
+        Request::setInstance()->capture();
+        return $this;
+    }
 
+    public function send(){
+        Request::setInstance()->capture();
+        return $this;
     }
 }

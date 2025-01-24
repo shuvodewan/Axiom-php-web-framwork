@@ -13,3 +13,10 @@ if (! function_exists('core_path')) {
         return $path?$base.$path:$base;
     }
 }
+
+if (! function_exists('config_path')) {
+    function config_path($path=null) {
+        $base = dirname(__DIR__).'/config';
+        return $path?$base.$path:$base;
+    }
+}
