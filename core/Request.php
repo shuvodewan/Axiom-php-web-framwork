@@ -17,9 +17,18 @@ class Request
     public $userIp;
 
 
+
+
     static function setInstance(){
         if(!self::$instance){
             self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    static function getInstance(){
+        if(!self::$instance){
+            self::setInstance();
         }
         return self::$instance;
     }
