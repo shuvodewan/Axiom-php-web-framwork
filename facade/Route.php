@@ -11,6 +11,6 @@ class Route implements FacadeContract
     use FacadeTrait;
     
     public static function getInstance(){
-        return CoreRoute::getInstance();
+        return new CoreRoute();
     }
 }

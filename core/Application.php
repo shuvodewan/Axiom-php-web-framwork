@@ -42,7 +42,7 @@ class Application
         return $this;
     }
     private function loadRoutes(){
-        (new Route(Request::getInstance()))
+        (new Route())
         ->loadRoutes();
         return $this;
     }

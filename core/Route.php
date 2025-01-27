@@ -7,9 +7,8 @@ use Exception;
 class Route
 
 {
-    static $instance;
+    static $middlewares='';
 
-    private $request;
     public $routes=[
         'get'=>[],
         'post'=>[],
@@ -17,21 +16,6 @@ class Route
         'delete'=>[],
         'patch'=>[],
     ];
-
-    public function __construct($request)
-    {
-        $this->request = $request;
-        self::setInstance($this);
-    }
-
-
-    static function setInstance($instance){
-        self::$instance = $instance;
-    }
-
-    static function getInstance(){
-        return self::$instance;
-    }
 
    public function loadRoutes(){
         $files = $this->loadRouteFiles();
@@ -50,31 +34,65 @@ class Route
         return debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['function'];
     }
 
-    private function registerRoutes($uri, $controller, $method, $middleware=[]){
+    private function cleanRouteDependencies(){
+        self::$middlewares = '';
+    }
+
+    private function registerRoutes($uri, $controller, $action, $middleware=''){
         $method = $this->getMethodName();
-        if(in_array($uri,$this->routes[$method])){
+        if(isset($uri,$this->routes[$method][$uri])){
             throw new Exception($uri.' Route already defined');
         }
-        array_push($this->routes[$method],$uri);
+
+        $middlewares = 
+
+        $route = [
+            'controller'=>$controller,
+            'action'=>$action,
+            'middleware'=>[...self::$middlewares!=''?explode(",", self::$middlewares):[],...$middleware!=''?explode(",", $middleware):[]]
+        ];
+
+        $this->routes[$method][$uri]=$route;
+        echo json_encode($this->routes);
     }
 
-    public function get($uri, $controller, $method, $middleware=[]){
-       $this->registerRoutes($uri, $controller, $method, $middleware=[]);
-    }
-    public function post($uri, $controller, $method, $middleware=[]){
-        $this->registerRoutes($uri, $controller, $method, $middleware=[]);
+
+    public function group($params=[],$func=null){
+
+        if(is_callable($params)){
+            return $params();
+        }
+
+        if(is_array($params)){
+            if(isset($params['middleware'])){
+                self::$middlewares = $params['middleware'];
+            }
+        }
+        
+        if(is_callable($func)){
+            call_user_func($func);
+        }
+
+        $this->cleanRouteDependencies();
     }
 
-    public function put($uri, $controller, $method, $middleware=[]){
-        $this->registerRoutes($uri, $controller, $method, $middleware=[]);
+    public function get($uri, $controller, $action, $middleware=''){
+       $this->registerRoutes($uri, $controller, $action, $middleware);
+    }
+    public function post($uri, $controller, $action, $middleware=''){
+        $this->registerRoutes($uri, $controller, $action, $middleware);
     }
 
-    public function delete($uri, $controller, $method, $middleware=[]){
-        $this->registerRoutes($uri, $controller, $method, $middleware=[]);
+    public function put($uri, $controller, $action, $middleware=''){
+        $this->registerRoutes($uri, $controller, $action, $middleware);
     }
 
-    public function patch($uri, $controller, $method, $middleware=[]){
-        $this->registerRoutes($uri, $controller, $method, $middleware=[]);
+    public function delete($uri, $controller, $action, $middleware=''){
+        $this->registerRoutes($uri, $controller, $action, $middleware);
+    }
+
+    public function patch($uri, $controller, $action, $middleware=''){
+        $this->registerRoutes($uri, $controller, $action, $middleware);
     }
 
 }
