@@ -1,0 +1,20 @@
+<?php ob_start() ?>
+    <div class="container">
+        <h1>Oops! Something went wrong.</h1>
+
+        <div class="details">
+            <div class="section">
+                <h2>Exception Message:</h2>
+                <p><?php echo htmlspecialchars($message) ?></p>
+            </div>
+
+            <div class="section">
+                <h2>Stack Trace:</h2>
+                <pre class="trace"><?php echo htmlspecialchars($trace)?></pre>
+            </div>
+        </div>
+    </div>
+<?php $content = ob_get_clean() ?>
+
+<?php require layout_path('/errors/errors.phtml') ?>
+

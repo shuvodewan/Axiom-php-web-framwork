@@ -9,7 +9,7 @@ return [
     'encrypt' => false,
     'cookie' => env(
         'SESSION_COOKIE',
-        Str::toSlug(env('APP_NAME', 'php'), '_').'_session'
+        Str::toSlug(env('APP_NAME', 'test'), '_').'_session'
     ),
     'path' => '/',
     'domain' => env('SESSION_DOMAIN', null),

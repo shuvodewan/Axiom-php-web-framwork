@@ -1,0 +1,95 @@
+<!--Intro Section-->
+    <section class="subscribe-intro mt-5">
+        <div class="container">
+            <div class="row ">
+                <div class="col-lg-8 col-md-6 col-sm-12 col-xs-12 m-auto">
+                    <h2>Become a Member?</h2>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                    <div class="text-end ">
+                        <a href="{{ route('members.registration') }}" class="theme-btn btn-style-one">Registration Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+<!--Main Footer-->
+<footer class="main-footer" style="background-image:url(<?php echo assets('Assets/images/background/footer.png')?>);">
+
+    <!--Footer Upper-->
+    <div class="footer-upper">
+        <div class="container">
+       
+
+                <!--Two 4th column-->
+        
+                    <div class="row ">
+                        <div class="col-lg-4 col-sm-6 col-xs-12 column">
+                        <h2>Contact Address</h2>
+                            <div class="footer-widget about-widget">
+                                
+                                <ul class="contact-info">
+                                    <li><span class="icon fa fa-map-marker"></span> BdREN, Navan HR Tower-2, 205,1 BIR
+                                        UTTAM MIR SHAWKAT SARAK, TEJGAON, DHAKA-1208
+                                    </li>
+                                    <li><span class="icon fa fa-phone"></span>Tel: +880-9612-223736</li>
+                                    <li><span class="icon fa fa-envelope-o"></span> info@greenprofessionalsbd.org </li>
+                                </ul>
+
+
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-sm-6 col-xs-12 dflexc">
+                        <div class="logo-footer pb-4"><a href="{{ route('home') }}"><img
+                                            src="<?php echo assets('Assets/images/logo.svg')?>" class="img-responsive" alt=""></a>
+                                </div>
+                        <ul class="social-ul">
+                            <li><a href="https://www.facebook.com/greenprofessionalsbd.org" target="_blank"
+                            class="facebook img-circle"><i class="fa-brands fa-facebook-f"></i></a></li>
+                            <li><a href="https://www.linkedin.com/company/104166785/admin/dashboard/" class="twitter img-circle" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a></li>
+                            <li><a href="#" class="google-plus img-circle"><i class="fa-brands fa-youtube"></i></a></li>
+                        </ul>
+
+        <div class="partner-footer">
+
+        <h4>Partners:</h4>
+        
+        <!-- <img class="kwpf-logo me-2" src="{{asset('Assets/images/partn.png')}}"> -->
+        <img class="worldbank" src="{{asset('Assets/images/worldbank.png')}}">
+        </div>
+
+                        
+                        </div>
+
+
+                        <!--Footer Column-->
+                        <div class="col-lg-2 col-sm-6 col-xs-12 column">
+                            <h2>Quick Access</h2>
+                            <div class="footer-widget links-widget">
+                                <ul>
+                                    <li><a href="{{ route('home') }}">Home</a></li>
+                                    <li><a href="{{ route('aboutNetwork') }}">About Us</a></li>
+                                    <li><a href="{{ route('members') }}">Members</a></li>
+                                    <li><a href="{{ route('events') }}">Events</a></li>
+                                    <li><a href="{{ route('blogs') }}">Blogs</a></li>
+                                    <li><a href="{{ route('news') }}">News</a></li>
+                                    <li><a href="{{ route('contactUs') }}">Contact Us</a></li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+        </div>
+    </div>
+
+    <!--Footer Bottom-->
+    <div class="footer-bottom">
+        <div class="auto-container clearfix">
+            <!--Copyright-->
+            <div class="copyright text-center">Copyright 2025 © <?php echo config('app.name')?></a></div>
+        </div>
+    </div>
+
+</footer>

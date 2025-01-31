@@ -41,10 +41,3 @@ if (! function_exists('storage_path')) {
         return $path?$base.$path:$base;
     }
 }
-
-if (! function_exists('template_path')) {
-    function template_path($path=null) {
-        $base = dirname(__DIR__).'/template';
-        return $path?$base.$path:$base;
-    }
-}

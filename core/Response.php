@@ -85,9 +85,25 @@ class Response
         return $this;
     }
 
+    public function getJsonResponseData($data=null,$status,$message){
+        return [
+            'status'=>$status,
+            'message'=>$message,
+            'data'=>$data,
+        ];
+    }
+
+    public function getJsonErrorResponseData($trace=null,$status,$message){
+        return [
+            'status'=>$status,
+            'message'=>$message,
+            'trace'=>$trace
+        ];
+    }
+
     public function json($data, $status = 200)
     {
-        $this->setstatus($status);
+        $this->setStatus($status);
         $this->header('Content-Type', 'application/json');
         $this->content = json_encode($data);
         return $this;
@@ -95,7 +111,7 @@ class Response
 
     public function text($content, $status = 200)
     {
-        $this->setstatus($status);
+        $this->setStatus($status);
         $this->header('Content-Type', 'text/plain');
         $this->content = $content;
         return $this;
@@ -103,7 +119,7 @@ class Response
 
     public function view($view, $data = [])
     {
-        $this->setstatus(200);
+        $this->setStatus(200);
         $this->header('Content-Type', 'text/html');
         $this->content = $this->renderView($view, $data);
         return $this;
@@ -112,20 +128,19 @@ class Response
     protected function renderView($view, $data=null)
     {
         extract($data); 
-        ob_start();
         include template_path("/".str_replace('.', '/', $view).'.phtml'); 
-        return ob_get_clean(); 
+        return $output; 
     }
 
     public function download($filePath, $filename = null)
     {
         if (!file_exists($filePath)) {
-            $this->setstatus(404);
+            $this->setStatus(404);
             $this->content = 'File not found.';
             return $this;
         }
 
-        $this->setstatus(200);
+        $this->setStatus(200);
         $this->header('Content-Type', 'application/octet-stream');
         $this->header('Content-Disposition', 'attachment; filename="' . ($filename ?? basename($filePath)) . '"');
         $this->content = file_get_contents($filePath);
@@ -134,7 +149,7 @@ class Response
 
     public function redirect($url, $status = 302)
     {
-        $this->setstatus($status);
+        $this->setStatus($status);
         $this->header('Location', $url);
         return $this;
     }

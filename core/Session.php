@@ -47,8 +47,7 @@ class Session {
     public function startSession() {
 
         session_set_cookie_params($this->lifetime, $this->path, $this->domain, $this->secure, $this->httpOnly);
-
-        session_start();
+        session_name($this->cookieName);
 
         if ($this->encrypt) {
             $this->encryptAllData();
@@ -61,8 +60,7 @@ class Session {
         if ($this->sameSite) {
             ini_set('session.cookie_samesite', $this->sameSite);
         }
-
-        session_name($this->cookieName);
+        session_start();
     }
 
     public function set($key, $value) {

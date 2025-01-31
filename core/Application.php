@@ -2,9 +2,12 @@
 
 namespace Core;
 
+use App\views\render\CoreView;
 use Exception;
 use Facade\Log as logger;
+use Facade\Request as req;
 use Facade\Response as Resp;
+use Facade\Route as Router;
 use Traits\EnvironmentTrait;
 
 class Application
@@ -41,9 +44,8 @@ class Application
         new Log();
         return $this;
     }
-    private function loadRoutes(){
-        (new Route())
-        ->loadRoutes();
+    private function bootRoutes(){
+        new Route(Request::getInstance());
         return $this;
     }
 
@@ -57,13 +59,14 @@ class Application
         ->bootConfig()
         ->bootRequest()
         ->bootResponse()
+        ->bootRoutes()
         ->bootLogger();
         return $this;
     }
 
     public function send(){
         try{
-            $this->loadRoutes();
+            Router::loadRoutes()->dispatch();
         }catch(Exception $e){
             $this->handleException($e);
         }
@@ -75,9 +78,29 @@ class Application
             'trace'=> $e->getTraceAsString()
         ]);
 
-        if(config('app.debug')){
-            Resp::view('errors.debug',['message'=>$e->getMessage(),'trace'=>$e->getTraceAsString()])->send();
+        if(Req::isJsonResponse()){
+            $this->handleJsonExceptionResponse($e);
+        }else{
+            $this->handleHtmlExceptionResponse($e);
         }
+
+    }
+
+    private function handleJsonExceptionResponse($e){
+        if(config('app.debug')){
+            resp::json(resp::getJsonErrorResponseData($e->getTraceAsString(),'error',$e->getMessage()))->send();       
+        }else{
+            resp::json(resp::getJsonErrorResponseData(null,'error','Something Went Wrong!'))->send();        
+        }
+    }
+
+    private function handleHtmlExceptionResponse($e){
+        if(config('app.debug')){
+            CoreView::init()->render('errors.debug',['message'=>$e->getMessage(),'trace'=>$e->getTraceAsString()]);
+        }else{
+            CoreView::init()->render('errors.production',['message'=>'Something Went Wrong!']);
+        }
+        
     }
 
     

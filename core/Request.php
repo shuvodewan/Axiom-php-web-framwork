@@ -45,8 +45,9 @@ class Request
     }
 
     private function captureBase(){
-        $this->uri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-        $this->method = $_SERVER['REQUEST_METHOD'];
+        $uri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+        $this->uri = $uri==''?'/':$uri;
+        $this->method = Str::toLower($_SERVER['REQUEST_METHOD']);
         return $this;
     }
 
@@ -78,38 +79,76 @@ class Request
     }
 
     public function isJsonResponse(){
-        return strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false;
+        return strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false;
     }
     
     public function isXmlResponse(){
-        return strpos($_SERVER['CONTENT_TYPE'], 'application/xml') !== false || strpos($_SERVER['CONTENT_TYPE'], 'text/xml') !== false;
+        return strpos($_SERVER['HTTP_ACCEPT'], 'application/xml') !== false || strpos($_SERVER['CONTENT_TYPE'], 'text/xml') !== false;
     }
     
     public function isHtmlResponse(){
-        return strpos($_SERVER['CONTENT_TYPE'], 'text/html') !== false;
+        return strpos($_SERVER['HTTP_ACCEPT'], 'text/html') !== false;
     }
     
     public function isFormResponse(){
-        return strpos($_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded') !== false;
+        return strpos($_SERVER['HTTP_ACCEPT'], 'application/x-www-form-urlencoded') !== false;
     }
     
     public function isMultipartFormResponse(){
-        return strpos($_SERVER['CONTENT_TYPE'], 'multipart/form-data') !== false;
+        return strpos($_SERVER['HTTP_ACCEPT'], 'multipart/form-data') !== false;
     }
     
     public function isPlainTextResponse(){
-        return strpos($_SERVER['CONTENT_TYPE'], 'text/plain') !== false;
+        return strpos($_SERVER['HTTP_ACCEPT'], 'text/plain') !== false;
     }
     
     public function isJavascriptResponse(){
-        return strpos($_SERVER['CONTENT_TYPE'], 'application/javascript') !== false || strpos($_SERVER['CONTENT_TYPE'], 'text/javascript') !== false;
+        return strpos($_SERVER['HTTP_ACCEPT'], 'application/javascript') !== false || strpos($_SERVER['CONTENT_TYPE'], 'text/javascript') !== false;
     }
     
     public function isCssResponse(){
+        return strpos($_SERVER['HTTP_ACCEPT'], 'text/css') !== false;
+    }
+
+    public function isJsonRequest() {
+        return strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false;
+    }
+    
+    public function isXmlRequest() {
+        return strpos($_SERVER['CONTENT_TYPE'], 'application/xml') !== false || strpos($_SERVER['CONTENT_TYPE'], 'text/xml') !== false;
+    }
+    
+    public function isHtmlRequest() {
+        return strpos($_SERVER['CONTENT_TYPE'], 'text/html') !== false;
+    }
+    
+    public function isFormRequest() {
+        return strpos($_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded') !== false;
+    }
+    
+    public function isMultipartFormRequest() {
+        return strpos($_SERVER['CONTENT_TYPE'], 'multipart/form-data') !== false;
+    }
+    
+    public function isPlainTextRequest() {
+        return strpos($_SERVER['CONTENT_TYPE'], 'text/plain') !== false;
+    }
+    
+    public function isJavascriptRequest() {
+        return strpos($_SERVER['CONTENT_TYPE'], 'application/javascript') !== false || strpos($_SERVER['CONTENT_TYPE'], 'text/javascript') !== false;
+    }
+    
+    public function isCssRequest() {
         return strpos($_SERVER['CONTENT_TYPE'], 'text/css') !== false;
     }
 
     public function getHeader($key){
-        return $this->headers[Str::camelToKebab($key)];
+        return isset($this->headers[$key])?$this->headers[$key]:null;
+    }
+    public function getBody($key){
+        return isset($this->body[$key])?$this->body[$key]:null;
+    }
+    public function getQuery($key){
+        return isset($this->query[$key])?$this->query[$key]:null;
     }
 }
