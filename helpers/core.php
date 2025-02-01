@@ -24,15 +24,15 @@ if (! function_exists('config')) {
 }
 
 if (! function_exists('session')) {
-    function session($key, $default=null) {
-        return Session::getInstance();
+    function session() {
+        return (new Session());
     }
 }
 
 if (! function_exists('csrf_token')) {
     function csrf_token() {
         $token = Hash::make(random_bytes(32));
-        Session::getInstance()->set('csrf_token',[
+        session()->set('csrf_token',[
             'token'=>$token,
             'expires_at' => Carbon::now()->addMinutes(config('app.csrf_expire_time'))->toDateTimeString()
         ]);
