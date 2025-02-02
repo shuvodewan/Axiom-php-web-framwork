@@ -12,17 +12,17 @@ class CsrfProtectionMiddleware implements MiddlewareContract
 {
     
     static function handle($request,$next){
+      
         if($request->method=='post'){
-            if(!$token = Session::getInstance()->get(self::getCsrfToken($request))){
+            if(!$token = self::getCsrfToken($request)){
                 throw new Exception('Page Expired');
             }else{
                 if(self::verify_csrf($token)){
-                    $next($request);
+                    return $next($request);
                 }
             }
             throw new Exception('Page Expired');
         } 
-
         $next($request);
     }
 
@@ -33,8 +33,8 @@ class CsrfProtectionMiddleware implements MiddlewareContract
 
 
     static function verify_csrf($token){
-        if($csrf_token = session('csrf_token')){
-           return hash_equals($csrf_token['token'], $token) && Carbon::now()->greaterThan(Carbon::parse($csrf_token['expire_time']));
+        if($csrf_token = session()->get('csrf_token')){
+           return hash_equals($csrf_token['token'], $token) && Carbon::now()->lessThan(Carbon::parse($csrf_token['expire_at']));
         }
     }
 }

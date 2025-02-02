@@ -9,34 +9,26 @@
                  <div class="col-lg-12 p0-menu">
                      <!-- Logo -->
                      <div class="logo">
-                         <a href="{{ route('home') }}"><img src="<?php echo assets('Assets/images/logo.svg') ?>"
+                         <a href="/"><img src="<?php echo assets('Assets/images/logo.svg') ?>"
                                  alt=""></a>
                      </div>
 
                      <!--Nav Outer-->
                      <div class="nav-outer clearfix">
                          <div class="nav-right">
+                            <?php if($user): ?>
                                  <!-- user-profile-drop-down -->
                                  <div class="user-profile-drop-down ms-1">
                                      <div class="btn-group">
                                          <button type="button" class="btn btn-danger dropdown-toggle"
                                              data-bs-toggle="dropdown" aria-expanded="false">
-                                             <img src="{{ $user->avatar ? Storage::url($user->avatar) : asset('Assets/images/profile/uploadimage.png') }}"
+                                             <img src="<?php echo $user->avatar ? storage()->url($user->avatar) : assets('Assets/images/profile/avatar.png') ?>"
                                                  alt="profile" class="img-responsive" />
-                                             <span>shuvo</span>
+                                             <span><?php echo $user->name ?></span>
                                          </button>
                                          <ul class="dropdown-menu mt-3">
                                                  <li><a class="dropdown-item" href="{{ route('profile') }}"><i
                                                              class="fa-solid fa-gauge me-2 text-gray"></i>Profile</a>
-                                                 </li>
-
-                                                 <li><a class="dropdown-item" href="{{ route('profile',['tab'=>'contacts'])  }}"><i
-                                                             class="fa-regular fa-user me-2  text-gray"></i>My Contacts
-                                                     </a>
-                                                 </li>
-                                                 <li><a class="dropdown-item" href="{{ route('jobListings') }}"><i
-                                                             class="fa-regular fa-file me-2  text-gray"></i>Job
-                                                         Listings</a>
                                                  </li>
                                              <li>
                                                  <hr class="dropdown-divider">
@@ -47,18 +39,19 @@
                                    document.getElementById('logout-form').submit();"><i
                                                          class="fa fa-sign-out text-danger"></i>
                                                      Logout</a>
-                                                 <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                                 <form id="logout-form" action="/auth/logout" method="POST"
                                                      style="display: none;">
-                                                     @csrf
+                                                    <input type="hidden" value="<?php echo csrf_token() ?>" name="csrf_token">
                                                  </form>
                                              </li>
                                          </ul>
                                      </div>
                                  </div>
                                  <!-- end user-profile-drop-down -->
-
+                                <?php else: ?>
                                  <li class="logon-li"><i class="fa-regular fa-user"></i><a
-                                         href="{{ route('login') }}">Login</a></li>
+                                         href="/auth/login">Login</a></li>
+                                <?php endif; ?>       
 
 
                          </div>

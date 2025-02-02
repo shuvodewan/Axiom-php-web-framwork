@@ -12,6 +12,7 @@ class Route
 
     protected $middlewares='';
     public $request;
+    private $currentRoute;
     public $routes=[
         'get'=>[],
         'post'=>[],

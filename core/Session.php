@@ -72,8 +72,23 @@ class Session {
         $_SESSION[$key] = $value;
     }
 
+    public function has($key) {
+        return $_SESSION[$key];
+    }
+
+    public function pull($key){
+        $value = $this->get($key);
+        unset($_SESSION[$key]);
+        return $value;
+    }
+
     public function get($key) {
-        $value = $_SESSION[$key];
+
+        if(empty($_SESSION[$key])){
+            return;
+        }
+
+        $value =  $_SESSION[$key];
         
         if($this->encrypt){
             return Crypt::decrypt($value);

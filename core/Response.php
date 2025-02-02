@@ -70,6 +70,8 @@ class Response
         $this->setCookies();
 
         echo $this->content;
+        
+        exit;  
     }
 
 
@@ -104,6 +106,9 @@ class Response
     public function json($data, $status = 200)
     {
         $this->setStatus($status);
+        if(count(Validator::$errorsBag)){
+            $data['errors']=Validator::$errorsBag;
+        }
         $this->header('Content-Type', 'application/json');
         $this->content = json_encode($data);
         return $this;

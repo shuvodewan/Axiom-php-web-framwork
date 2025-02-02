@@ -8,7 +8,9 @@ class Register{
         'web'=>[
             StartSessionMiddleware::class,
             CsrfProtectionMiddleware::class
-        ]
+        ],
+        'guest'=>GuestMiddleware::class,
+        'auth'=>AuthMiddleware::class,
     ]; 
 
 

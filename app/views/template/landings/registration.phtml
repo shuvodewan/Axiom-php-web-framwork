@@ -41,7 +41,7 @@
                         <div class="card m-5 mb-0 mlr-0-res">
                             <div class="">
                                 <div class="single-profile-img p-5 bg-gray-pic resp-pall">
-                                    <img :src="me.avatar" alt="single-profile-img-1" class="img-responsive">
+                                    <img :src="avatar" alt="single-profile-img-1" class="img-responsive">
                                     <form action="" class="file-upload">
                                         <div class=" btn-greenradiousphoto">
                                             <input type="file" @change="setPreview($event.target.files)" id="img" name="img" accept="image/*" style="display: none;">
@@ -52,7 +52,7 @@
                                 </div>
                             </div>
                         </div>
-                        <span x-show="getError('avatar_upload')" class="text-danger"><i class="fa-solid fa-circle-exclamation me-1"></i><span x-text="getError('avatar_upload')"></span></span>
+                        <span x-show="getError('avatar')" class="text-danger"><i class="fa-solid fa-circle-exclamation me-1"></i><span x-text="getError('avatar')"></span></span>
                     </div>
                     <!-- .col-lg-8 -->
                     <div class="col-lg-6">
@@ -71,7 +71,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="country-mobile-area">
-                                                <label x-show="country_code" class="country-label" x-text="country_code"></label>
+                                                <label class="country-label" >+88</label>
                                                 <div class="single-form mt-4">
                                                     <label class="form-label"> <span x-show="me.type=='organization'">Organization</span> Mobile
                                                         Number: <sup class="text-danger supc">*</sup></label>
@@ -82,7 +82,7 @@
                                         </div>
                                         <div class="col-md-12">
                                             <div class="single-form mt-4">
-                                                <label class="form-label"> <span x-show="me.type=='organization'">Organization</span> Email:
+                                                <label class="form-label">Email:
                                                     <sup class="text-danger supc">*</sup></label>
                                                 <input x-model="me.email" type="email" class="form-control">
                                             </div>
@@ -128,15 +128,20 @@
 <?php $content = ob_get_clean() ?>
 
 <?php ob_start() ?>
-    <script src="{{ asset('Assets/plugins/ckeditor/ckeditor.js') }}"></script>
-    <script src="{{ asset('Assets/js/useForm.js') }}"></script>
-    <script src="{{ asset('Assets/js/request.js') }}"></script>
+    <script src="<?php echo assets('Assets/plugins/ckeditor/ckeditor.js') ?>"></script>
+    <script src="<?php echo assets('Assets/js/useForm.js') ?>"></script>
+    <script src="<?php echo assets('Assets/js/request.js') ?>"></script>
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('data', () => ({
                 me: {
-                    avatar: "{{ asset('Assets/images/profile/uploadimage.png') }}",
+                    name:null,
+                    phone:null,
+                    email:null,
+                    password:null,
+                    password_confirmation:null
                 },
+                avatar: "<?php echo assets('Assets/images/profile/uploadimage.png') ?>",
                 errors: {},
 
                 getError(name) {
@@ -147,8 +152,8 @@
                 },
 
                 setPreview(files) {
-                    this.me.avatar_upload = files[0]
-                    this.me.avatar = URL.createObjectURL(files[0])
+                    this.me.avatar = files[0]
+                    this.avatar = URL.createObjectURL(files[0])
                 },
 
 
@@ -162,15 +167,15 @@
                             if (result && result.errors) {
                                 this.errors = result.errors
                             }
-
-                            if (result.status == 'success') {
+                            console.log(result.status)
+                            if (result.status) {
                                 toasts.push({
                                     title: 'Success',
                                     content: `Registration Successful`,
                                     style: 'success',
                                     dismissAfter: '1s'
                                 });
-                                window.location.assign("/");
+                                // window.location.assign("/");
                             } else {
                                 toasts.push({
                                     title: 'Failed',

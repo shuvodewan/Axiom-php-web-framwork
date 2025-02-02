@@ -1,0 +1,40 @@
+<?php $title = "Profile" ?>
+
+<?php ob_start() ?>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<?php $top_js = ob_get_clean() ?>    
+
+<?php ob_start() ?>
+
+<div x-data="data">
+    <section class="bg-Profile banner-section all-sub-banner profile-new">
+        <div class="page-header-overlay">
+            <div class="container container-profile">
+
+                <div class="profile-user-all">
+                    <div class="profile-img-left">
+                        <img src="<?php echo $user->avatar ? storage()->url($user->avatar) : assets('Assets/images/profile/avatar.png') ?>"
+                            alt="single-profile-img-1" class="img-responsive">
+                    </div>
+                    <div class="user-pr-details">
+                        <h3 class="pt-3"><?php echo $user->name ?></h3>
+                        <p class="mb-0">
+                            <?php echo $user->email ?> ,<?php echo $user->phone ?>
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+            <!-- .container -->
+        </div>
+        <!-- .page-header-overlay -->
+    </section>
+<!-- contact-request-end TAB -->
+
+</div>
+
+</section>
+</div>
+
+<?php $content = ob_get_clean() ?>
+<?php require layout_path('/landings/landing.phtml') ?>

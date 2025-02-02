@@ -1,0 +1,96 @@
+<?php $title = "Login" ?> 
+
+<?php ob_start() ?>
+
+<section class="bg-page-header banner-section">
+    <div class="page-header-overlay">
+        <div class="auto-container">
+            <div class="row">
+                <div class="page-header">
+                    <div class="page-title-registration">
+                        <h2>Login</h2>
+                    </div>
+                    <!-- .page-title -->
+                    <div class="page-header-content">
+                        <ol class="breadcrumb">
+                            <li><a href="/">Home</a></li>
+                            <li class="current ">Login</li>
+                        </ol>
+                    </div> 
+                    <!-- .page-header-content -->
+                </div>
+                <!-- .page-header -->
+            </div>
+            <!-- .row -->
+        </div>
+        <!-- .container -->
+    </div>
+    <!-- .page-header-overlay -->
+</section>
+<div class="section login-register-section">
+    <div class="auto-container">
+
+        <!-- Login & Register Wrapper Start -->
+        <div class="login-register-wrap">
+            <div class="row ">
+                <div class="col-lg-6 offset-lg-3">
+
+                    <!-- Login & Register Box Start -->
+                    <div class="login-register-box">
+                        <!-- Section Title Start -->
+                        <div class="about-greengrowth-content mt-4">
+                            <h2 class="text-center">Login</h2>
+                            <!-- Section Title End -->
+                        </div>
+                        <div class="login-register-form">
+                            <form action="/auth/login" method="post">
+                                <input type="hidden" value="<?php echo csrf_token() ?>" name="csrf_token">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class=" single-form mt-4">
+                                            <label class="form-label">Email</label>
+                                        </div>
+                                        <div class="form-box">
+                                            <i class="fa fa-user"></i>
+                                            <input type="email" value="" name="email" placeholder="Email">
+                                        </div>
+                                    </div>
+                                    <?php if(errors('email')): ?>
+                                    <span >
+                                        <p class="text-danger"><i class="fa-solid fa-triangle-exclamation me-1"></i> <?php echo errors('email') ?></p>
+                                    </span>
+                                    <?php endif; ?>
+
+                                    <div class="col-md-12">
+                                        <div class="single-form mt-4">
+                                            <label class="form-label">Password</label>
+                                        </div>
+                                        <div class="form-box ">
+                                            <i class="fa fa-lock"></i><input type="password" name="password" placeholder="Password">
+                                        </div>
+
+                                    </div>
+                                    <div class="button-box"><a href="{{route('forgetPassword')}}" class="float-left small">Forgot
+                                            password?</a>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="d-flex mt-5">
+                                    <button class="btn  btn-greenradious2 m-auto ">Login <i class="fa-solid fa-right-to-bracket ps-2"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- Login & Register Box End -->
+
+                </div>
+            </div>
+        </div>
+        <!-- Login & Register Wrapper End -->
+
+    </div>
+</div>
+<?php $content = ob_get_clean() ?>
+<?php require layout_path('/landings/landing.phtml') ?>

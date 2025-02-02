@@ -3,15 +3,17 @@
 namespace Core;
 
 use Facade\Str;
+use Traits\FileTrait;
 
 class Request
 {
+    use FileTrait;
+
     static $instance;
     public $uri;
     public $method;
     public $body=[];
     public $query=[];
-    public $files=[];
     public $agent=[];
     public $headers=[];
     public $userIp;
@@ -38,6 +40,7 @@ class Request
         $this->captureBase()
         ->captureQueryStrings()
         ->capturePostBody()
+        ->captureFiles()
         ->captureHeaders()
         ->captureUserAgent()
         ->captureUserIp();
@@ -61,9 +64,14 @@ class Request
         return $this;
     }
 
+    private function captureFiles(){
+        $this->setFiles();
+        return $this;
+    }
+
     private function captureHeaders(){
         $this->headers = array_map(function($value) {
-            return strtolower($value);
+            return $value;
         }, array_change_key_case(getallheaders(), CASE_LOWER));
 
         return $this;
@@ -150,5 +158,9 @@ class Request
     }
     public function getQuery($key){
         return isset($this->query[$key])?$this->query[$key]:null;
+    }
+
+    public function getUri(){
+        return $this->uri;
     }
 }

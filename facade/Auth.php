@@ -3,14 +3,14 @@
 namespace Facade;
 
 use Contract\FacadeContract;
-use Core\Route as CoreRoute;
+use Core\Auth as CoreAuth;
 use Traits\FacadeTrait;
 
-class Route implements FacadeContract
+class Auth implements FacadeContract
 {
     use FacadeTrait;
     
     public static function getInstance(){
-        return CoreRoute::getInstance();
+        return new CoreAuth();
     }
 }

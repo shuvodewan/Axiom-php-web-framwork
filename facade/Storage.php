@@ -3,14 +3,14 @@
 namespace Facade;
 
 use Contract\FacadeContract;
-use Core\Route as CoreRoute;
+use Core\Storage as CoreStorage;
 use Traits\FacadeTrait;
 
-class Route implements FacadeContract
+class Storage implements FacadeContract
 {
     use FacadeTrait;
     
     public static function getInstance(){
-        return CoreRoute::getInstance();
+        return new CoreStorage();
     }
 }

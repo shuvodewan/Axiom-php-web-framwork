@@ -52,7 +52,24 @@
     <script src="<?php echo assets('Assets/js/bootstrap.min.js') ?>"></script>
     <script src="<?php echo assets('Assets/js/script.js') ?>"></script>
     <script src="<?php echo assets('Assets/js/toaster.js') ?>"></script>
-
+    <script src="<?php echo assets('Assets/js/toaster.js') ?>"></script>
+    <script>
+        <?php if(session()->has('success')): ?>
+            toasts.push({
+                title: 'Success',
+                content: `<?php echo session()->get('success') ?>`,
+                style: 'success',
+                dismissAfter: '1s'
+            });
+        <?php elseif(session()->has('error')): ?>
+            toasts.push({
+                title: 'Failed',
+                content: `<?php echo session()->get('error') ?>`,
+                style: 'error',
+                dismissAfter: '1s'
+            });
+        <?php endif ?>
+    </script>
     <script>
         $(document).on('click', '.pass-view', function(event) {
             var $open = $(this).children('.fa-eye');
@@ -74,7 +91,6 @@
     <?php echo $js ?>
 
     <script src='https://unpkg.com/aos@2.3.0/dist/aos.js'></script>
-
     <script>
         AOS.init({
             duration: 1200,
