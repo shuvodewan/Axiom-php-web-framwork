@@ -30,8 +30,16 @@ class AuthController
         }
 
         if($user = User::findByEmail($request->getBody('email'))){
-
+          if(Hash::check($request->getBody('password'),$user->password)){
+            Auth::login($user);
+            session()->set('success','You are logged in');
+            Response::redirect('/profile')->send();
+          }
         }
+
+        session()->set('error','In correct email or password ');
+        Response::redirect('/auth/login')->send();
+
     }
 
     public function registration($request){
@@ -83,6 +91,7 @@ class AuthController
     public function logOut($request){
         Auth::logout();
         session()->regenerateId();
+        Response::redirect('/auth/login')->send();
     }
     
 

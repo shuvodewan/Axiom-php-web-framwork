@@ -27,7 +27,7 @@
                                              <span><?php echo $user->name ?></span>
                                          </button>
                                          <ul class="dropdown-menu mt-3">
-                                                 <li><a class="dropdown-item" href="{{ route('profile') }}"><i
+                                                 <li><a class="dropdown-item" href="/profile"><i
                                                              class="fa-solid fa-gauge me-2 text-gray"></i>Profile</a>
                                                  </li>
                                              <li>
@@ -76,7 +76,7 @@
                              <div class="navbar-collapse collapse clearfix" id="bs-example-navbar-collapse-1">
                                  <ul class="navigation">
 
-                                     <li class="{{ Request::url() === route('home') ? 'current' : '' }}"><a
+                                     <li class="/"><a
                                              href="{{ route('home') }}">HOME</a>
 
                                      </li>

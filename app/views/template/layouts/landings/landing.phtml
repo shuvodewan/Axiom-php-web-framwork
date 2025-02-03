@@ -61,6 +61,7 @@
                 style: 'success',
                 dismissAfter: '1s'
             });
+           <?php  unset($_SESSION['success']) ?>
         <?php elseif(session()->has('error')): ?>
             toasts.push({
                 title: 'Failed',
@@ -68,6 +69,7 @@
                 style: 'error',
                 dismissAfter: '1s'
             });
+            <?php  unset($_SESSION['error']) ?>
         <?php endif ?>
     </script>
     <script>
