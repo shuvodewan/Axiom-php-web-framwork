@@ -2,8 +2,6 @@
 
 namespace Core;
 
-use Facade\Request;
-
 class Response
 {
     static    $instance;

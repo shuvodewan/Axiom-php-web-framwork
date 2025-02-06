@@ -3,7 +3,7 @@
 namespace App\views\render;
 
 use Core\View;
-use Facade\Auth;
+use Core\facade\Auth;
 
 class LandingView extends View
 {

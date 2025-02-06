@@ -3,8 +3,8 @@
 namespace App\middlewares;
 
 use Contract\MiddlewareContract;
-use Facade\Auth;
-use Facade\Response;
+use Core\facade\Auth;
+use Core\facade\Response;
 
 class GuestMiddleware implements MiddlewareContract
 {

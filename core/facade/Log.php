@@ -1,16 +1,16 @@
 <?php
 
-namespace Facade;
+namespace Core\facade;
 
 use Contract\FacadeContract;
-use Core\Config as CoreConfig;
+use Core\Log as CoreLog;
 use Traits\FacadeTrait;
 
-class Config implements FacadeContract
+class Log implements FacadeContract
 {
     use FacadeTrait;
     
     public static function getInstance(){
-        return CoreConfig::getInstance();
+        return CoreLog::getInstance();
     }
 }

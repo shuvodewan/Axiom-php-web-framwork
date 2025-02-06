@@ -1,6 +1,6 @@
 <?php
 
-namespace Facade;
+namespace Core\facade;
 
 use Contract\FacadeContract;
 use Core\Str as CoreStr;

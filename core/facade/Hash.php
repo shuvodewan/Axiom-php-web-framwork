@@ -1,16 +1,16 @@
 <?php
 
-namespace Facade;
+namespace Core\facade;
 
 use Contract\FacadeContract;
-use Core\Auth as CoreAuth;
+use Core\Hash as CoreHash;
 use Traits\FacadeTrait;
 
-class Auth implements FacadeContract
+class Hash implements FacadeContract
 {
     use FacadeTrait;
     
     public static function getInstance(){
-        return new CoreAuth();
+        return new CoreHash();
     }
 }

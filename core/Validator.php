@@ -2,7 +2,7 @@
 
 namespace Core;
 
-use Facade\Request;
+use Core\facade\Request;
 
 class Validator
 {

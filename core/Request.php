@@ -2,7 +2,7 @@
 
 namespace Core;
 
-use Facade\Str;
+use Core\facade\Str;
 use Traits\FileTrait;
 
 class Request

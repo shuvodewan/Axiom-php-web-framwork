@@ -1,16 +1,16 @@
 <?php
 
-namespace Facade;
+namespace Core\facade;
 
 use Contract\FacadeContract;
-use Core\Hash as CoreHash;
+use Core\Route as CoreRoute;
 use Traits\FacadeTrait;
 
-class Hash implements FacadeContract
+class Route implements FacadeContract
 {
     use FacadeTrait;
     
     public static function getInstance(){
-        return new CoreHash();
+        return CoreRoute::getInstance();
     }
 }

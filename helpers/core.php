@@ -4,9 +4,9 @@ use Carbon\Carbon;
 use Core\Application;
 use Core\Session;
 use Core\Storage;
-use Facade\Config;
-use Facade\Hash;
-use Facade\Request;
+use Core\facade\Config;
+use Core\facade\Hash;
+use Core\facade\Request;
 
 if (! function_exists('env')) {
     function env($key, $default=null) {

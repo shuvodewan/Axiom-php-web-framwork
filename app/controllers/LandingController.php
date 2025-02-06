@@ -4,7 +4,6 @@ namespace App\controllers;
 
 use App\views\render\LandingView;
 use Exception;
-use Facade\Auth;
 
 class LandingController
 {

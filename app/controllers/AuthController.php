@@ -6,11 +6,9 @@ use App\models\User;
 use App\serialize\UserSerializers;
 use App\views\render\LandingView;
 use Core\Validator;
-use Exception;
-use Facade\Auth;
-use Facade\Hash;
-use Facade\Response;
-use Facade\Route;
+use Core\facade\Auth;
+use Core\facade\Hash;
+use Core\facade\Response;
 
 class AuthController
 {

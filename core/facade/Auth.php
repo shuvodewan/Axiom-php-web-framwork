@@ -1,16 +1,16 @@
 <?php
 
-namespace Facade;
+namespace Core\facade;
 
 use Contract\FacadeContract;
-use Core\Response as CoreResponse;
+use Core\Auth as CoreAuth;
 use Traits\FacadeTrait;
 
-class Response implements FacadeContract
+class Auth implements FacadeContract
 {
     use FacadeTrait;
     
     public static function getInstance(){
-        return CoreResponse::getInstance();
+        return new CoreAuth();
     }
 }

@@ -2,7 +2,7 @@
 
 use App\controllers\AuthController;
 use App\controllers\LandingController;
-use Facade\Route;
+use Core\facade\Route;
 
 //Route doesn't support nested group yet!
 

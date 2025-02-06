@@ -1,7 +1,8 @@
 <?php
 namespace Core;
 
-use Facade\Crypt;
+use Core\facede\Crypt;
+
 class Session {
 
     static  $instance;

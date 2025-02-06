@@ -4,10 +4,10 @@ namespace Core;
 
 use App\views\render\CoreView;
 use Exception;
-use Facade\Log as logger;
-use Facade\Request as req;
-use Facade\Response as Resp;
-use Facade\Route as Router;
+use Core\facade\Log as logger;
+use Core\facade\Request as req;
+use Core\facade\Response as Resp;
+use Core\facade\Route as Router;
 use Traits\EnvironmentTrait;
 
 class Application

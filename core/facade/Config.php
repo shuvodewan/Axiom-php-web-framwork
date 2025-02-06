@@ -1,16 +1,16 @@
 <?php
 
-namespace Facade;
+namespace Core\facade;
 
 use Contract\FacadeContract;
-use Core\Storage as CoreStorage;
+use Core\Config as CoreConfig;
 use Traits\FacadeTrait;
 
-class Storage implements FacadeContract
+class Config implements FacadeContract
 {
     use FacadeTrait;
     
     public static function getInstance(){
-        return new CoreStorage();
+        return CoreConfig::getInstance();
     }
 }

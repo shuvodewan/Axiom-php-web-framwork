@@ -1,6 +1,6 @@
 <?php
 
-use Facade\Str;
+use Core\facade\Str;
 
 return [
 
