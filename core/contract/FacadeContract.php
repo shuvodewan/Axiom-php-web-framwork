@@ -1,6 +1,6 @@
 <?php
 
-namespace Contract;
+namespace Core\contract;
 
 interface FacadeContract
 {

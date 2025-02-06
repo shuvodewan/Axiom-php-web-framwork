@@ -2,7 +2,7 @@
 
 namespace Core\facade;
 
-use Contract\FacadeContract;
+use Core\contract\FacadeContract;
 use Core\Crypt as CoreCrypt;
 use Traits\FacadeTrait;
 

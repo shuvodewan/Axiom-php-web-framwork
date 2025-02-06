@@ -23,7 +23,7 @@
             "Contract\\":"contract/"
         },
         "files": [
-            "helpers/helper.php"
+            "core/helpers/helper.php"
         ]
     }
 }

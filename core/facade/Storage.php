@@ -2,7 +2,7 @@
 
 namespace Core\facade;
 
-use Contract\FacadeContract;
+use Core\contract\FacadeContract;
 use Core\Storage as CoreStorage;
 use Traits\FacadeTrait;
 
