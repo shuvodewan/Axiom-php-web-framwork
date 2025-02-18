@@ -8,11 +8,10 @@ use Core\facade\Log as logger;
 use Core\facade\Request as req;
 use Core\facade\Response as Resp;
 use Core\facade\Route as Router;
-use Traits\EnvironmentTrait;
+use Core\traits\EnvironmentTrait;
 
 class Application
 {
-
     use EnvironmentTrait;
 
     static $instance;

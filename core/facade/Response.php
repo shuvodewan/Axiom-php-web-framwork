@@ -4,7 +4,7 @@ namespace Core\facade;
 
 use Core\contract\FacadeContract;
 use Core\Response as CoreResponse;
-use Traits\FacadeTrait;
+use Core\traits\FacadeTrait;
 
 class Response implements FacadeContract
 {

@@ -4,7 +4,7 @@ namespace Core\facade;
 
 use Core\contract\FacadeContract;
 use Core\Auth as CoreAuth;
-use Traits\FacadeTrait;
+use Core\traits\FacadeTrait;
 
 class Auth implements FacadeContract
 {

@@ -4,7 +4,7 @@ namespace Core\facade;
 
 use Core\contract\FacadeContract;
 use Core\Request as CoreRequest;
-use Traits\FacadeTrait;
+use Core\traits\FacadeTrait;
 
 class Request implements FacadeContract
 {

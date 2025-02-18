@@ -4,7 +4,7 @@ namespace Core\facade;
 
 use Core\contract\FacadeContract;
 use Core\Storage as CoreStorage;
-use Traits\FacadeTrait;
+use Core\traits\FacadeTrait;
 
 class Storage implements FacadeContract
 {

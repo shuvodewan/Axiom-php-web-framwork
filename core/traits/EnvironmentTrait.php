@@ -1,6 +1,6 @@
 <?php
 
-namespace Traits;
+namespace Core\traits;
 
 use Dotenv\Dotenv;
 

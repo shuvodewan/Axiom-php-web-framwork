@@ -4,7 +4,7 @@ namespace App\middlewares;
 
 use App\exception\PageExpireException;
 use Carbon\Carbon;
-use Contract\MiddlewareContract;
+use Core\contract\MiddlewareContract;
 use Core\Session;
 use Exception;
 

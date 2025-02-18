@@ -3,7 +3,7 @@
 namespace Core;
 
 use Core\facade\Str;
-use Traits\FileTrait;
+use Core\traits\FileTrait;
 
 class Request
 {

@@ -2,7 +2,7 @@
 
 namespace App\middlewares;
 
-use Contract\MiddlewareContract;
+use Core\contract\MiddlewareContract;
 use Core\Session;
 
 class StartSessionMiddleware implements MiddlewareContract

@@ -4,7 +4,7 @@ namespace Core\facade;
 
 use Core\contract\FacadeContract;
 use Core\Hash as CoreHash;
-use Traits\FacadeTrait;
+use Core\traits\FacadeTrait;
 
 class Hash implements FacadeContract
 {

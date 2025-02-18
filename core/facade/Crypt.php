@@ -4,7 +4,7 @@ namespace Core\facade;
 
 use Core\contract\FacadeContract;
 use Core\Crypt as CoreCrypt;
-use Traits\FacadeTrait;
+use Core\traits\FacadeTrait;
 
 class Crypt implements FacadeContract
 {

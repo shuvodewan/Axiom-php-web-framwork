@@ -4,7 +4,7 @@ namespace Core\facade;
 
 use Core\contract\FacadeContract;
 use Core\Log as CoreLog;
-use Traits\FacadeTrait;
+use Core\traits\FacadeTrait;
 
 class Log implements FacadeContract
 {

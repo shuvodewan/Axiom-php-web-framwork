@@ -2,7 +2,7 @@
 
 namespace App\middlewares;
 
-use Contract\MiddlewareContract;
+use Core\contract\MiddlewareContract;
 use Core\facade\Auth;
 use Core\facade\Response;
 
