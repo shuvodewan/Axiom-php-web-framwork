@@ -8,7 +8,8 @@ class Route
 
 {
     protected $router;
-    protected $prefixes = [];
+    protected $prefix;
+    public $name;
     public $middlewares = [];
     public $uri;
     public $controller;
@@ -25,10 +26,15 @@ class Route
         return $this;
     }
 
-    public function prefix($prefix){
-       array_push($this->prefixes,trim($prefix,'/')); 
+    public function prefix(string $prefix){
+        $this->prefix = trim($prefix,'/'); 
        return $this;
     }
+
+    public function name(string $name){
+        $this->name = $name;
+        return $this;
+     }
 
     public function loadRoutes(){
             $files = $this->loadRouteFiles();
@@ -50,22 +56,21 @@ class Route
 
 
     public function group($params=[],$func=null){
+        $parent = $this->setGroupParent();
 
         if(is_callable($params)){
             return $params();
         }
 
         if(is_array($params)){
-            if(isset($params['middleware'])){
-                $this->middlewares = $params['middleware'];
-            }
+           $this->router->setGroupData($params);
         }
         
         if(is_callable($func)){
             call_user_func($func);
         }
 
-        $this->cleanRouteDependencies();
+        $this->cleanGroupData($parent);
     }
 
     public function get($uri, $controller, $action){
@@ -99,7 +104,7 @@ class Route
         }
     }
 
-    private function registerRoutes($uri, $controller, $action){
+    private function registerRoutes($uri, $controller, $action=null){
         $this->uri=$this->setUri($uri);
         $this->controller=$controller;
         $this->action=$action;
@@ -109,7 +114,20 @@ class Route
 
 
     private function setUri($uri){
-       return  $uri = count($this->prefixes)?trim(implode('/',$this->prefixes),'/') . '/' . $uri:$uri;
+       return  $uri =  $this->prefix?$this->prefix . '/' . $uri:$uri;
+    }
+
+    private function setGroupParent(){
+        if(!$this->router->groupParent){
+            $this->router->groupParent = true;
+            return true;
+        }
+    }
+
+    private function cleanGroupData($isParent){
+        if($isParent){
+            $this->router->cleanData();
+        }
     }
 
 }

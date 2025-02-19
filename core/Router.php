@@ -3,6 +3,7 @@
 namespace Core;
 
 use App\middlewares\Register;
+use Core\facade\Cache;
 use Exception;
 
 class Router
@@ -12,13 +13,16 @@ class Router
 
     protected $middlewares=[];
     protected $prefixes=[];
+    protected $names=[];
     public $request;
+    public $groupParent;
     public $routes=[
         'get'=>[],
         'post'=>[],
         'put'=>[],
         'delete'=>[],
         'patch'=>[],
+        'names'=>[]
     ];
 
     public function __construct($request)
@@ -35,46 +39,39 @@ class Router
         return self::$instance;
     }
 
-   public function loadRoutes(){
+    public function loadRoutes(){
+        if($routes = $this->loadFromCache()){
+            $this->routes=$routes;
+        }else{
+          $this->loadFromFile()->setRoutesInCache();  
+        }  
+        dd($this->routes); 
+        return $this;
+    }
+
+    private function loadFromCache(){
+        return Cache::setFormat('serialize')->setSubDir('service')->get('routes');
+    }
+
+    private function setRoutesInCache(){
+        return Cache::setFormat('serialize')->setSubDir('service')->set('routes',$this->routes);
+    }
+
+    private function loadFromFile(){
         $files = $this->loadRouteFiles();
         foreach($files as $file){
             $key = pathinfo($file, PATHINFO_FILENAME);
             include route_path('/'.$file);
         }
+
         return $this;
-   }
+    }
 
     private function loadRouteFiles(){
         $files = scandir(route_path());
         return array_diff($files, array('.', '..'));
     }
 
-    private function getMethodName(){
-        return debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['function'];
-    }
-
-    private function cleanRouteDependencies(){
-        $this->middlewares = '';
-    }
-
-    public function group($params=[],$func=null){
-
-        if(is_callable($params)){
-            return $params();
-        }
-
-        if(is_array($params)){
-            if(isset($params['middleware'])){
-                $this->middlewares = $params['middleware'];
-            }
-        }
-        
-        if(is_callable($func)){
-            call_user_func($func);
-        }
-
-        $this->cleanRouteDependencies();
-    }
 
     public function registerRoutes($method,$route){
         if(isset($route->uri,$this->routes[$method][$route->uri])){
@@ -87,11 +84,30 @@ class Router
             'middleware'=>[...$this->middlewares,...$route->middlewares]
         ];
         $uri = count($this->prefixes)?trim(implode('/',$this->prefixes),'/') . '/' . $route->uri:$route->uri;
-
+        $name = count($this->names)?implode('', $this->names) . '' . $route->name:$route->name;
         $this->routes[$method][$uri]=$params;
+        $name?$this->routes['names'][$name]=$uri:'';
+    }
 
-        var_dump($this->routes);
+    public function setGroupData(array $params){
+        if(isset($params['middlewares'])){
+            $this->setMiddlewares($params['middlewares']);
+        }
 
+        if(isset($params['prefix'])){
+            $this->setPrefix($params['prefix']);
+        }
+
+        if(isset($params['name'])){
+            $this->setName($params['name']);
+        }
+    }
+
+
+    public function cleanData(){
+        $this->middlewares = [];
+        $this->prefixes = [];
+        $this->names = [];
     }
 
 
@@ -107,6 +123,30 @@ class Router
         throw new Exception( $this->request->uri.' route not found',404);
     }
 
+
+    private function setMiddlewares($middlewares){
+        if(!is_array($middlewares)){
+            $this->setSingleMiddleware($middlewares);
+        }else{
+            foreach($middlewares as $middleware){
+                $this->setSingleMiddleware($middleware);
+            }
+        }
+    }
+
+    private function setPrefix(string $prefix){
+       array_push($this->prefixes,trim($prefix,'/'));
+    }
+
+    private function setName(string $name){
+        array_push($this->names,$name);
+    }
+
+
+    private function setSingleMiddleware($middleware){
+        array_push($this->middlewares,$middleware);
+    }
+
     private function getRegisterMiddlewares($middlewares){
         $middlewaresStack = [];
         foreach($middlewares as $middleware){
@@ -117,10 +157,6 @@ class Router
         return array_reverse($middlewaresStack);
     }
 
-    private function executeControllerAction($request,$controller,$action,$params=[]){
-        (new $controller())->$action($request,...$params);
-    }
-
 
     private function handleAction($action,$params=[]){
         $next = array_reduce($this->getRegisterMiddlewares($action['middleware']), function ($next, $middleware) {
@@ -128,12 +164,26 @@ class Router
                 return (new ($middleware))->handle($request, $next);
             };
         }, function($request) use($action,$params){
-            $this->executeControllerAction($request, $action['controller'], $action['action'],$params);
+            if(is_callable($action['controller'])){
+                $this->executeAction($request, $action['controller'],$params);
+            }else{
+                $this->executeControllerAction($request, $action['controller'], $action['action'],$params);
+            }
         });
 
         return $next($this->request);
     }
     
-    
+
+    private function executeControllerAction($request,$controller,$action=null,$params=[]){
+        $action?(new $controller())->$action($request,...$params):(new $controller())();
+    }
+
+    private function executeAction($request,$controller,$action,$params=[]){
+       call_user_func($action($request,...$params));
+    }
+
+
+
 
 }
