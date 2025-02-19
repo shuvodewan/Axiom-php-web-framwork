@@ -10,9 +10,9 @@ class Router
 {
     static $instance;
 
-    protected $middlewares='';
+    protected $middlewares=[];
+    protected $prefixes=[];
     public $request;
-    private $currentRoute;
     public $routes=[
         'get'=>[],
         'post'=>[],
@@ -57,22 +57,6 @@ class Router
         $this->middlewares = '';
     }
 
-    private function registerRoutes($uri, $controller, $action, $middleware=''){
-        $method = $this->getMethodName();
-        if(isset($uri,$this->routes[$method][$uri])){
-            throw new Exception($uri.' Route already defined');
-        }
-
-        $route = [
-            'controller'=>$controller,
-            'action'=>$action,
-            'middleware'=>[...$this->middlewares!=''?explode(",", $this->middlewares):[],...$middleware!=''?explode(",", $middleware):[]]
-        ];
-
-        $this->routes[$method][$uri]=$route;
-    }
-
-
     public function group($params=[],$func=null){
 
         if(is_callable($params)){
@@ -92,24 +76,24 @@ class Router
         $this->cleanRouteDependencies();
     }
 
-    public function get($uri, $controller, $action, $middleware=''){
-       $this->registerRoutes($uri, $controller, $action, $middleware);
-    }
-    public function post($uri, $controller, $action, $middleware=''){
-        $this->registerRoutes($uri, $controller, $action, $middleware);
+    public function registerRoutes($method,$route){
+        if(isset($route->uri,$this->routes[$method][$route->uri])){
+            throw new Exception($route->uri.' Route already defined');
+        }
+
+        $params = [
+            'controller'=>$route->controller,
+            'action'=>$route->action,
+            'middleware'=>[...$this->middlewares,...$route->middlewares]
+        ];
+        $uri = count($this->prefixes)?trim(implode('/',$this->prefixes),'/') . '/' . $route->uri:$route->uri;
+
+        $this->routes[$method][$uri]=$params;
+
+        var_dump($this->routes);
+
     }
 
-    public function put($uri, $controller, $action, $middleware=''){
-        $this->registerRoutes($uri, $controller, $action, $middleware);
-    }
-
-    public function delete($uri, $controller, $action, $middleware=''){
-        $this->registerRoutes($uri, $controller, $action, $middleware);
-    }
-
-    public function patch($uri, $controller, $action, $middleware=''){
-        $this->registerRoutes($uri, $controller, $action, $middleware);
-    }
 
     public function dispatch() {
         
@@ -149,6 +133,7 @@ class Router
 
         return $next($this->request);
     }
+    
     
 
 }

@@ -3,14 +3,14 @@
 namespace Core\facade;
 
 use Core\contract\FacadeContract;
-use Core\Route as CoreRoute;
+use Core\Router as CoreRouter;
 use Core\traits\FacadeTrait;
 
-class Route implements FacadeContract
+class Router implements FacadeContract
 {
     use FacadeTrait;
     
     public static function getInstance(){
-        return new CoreRoute();
+        return CoreRouter::getInstance();
     }
 }

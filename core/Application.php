@@ -7,7 +7,7 @@ use Exception;
 use Core\facade\Log as logger;
 use Core\facade\Request as req;
 use Core\facade\Response as Resp;
-use Core\facade\Route as Router;
+use Core\facade\Router as Rtr;
 use Core\traits\EnvironmentTrait;
 
 class Application
@@ -44,7 +44,7 @@ class Application
         return $this;
     }
     private function bootRoutes(){
-        new Route(Request::getInstance());
+        new Router(Request::getInstance());
         return $this;
     }
 
@@ -65,7 +65,7 @@ class Application
 
     public function send(){
         try{
-            Router::loadRoutes()->dispatch();
+            Rtr::loadRoutes()->dispatch();
         }catch(Exception $e){
             $this->handleException($e);
         }

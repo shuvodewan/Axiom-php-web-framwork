@@ -7,15 +7,37 @@ use Exception;
 class Route
 
 {
+    protected $router;
+    protected $prefixes = [];
+    public $middlewares = [];
+    public $uri;
+    public $controller;
+    public $action;
 
-   public function loadRoutes(){
-        $files = $this->loadRouteFiles();
-        foreach($files as $file){
-            $key = pathinfo($file, PATHINFO_FILENAME);
-            include route_path('/'.$file);
-        }
+    public function __construct()
+    {
+        $this->router = Router::getInstance();
+    }
+
+
+    public function middlewares($middlewares){
+        is_array($middlewares)?$this->setMiddlewares($middlewares):$this->setSingleMiddleware($middlewares);
         return $this;
-   }
+    }
+
+    public function prefix($prefix){
+       array_push($this->prefixes,trim($prefix,'/')); 
+       return $this;
+    }
+
+    public function loadRoutes(){
+            $files = $this->loadRouteFiles();
+            foreach($files as $file){
+                $key = pathinfo($file, PATHINFO_FILENAME);
+                include route_path('/'.$file);
+            }
+            return $this;
+    }
 
     private function loadRouteFiles(){
         $files = scandir(route_path());
@@ -24,14 +46,6 @@ class Route
 
     private function getMethodName(){
         return debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['function'];
-    }
-
-    private function registerRoutes($uri, $controller, $action, $middleware=''){
-        $method = $this->getMethodName();
-        if(isset($uri,$this->routes[$method][$uri])){
-            throw new Exception($uri.' Route already defined');
-        }
-
     }
 
 
@@ -54,23 +68,48 @@ class Route
         $this->cleanRouteDependencies();
     }
 
-    public function get($uri, $controller, $action, $middleware=''){
-       $this->registerRoutes($uri, $controller, $action, $middleware);
+    public function get($uri, $controller, $action){
+       $this->registerRoutes($uri, $controller, $action);
     }
-    public function post($uri, $controller, $action, $middleware=''){
-        $this->registerRoutes($uri, $controller, $action, $middleware);
-    }
-
-    public function put($uri, $controller, $action, $middleware=''){
-        $this->registerRoutes($uri, $controller, $action, $middleware);
+    public function post($uri, $controller, $action){
+        $this->registerRoutes($uri, $controller, $action);
     }
 
-    public function delete($uri, $controller, $action, $middleware=''){
-        $this->registerRoutes($uri, $controller, $action, $middleware);
+    public function put($uri, $controller, $action){
+        $this->registerRoutes($uri, $controller, $action);
     }
 
-    public function patch($uri, $controller, $action, $middleware=''){
-        $this->registerRoutes($uri, $controller, $action, $middleware);
+    public function delete($uri, $controller, $action){
+        $this->registerRoutes($uri, $controller, $action);
+    }
+
+    public function patch($uri, $controller, $action){
+        $this->registerRoutes($uri, $controller, $action);
+    }
+
+
+    private function setSingleMiddleware($middleware){
+        !is_array($middleware)?array_push($this->middlewares,$middleware):'';
+    }
+
+
+    private function setMiddlewares($middlewares){
+        foreach($middlewares as $middleware){
+            $this->setSingleMiddleware($middleware);
+        }
+    }
+
+    private function registerRoutes($uri, $controller, $action){
+        $this->uri=$this->setUri($uri);
+        $this->controller=$controller;
+        $this->action=$action;
+
+        $this->router->registerRoutes($this->getMethodName(),$this);
+    }
+
+
+    private function setUri($uri){
+       return  $uri = count($this->prefixes)?trim(implode('/',$this->prefixes),'/') . '/' . $uri:$uri;
     }
 
 }
