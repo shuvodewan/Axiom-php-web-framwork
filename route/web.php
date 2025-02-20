@@ -17,7 +17,7 @@ use Core\facade\Route;
 
 Route::group(['middleware'=>'web'],function(){
     Route::get('/',LandingController::class,'index');
-    Route::get('/home',LandingController::class,'index');
+    Route::get('home',LandingController::class,'index');
     //Auth
     Route::get('auth/login',AuthController::class,'login','guest');
     Route::post('auth/login',AuthController::class,'authenticate','guest');

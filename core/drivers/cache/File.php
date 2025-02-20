@@ -13,7 +13,7 @@ class File implements CacheContract {
    
     public function __construct() {
 
-        $this->cacheDir = base_path('/cache');
+        $this->cacheDir = storage_path('/cache');
         if (!is_dir($this->cacheDir)) {
             mkdir($this->cacheDir, 0777, true);
         }

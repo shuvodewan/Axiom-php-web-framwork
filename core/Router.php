@@ -45,7 +45,6 @@ class Router
         }else{
           $this->loadFromFile()->setRoutesInCache();  
         }  
-        dd($this->routes); 
         return $this;
     }
 
@@ -83,7 +82,7 @@ class Router
             'action'=>$route->action,
             'middleware'=>[...$this->middlewares,...$route->middlewares]
         ];
-        $uri = count($this->prefixes)?trim(implode('/',$this->prefixes),'/') . '/' . $route->uri:$route->uri;
+        $uri = count($this->prefixes)?trim(implode('/',$this->prefixes),'/') . '/' . $route->uri:trim($route->uri,'/');
         $name = count($this->names)?implode('', $this->names) . '' . $route->name:$route->name;
         $this->routes[$method][$uri]=$params;
         $name?$this->routes['names'][$name]=$uri:'';
@@ -182,8 +181,5 @@ class Router
     private function executeAction($request,$controller,$action,$params=[]){
        call_user_func($action($request,...$params));
     }
-
-
-
 
 }
