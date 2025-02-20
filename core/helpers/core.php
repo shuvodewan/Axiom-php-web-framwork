@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Core\Application;
+use Core\console\Preview;
 use Core\Session;
 use Core\Storage;
 use Core\facade\Config;
@@ -21,23 +22,29 @@ if (! function_exists('env')) {
 if (!function_exists('dd')) {
     function dd(...$vars)
     {
-        echo '<style>';
-        echo '    body { font-family: "Arial", sans-serif; margin: 0; padding: 0; background-color: #333; color: #fff; font-size: 14px; }';
-        echo '    .dd-container { padding: 20px; max-width: 900px; margin: 50px auto; background-color: #222; border-radius: 5px; }';
-        echo '    pre { color: #fff; background-color: #222; padding: 10px; border-radius: 3px; overflow-x: auto; }';
-        echo '    code { color: #ffcc00; font-size: 14px; }';
-        echo '    .dd-header { font-size: 20px; color: #ffcc00; padding-bottom: 10px; }';
-        echo '</style>';
-
-        echo '<div class="dd-container">';
-        echo '<div class="dd-header">Dumped Variables:</div>';
-
-        foreach ($vars as $var) {
-            echo "<pre>";
-            var_dump($var);
-            echo "</pre>";
+        if(Application::getInstance()->isConsole()){
+            foreach ($vars as $var) {
+              Preview::render($var);
+            }
+        }else{
+            echo '<style>';
+            echo '    body { font-family: "Arial", sans-serif; margin: 0; padding: 0; background-color: #333; color: #fff; font-size: 14px; }';
+            echo '    .dd-container { padding: 20px; max-width: 900px; margin: 50px auto; background-color: #222; border-radius: 5px; }';
+            echo '    pre { color: #fff; background-color: #222; padding: 10px; border-radius: 3px; overflow-x: auto; }';
+            echo '    code { color: #ffcc00; font-size: 14px; }';
+            echo '    .dd-header { font-size: 20px; color: #ffcc00; padding-bottom: 10px; }';
+            echo '</style>';
+    
+            echo '<div class="dd-container">';
+            echo '<div class="dd-header">Dumped Variables:</div>';
+    
+            foreach ($vars as $var) {
+                echo "<pre>";
+                var_dump($var);
+                echo "</pre>";
+            }
         }
-
+       
         die(1);
     }
 }

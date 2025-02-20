@@ -3,6 +3,7 @@
 namespace Core;
 
 use App\views\render\CoreView;
+use Core\console\Preview;
 use Exception;
 use Core\facade\Log as logger;
 use Core\facade\Request as req;
@@ -15,6 +16,8 @@ class Application
     use EnvironmentTrait;
 
     static $instance;
+
+    protected $isConsole=false;
 
     public function __construct()
     {
@@ -48,6 +51,11 @@ class Application
         return $this;
     }
 
+    private function setConsole(){
+        $this->isConsole = true;
+        return $this;
+    }
+
     public function bootConfig(){
         new Config();
         return $this;
@@ -61,6 +69,18 @@ class Application
         ->bootRoutes()
         ->bootLogger();
         return $this;
+    }
+
+    public function bootConsole(){
+        $this->setConsole()
+        ->loadEnv()
+        ->bootConfig()
+        ->bootLogger();
+        return $this;
+    }
+
+    public function isConsole(){
+        return $this->isConsole;
     }
 
     public function send(){
@@ -101,6 +121,5 @@ class Application
         }
         
     }
-
     
 }

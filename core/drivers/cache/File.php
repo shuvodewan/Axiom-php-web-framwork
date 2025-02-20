@@ -55,7 +55,7 @@ class File implements CacheContract {
     }
 
     public function clear() {
-        array_map('unlink', glob($this->cacheDir . '/*.cache'));
+        array_map('unlink', glob($this->cacheDir. '/' . $this->subdir . '/*.cache'));
     }
 
     private function getFilePath(string $key): string {

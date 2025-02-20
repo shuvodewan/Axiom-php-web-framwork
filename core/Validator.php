@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Core\console\Preview;
 use Core\facade\Request;
 
 class Validator
@@ -12,10 +13,10 @@ class Validator
     protected $rules;
     protected $errors = [];
 
-    public function __construct($request, $rules)
+    public function __construct($data, $rules)
     {
-        $this->data = $request->body;
-        $this->files = $request->getFiles();
+        $this->data =  is_array($data)?$data:$data->body;
+        $this->files = is_array($data)?:$data->getFiles();
         $this->rules = $rules;
     }
 
@@ -138,6 +139,13 @@ class Validator
     }
 
     public function setToResponse(){
+        if(Application::getInstance()->isConsole()){
+            foreach($this->errors as $error){
+                Preview::render($error[0]);
+            }
+            return;
+        }
+
         if(!empty($this->errors)){
             Request::isJsonResponse()
             ?self::$errorsBag = $this->errors

@@ -1,0 +1,10 @@
+<?php
+
+use Core\Application;
+use Core\console\Kernel;
+
+require __DIR__.'/vendor/autoload.php';
+
+$app = (new Application())->bootConsole();
+
+(new Kernel())->handle($_SERVER['argv']);
