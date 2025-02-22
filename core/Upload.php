@@ -1,19 +1,20 @@
 <?php
 
 namespace Core;
+
+use Core\facade\Filesystem;
+
 class Upload
 {
-    protected $uploadPath;
-    protected $dir;
     protected $file;
-    protected $disk;
+    protected $filesystem;
     public $name;
     public $type;
     public $size;
 
     public function __construct($file)
     {
-        $this->disk = config('disk.default');
+        $this->filesystem = Filesystem::instance();
         $this->file = $file;
         $this->name = $file['name'];
         $this->type = $file['type'];
@@ -22,24 +23,20 @@ class Upload
 
     public function save($name = null,$path=null)
     {
-        $dir = config('disk'.'.'.$this->disk.'.path') . $path;
-
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
-        }
-
+        
         $extension = pathinfo($this->file['name'], PATHINFO_EXTENSION);
         $fileName = $name ? "$name.$extension" : uniqid() . ".$extension";
-        $target = $dir . '/' . $fileName;
-        if (move_uploaded_file($this->file['tmp_name'], $target)) {
-            return  $path .'/'. $fileName;
+        $target =$path?$path . '/' . $fileName:$fileName;
+        $content = file_get_contents($this->file['tmp_name']);
+        if ($this->filesystem->put($target,$content)) {
+            return $target;
         } else {
             return false;
         }
     }
 
-    public function disk($diskName){
-        $this->disk=$diskName;
+    public function disk(string $name){
+        $this->filesystem->disk($name);
         return $this;
     }
 }

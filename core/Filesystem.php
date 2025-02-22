@@ -28,14 +28,23 @@ class Filesystem
         return $this->setDriver();
     }
 
-    public function get(string $path)
+    public function getDisk(string $name)
     {
-        return $this->setDriver()->read($path);
+        return $this->disk;
     }
 
-    public function put(string $path, string $contents)
+    public function get(string $path)
     {
-        $this->setDriver()->write($path, $contents);
+        return $this->setDriver()->read($this->setDiskPath($path));
+    }
+
+    public function put(string $path = null, string $contents)
+    {
+        return $this->setDriver()->write($this->setDiskPath($path), $contents);
+    }
+
+    public function setDiskPath($path = null){
+        return trim($path,'/');
     }
 
     public function delete(string $path)
@@ -53,13 +62,13 @@ class Filesystem
     }
 
     private function setDriver(){
-        $driver = config('filesystem.' . $this->disk . 'driver');
+        $driver = config('filesystem.disks.' . $this->disk . '.driver');
         if(!array_key_exists($driver,$this->registerDrivers)){
             throw new Exception("$driver driver not found");
         }
 
         if(!array_key_exists($driver,$this->drivers)){
-            $this->drivers[$driver] = new $this->registerDrivers[$driver](config('filesystem.' . $this->disk));
+            $this->drivers[$driver] = new $this->registerDrivers[$driver](config('filesystem.disks.' . $this->disk));
         }
 
         return $this->drivers[$driver];

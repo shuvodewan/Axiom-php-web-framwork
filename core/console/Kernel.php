@@ -16,7 +16,7 @@ class Kernel
     {
 
         $this->commands = [
-            'app-cash:clear'=>AppCashClearCommand::class,
+            'app-cache:clear'=>AppCashClearCommand::class,
             'app-start'=>AppServeCommand::class,
         ];
     }

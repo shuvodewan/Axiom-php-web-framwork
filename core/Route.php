@@ -73,22 +73,22 @@ class Route
         $this->cleanGroupData($parent);
     }
 
-    public function get($uri, $controller, $action){
+    public function get($uri, $controller, $action=null){
        $this->registerRoutes($uri, $controller, $action);
     }
-    public function post($uri, $controller, $action){
+    public function post($uri, $controller, $action=null){
         $this->registerRoutes($uri, $controller, $action);
     }
 
-    public function put($uri, $controller, $action){
+    public function put($uri, $controller, $action=null){
         $this->registerRoutes($uri, $controller, $action);
     }
 
-    public function delete($uri, $controller, $action){
+    public function delete($uri, $controller, $action=null){
         $this->registerRoutes($uri, $controller, $action);
     }
 
-    public function patch($uri, $controller, $action){
+    public function patch($uri, $controller, $action=null){
         $this->registerRoutes($uri, $controller, $action);
     }
 

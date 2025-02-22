@@ -16,6 +16,9 @@ use Core\facade\Route;
 //  Route::get('update',LandingController::class,'update');
 
 Route::group(['middleware'=>'web'],function(){
+    Route::get('test',function($request){
+        dd($request);
+    });
     Route::get('/',LandingController::class,'index');
     Route::get('home',LandingController::class,'index');
     //Auth

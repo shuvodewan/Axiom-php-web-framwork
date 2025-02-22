@@ -7,8 +7,8 @@ use League\Flysystem\Local\LocalFilesystemAdapter;
 
 class Local extends Filesystem
 {
-    public function __construct(string $root)
+    public function __construct(array $config)
     {
-        parent::__construct(new LocalFilesystemAdapter($root));
+        parent::__construct(new LocalFilesystemAdapter($config['root']));
     }
 }

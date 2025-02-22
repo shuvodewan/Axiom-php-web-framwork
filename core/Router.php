@@ -40,11 +40,16 @@ class Router
     }
 
     public function loadRoutes(){
-        if($routes = $this->loadFromCache()){
-            $this->routes=$routes;
+        if(config('app.mode')=='production' && !config('app.route_closure')){
+            if($routes = $this->loadFromCache()){
+                $this->routes=$routes;
+            }else{
+              $this->loadFromFile()->setRoutesInCache();  
+            }  
         }else{
-          $this->loadFromFile()->setRoutesInCache();  
-        }  
+            $this->loadFromFile();
+        }
+
         return $this;
     }
 
@@ -114,7 +119,7 @@ class Router
         
         foreach ($this->routes[Request::getInstance()->method] as $path => $action) {
             $pattern = preg_replace('/\{([^\/]+)\}/', '([^\/]+)', $path);
-            if (preg_match("#^$pattern$#", $this->request->uri, $matches)) {
+            if (preg_match("#^$pattern$#", $this->request->uri=='/'?'':$this->request->uri, $matches)) {
                 array_shift($matches);
                 return $this->handleAction($action,$matches);
             }
@@ -178,8 +183,8 @@ class Router
         $action?(new $controller())->$action($request,...$params):(new $controller())();
     }
 
-    private function executeAction($request,$controller,$action,$params=[]){
-       call_user_func($action($request,...$params));
+    private function executeAction($request,$action,$params=[]){
+       call_user_func($action,[$request,...$params]);
     }
 
 }
