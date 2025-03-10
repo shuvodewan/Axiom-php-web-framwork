@@ -11,6 +11,8 @@ class AppCashClearCommand extends Command
     {
         return [];
     }
+
+    
     public function handle(){
         $this->start('App cache cleaning');
         $this->empty();

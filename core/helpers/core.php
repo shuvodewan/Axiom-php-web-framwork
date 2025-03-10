@@ -4,10 +4,10 @@ use Carbon\Carbon;
 use Core\Application;
 use Core\console\Preview;
 use Core\Session;
-use Core\Storage;
 use Core\facade\Config;
 use Core\facade\Hash;
 use Core\facade\Request;
+use Core\Filesystem;
 
 if (! function_exists('env')) {
     function env($key, $default=null) {
@@ -82,7 +82,7 @@ if (! function_exists('assets')) {
 
 if (! function_exists('storage')) {
     function storage() {
-        return new Storage();
+        return new Filesystem();
     }
 }
 

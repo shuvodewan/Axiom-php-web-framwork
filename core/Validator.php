@@ -4,10 +4,13 @@ namespace Core;
 
 use Core\console\Preview;
 use Core\facade\Request;
+use Core\traits\ValidatorRules;
 
 class Validator
 {
-    static $errorsBag=[];
+    use ValidatorRules;
+
+    static $errorsBag = [];
     protected $data;
     protected $files;
     protected $rules;
@@ -15,8 +18,8 @@ class Validator
 
     public function __construct($data, $rules)
     {
-        $this->data =  is_array($data)?$data:$data->body;
-        $this->files = is_array($data)?:$data->getFiles();
+        $this->data = is_array($data) ? $data : $data->body;
+        $this->files = is_array($data) ? : $data->getFiles();
         $this->rules = $rules;
     }
 
@@ -26,6 +29,9 @@ class Validator
             $value = $this->data[$field] ?? null;
 
             foreach (explode('|', $rules) as $rule) {
+                if(is_callable($rule)){
+                    $rule($field, $value??$this->files[$field], $this);
+                }
                 $this->applyRule($field, $value, $rule);
             }
         }
@@ -40,95 +46,52 @@ class Validator
         if (strpos($rule, ':') !== false) {
             list($rule, $params) = explode(':', $rule);
         }
+        
 
         switch ($rule) {
             case 'required':
-                if (empty($value) && !isset($this->files[$field])) {
-                    $this->addError($field, "$field is required.");
-                }
+                $this->validateRequired($field, $value);
                 break;
 
             case 'email':
-                if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                    $this->addError($field, "$field must be a valid email.");
-                }
+                $this->validateEmail($field, $value);
                 break;
 
             case 'unique':
-                if ($value && (new Database())->isUnique($params,$field,$value)) {
-                    $this->addError($field, "$field exist.");
-                }
-                break;    
+                $this->validateUnique($field, $value, $params);
+                break;
 
             case 'min':
-                if (strlen($value) < $params) {
-                    $this->addError($field, "$field must be at least $params characters.");
-                }
+                $this->validateMin($field, $value, $params);
                 break;
 
             case 'max':
-                if (strlen($value) > $params) {
-                    $this->addError($field, "$field may not be greater than $params characters.");
-                }
+                $this->validateMax($field, $value, $params);
                 break;
 
             case 'regex':
-                if (!preg_match($params, $value)) {
-                    $this->addError($field, "$field has an invalid format.");
-                }
+                $this->validateRegex($field, $value, $params);
                 break;
 
             case 'match':
-                if(!isset($this->data[$params])){
-                    $this->addError($field, "$params is required.");
-                    break;
-                }
-
-                if ($value !== $this->data[$params]) {
-                    $this->addError($field, "$field must match with $params.");
-                }
+                $this->validateMatch($field, $value, $params);
                 break;
 
             case 'mimes':
-                $types = explode(',', $params);
-
-                if(!isset($this->files[$field])){
-                    $this->addError($field, "$field must be a file of type: " . implode(', ', $types) . ".");
-                }
-
-                $fileType =explode('/', $this->files[$field]->type)[1];
-                if (!in_array($fileType, array_map('trim', $types))) {
-                    $this->addError($field, "$field must be a file of type: " . implode(', ', $types) . ".");
-                }
+                $this->validateMimes($field, $params);
                 break;
 
             case 'file_max':
-
-                if(!isset($this->files[$field])){
-                    $this->addError($field, "$field must be a file of");
-                }
-
-                $max = (int) $params * 1024;
-                if ($this->files[$field]->size > $max) {
-                    $this->addError($field, "$field must not be larger than $params KB.");
-                }
+                $this->validateFileMax($field, $params);
                 break;
 
             case 'file_min':
-
-                if(!isset($this->files[$field])){
-                    $this->addError($field, "$field must be a file of");
-                }
-
-                $minSize = (int) $params * 1024; 
-                if ($this->files[$field]->size < $minSize) {
-                    $this->addError($field, "$field must be at least $value KB.");
-                }
-                break;     
+                $this->validateFileMin($field, $params);
+                break;
         }
     }
 
-    protected function addError($field, $message)
+    public function addError($field, $message)
     {
         $this->errors[$field][] = $message;
     }
@@ -138,18 +101,19 @@ class Validator
         return $this->errors;
     }
 
-    public function setToResponse(){
-        if(Application::getInstance()->isConsole()){
-            foreach($this->errors as $error){
+    public function setToResponse()
+    {
+        if (Application::getInstance()->isConsole()) {
+            foreach ($this->errors as $error) {
                 Preview::render($error[0]);
             }
             return;
         }
 
-        if(!empty($this->errors)){
+        if (!empty($this->errors)) {
             Request::isJsonResponse()
-            ?self::$errorsBag = $this->errors
-            :session()->set(Request::getUri(),$this->errors);
+                ? self::$errorsBag = $this->errors
+                : session()->set(Request::getUri(), $this->errors);
         }
     }
 }

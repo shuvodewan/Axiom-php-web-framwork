@@ -9,6 +9,7 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('/app'),
+            'url' => storage_path('/app'),
         ],
 
         'public' => [

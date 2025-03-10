@@ -10,6 +10,8 @@ class AppServeCommand extends Command
     {
        return []; 
     }
+
+    
     public function handle(){
 
         $host = $this->argument('host')??'localhost';

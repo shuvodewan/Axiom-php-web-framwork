@@ -15,7 +15,7 @@ class Filesystem
         's3'=>S3::class,
     ];
 
-    public function __construct(string $disk=null)
+    public function __construct($disk=null)
     {
         $this->disk = !$disk?config('filesystem.default'):$disk;
 
@@ -38,7 +38,7 @@ class Filesystem
         return $this->setDriver()->read($this->setDiskPath($path));
     }
 
-    public function put(string $path = null, string $contents)
+    public function put(string $contents,$path = null)
     {
         return $this->setDriver()->write($this->setDiskPath($path), $contents);
     }
@@ -59,6 +59,10 @@ class Filesystem
     public function exists(string $path)
     {
         return $this->setDriver()->fileExists($path);
+    }
+
+    public function url(){
+        return $this->setDriver()->getUrl();
     }
 
     private function setDriver(){
