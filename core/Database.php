@@ -2,44 +2,39 @@
 
 namespace Core;
 
+use Core\drivers\database\Sql;
 use Exception;
-use PDO;
-use PDOException;
 
 class Database
 {
-    static $instance = null;
-    private $pdo;
 
-    public function __construct()
-    {
-        try {
-            $host = config('database.host');
-            $port = config('database.port');
-            $database = config('database.database');
-            $username = config('database.username');
-            $password = config('database.password');
+    protected $drivers = [
+        'sql'=>Sql::class
+    ];
 
-            $this->pdo = new PDO("mysql:host=".$host.";port=".$port.";dbname=".$database.";charset=utf8mb4", $username, $password);
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
-        } catch (PDOException $e) {
-            throw new Exception("Database connection failed: " . $e->getMessage(),$e->getCode(),$e);
+    protected $connection;
+
+
+    public function connect($connection=null){
+        
+        if(!$config = config('database.' . ($connection??config('database.default')))){
+            throw new Exception('Connection not found');
         }
-    }
 
-    static function getInstance()
-    {
-        if (self::$instance === null) {
-            self::$instance = new static();
+
+        if(!in_array($config['driver'], $this->drivers)){
+            throw new Exception('Driver not found');
         }
-        return self::$instance->pdo;
+
+        $driver = $this->drivers[$config['driver']];
+
+        if(!$this->connection instanceof $driver){
+            $this->connection = new ($config);
+        }
+
+        return $this->connection;
+
     }
 
-    public function isUnique($table, $column, $value)
-    {
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM $table WHERE $column = :value");
-        $stmt->execute([':value' => $value]);
-        return $stmt->fetchColumn() != 0;
-    }
+   
 }
