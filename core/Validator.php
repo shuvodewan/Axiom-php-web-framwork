@@ -5,6 +5,7 @@ namespace Core;
 use Core\console\Preview;
 use Core\facade\Request;
 use Core\traits\ValidatorRules;
+use Exception;
 
 class Validator
 {
@@ -16,15 +17,27 @@ class Validator
     protected $rules;
     protected $errors = [];
 
-    public function __construct($data, $rules)
+    public function __construct($data=null, $rules=null)
     {
+        if($data && $rules){
+            $this->setData($data,$rules);
+        }
+    }
+
+    public function setData($data, $rules){
         $this->data = is_array($data) ? $data : $data->body;
         $this->files = is_array($data) ? : $data->getFiles();
         $this->rules = $rules;
+
+        return $this;
     }
 
     public function validate()
     {
+        if(!$this->data || $this->rules){
+            throw New Exception('!Required data missing');
+        }
+
         foreach ($this->rules as $field => $rules) {
             $value = $this->data[$field] ?? null;
 
