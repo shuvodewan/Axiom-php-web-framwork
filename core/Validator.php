@@ -34,7 +34,7 @@ class Validator
 
     public function validate()
     {
-        if(!$this->data || $this->rules){
+        if(!$this->data || !$this->rules){
             throw New Exception('!Required data missing');
         }
 
@@ -100,6 +100,10 @@ class Validator
 
             case 'file_min':
                 $this->validateFileMin($field, $params);
+                break;
+
+            case 'in':
+                $this->validateIn($field, $value, $params);
                 break;
         }
     }

@@ -83,4 +83,74 @@ class Str
     public function unique(){
         return bin2hex(random_bytes(16));
     }
+
+    public function plural($word)
+    {
+        $irregular = [
+            'child' => 'children',
+            'person' => 'people',
+            'man' => 'men',
+            'woman' => 'women',
+            'tooth' => 'teeth',
+            'foot' => 'feet',
+            'mouse' => 'mice',
+            'goose' => 'geese',
+            'ox' => 'oxen'
+        ];
+
+        if (isset($irregular[$word])) {
+            return $irregular[$word];
+        }
+
+        if (preg_match('/(s|x|z|ch|sh)$/i', $word)) {
+            return $word . 'es';
+        }
+
+        if (preg_match('/y$/i', $word) && !preg_match('/[aeiou]y$/i', $word)) {
+            return substr($word, 0, -1) . 'ies';
+        }
+
+        if (preg_match('/(f|fe)$/i', $word)) {
+            return preg_replace('/(f|fe)$/i', 'ves', $word);
+        }
+
+        return $word . 's';
+    }
+
+    public function singular($word)
+    {
+        $irregular = [
+            'children' => 'child',
+            'people' => 'person',
+            'men' => 'man',
+            'women' => 'woman',
+            'teeth' => 'tooth',
+            'feet' => 'foot',
+            'mice' => 'mouse',
+            'geese' => 'goose',
+            'oxen' => 'ox'
+        ];
+
+        if (isset($irregular[$word])) {
+            return $irregular[$word];
+        }
+
+        if (preg_match('/(s|x|z|ch|sh)es$/i', $word)) {
+            return substr($word, 0, -2);
+        }
+
+        if (preg_match('/ies$/i', $word) && !preg_match('/[aeiou]ies$/i', $word)) {
+            return substr($word, 0, -3) . 'y';
+        }
+
+        if (preg_match('/ves$/i', $word)) {
+            return preg_replace('/ves$/i', 'f', $word);
+        }
+
+        if (preg_match('/s$/i', $word) && !preg_match('/ss$/i', $word)) {
+            return substr($word, 0, -1);
+        }
+
+        return $word;
+    }
 }

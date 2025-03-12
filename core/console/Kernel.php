@@ -4,6 +4,7 @@ namespace Core\console;
 
 use Core\console\commands\AppCashClearCommand;
 use Core\console\commands\AppServeCommand;
+use Core\console\commands\CreateApplicationCommand;
 use Core\facade\Cache;
 use Core\facade\Log;
 use Exception;
@@ -16,8 +17,9 @@ class Kernel
     {
 
         $this->commands = [
-            'app-cache:clear'=>AppCashClearCommand::class,
-            'app-start'=>AppServeCommand::class,
+            'project-cache:clear'=>AppCashClearCommand::class,
+            'project-start'=>AppServeCommand::class,
+            'app-create'=>CreateApplicationCommand::class,
         ];
     }
 

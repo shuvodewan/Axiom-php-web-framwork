@@ -103,4 +103,13 @@ trait ValidatorRules
         }
     }
 
+    protected function validateIn($field, $value, $params)
+    {
+        $allowedValues = explode(',', $params);
+
+        if (!in_array($value, array_map('trim', $allowedValues))) {
+            $this->addError($field, "$field must be one of the following: " . implode(', ', $allowedValues) . ".");
+        }
+    }
+
 }

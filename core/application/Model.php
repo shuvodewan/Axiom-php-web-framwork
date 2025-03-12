@@ -1,6 +1,6 @@
 <?php
 
-namespace Core;
+namespace Core\application;
 
 use Core\application\repository\SqlRepository;
 use stdClass;
