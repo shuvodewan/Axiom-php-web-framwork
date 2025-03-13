@@ -3,12 +3,16 @@
 namespace Core;
 
 use App\views\render\CoreView;
-use Core\console\Preview;
 use Exception;
 use Core\facade\Log as logger;
 use Core\facade\Request as req;
 use Core\facade\Response as Resp;
 use Core\facade\Router as Rtr;
+use Core\http\Request;
+use Core\http\Response;
+use Core\http\Router;
+use Core\support\Config;
+use Core\support\Log;
 use Core\traits\EnvironmentTrait;
 
 class Application

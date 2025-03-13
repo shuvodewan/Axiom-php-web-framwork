@@ -2,7 +2,7 @@
 
 namespace Core\traits;
 
-use Core\Upload;
+use Core\support\Upload;
 
 trait FileTrait
 {

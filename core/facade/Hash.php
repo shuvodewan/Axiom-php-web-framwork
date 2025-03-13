@@ -3,14 +3,14 @@
 namespace Core\facade;
 
 use Core\contract\FacadeContract;
-use Core\Hash as CoreHash;
 use Core\traits\FacadeTrait;
+use Core\util\Hash as UtilHash;
 
 class Hash implements FacadeContract
 {
     use FacadeTrait;
     
     public static function getInstance(){
-        return new CoreHash();
+        return new UtilHash();
     }
 }

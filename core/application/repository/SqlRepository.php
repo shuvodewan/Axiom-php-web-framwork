@@ -3,9 +3,9 @@
 namespace Core\application\repository;
 
 use Carbon\Carbon;
+use Core\application\Model;
 use Core\contract\RepositoryContract;
-use Core\Database;
-use Core\Model;
+use Core\support\Database;
 
 class SqlRepository implements RepositoryContract
 {

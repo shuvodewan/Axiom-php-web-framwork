@@ -13,6 +13,6 @@ return [
     //
 
     'applications'=>[
-        'app.t'
+        'app.test'
     ]
 ];

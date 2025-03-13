@@ -2,8 +2,8 @@
 
 namespace Core\facade;
 
-use Core\Cache as CoreCache;
 use Core\contract\FacadeContract;
+use Core\support\Cache as SupportCache;
 use Core\traits\FacadeTrait;
 
 class Cache implements FacadeContract
@@ -11,6 +11,6 @@ class Cache implements FacadeContract
     use FacadeTrait;
     
     public static function getInstance(){
-        return CoreCache::getInstance();
+        return SupportCache::getInstance();
     }
 }

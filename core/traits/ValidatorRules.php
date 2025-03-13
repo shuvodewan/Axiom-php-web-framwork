@@ -2,7 +2,7 @@
 
 namespace Core\traits;
 
-use Core\Database;
+use Core\support\Database;
 
 trait ValidatorRules
 {

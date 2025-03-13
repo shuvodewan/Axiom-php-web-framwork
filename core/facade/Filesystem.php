@@ -3,7 +3,7 @@
 namespace Core\facade;
 
 use Core\contract\FacadeContract;
-use Core\Filesystem as CoreFilesystem;
+use Core\support\Filesystem as SupportFilesystem;
 use Core\traits\FacadeTrait;
 
 class Filesystem implements FacadeContract
@@ -11,6 +11,6 @@ class Filesystem implements FacadeContract
     use FacadeTrait;
     
     public static function getInstance(){
-        return new CoreFilesystem();
+        return new SupportFilesystem();
     }
 }

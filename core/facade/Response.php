@@ -3,7 +3,7 @@
 namespace Core\facade;
 
 use Core\contract\FacadeContract;
-use Core\Response as CoreResponse;
+use Core\http\Response as HttpResponse;
 use Core\traits\FacadeTrait;
 
 class Response implements FacadeContract
@@ -11,6 +11,6 @@ class Response implements FacadeContract
     use FacadeTrait;
     
     public static function getInstance(){
-        return CoreResponse::getInstance();
+        return HttpResponse::getInstance();
     }
 }

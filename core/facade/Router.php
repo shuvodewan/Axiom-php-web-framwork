@@ -3,7 +3,7 @@
 namespace Core\facade;
 
 use Core\contract\FacadeContract;
-use Core\Router as CoreRouter;
+use Core\http\Router as HttpRouter;
 use Core\traits\FacadeTrait;
 
 class Router implements FacadeContract
@@ -11,6 +11,6 @@ class Router implements FacadeContract
     use FacadeTrait;
     
     public static function getInstance(){
-        return CoreRouter::getInstance();
+        return HttpRouter::getInstance();
     }
 }

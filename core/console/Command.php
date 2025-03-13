@@ -2,7 +2,7 @@
 
 namespace Core\console;
 
-use Core\Validator;
+use Core\http\Validator;
 use Exception;
 
 abstract class Command
@@ -38,7 +38,7 @@ abstract class Command
 
         if(!$validator->validate()){
             $validator->setToResponse();
-            throw new Exception('Failed to start server');
+            throw new Exception('Failed to execute command!');
         }
         
         $this->arguments = $data;

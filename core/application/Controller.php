@@ -2,9 +2,9 @@
 
 namespace Core\application;
 
-use Core\Request;
-use Core\Response;
-use Core\Validator;
+use Core\http\Request;
+use Core\http\Response;
+use Core\http\Validator;
 use Project\CoreView;
 
 class Controller

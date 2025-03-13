@@ -3,8 +3,9 @@
 namespace Core\console;
 
 use Core\console\commands\AppCashClearCommand;
+use Core\console\commands\apps\CreateApplicationCommand;
+use Core\console\commands\apps\DeleteApplicationCommand;
 use Core\console\commands\AppServeCommand;
-use Core\console\commands\CreateApplicationCommand;
 use Core\facade\Cache;
 use Core\facade\Log;
 use Exception;
@@ -20,6 +21,7 @@ class Kernel
             'project-cache:clear'=>AppCashClearCommand::class,
             'project-start'=>AppServeCommand::class,
             'app-create'=>CreateApplicationCommand::class,
+            'app-delete'=>DeleteApplicationCommand::class,
         ];
     }
 

@@ -3,14 +3,14 @@
 namespace Core\facade;
 
 use Core\contract\FacadeContract;
-use Core\Crypt as CoreCrypt;
 use Core\traits\FacadeTrait;
+use Core\util\Crypt as UtilCrypt;
 
 class Crypt implements FacadeContract
 {
     use FacadeTrait;
     
     public static function getInstance(){
-        return new CoreCrypt();
+        return new UtilCrypt();
     }
 }
