@@ -1,8 +1,9 @@
 <?php
 
-namespace Core;
+namespace Axiom\Core;
 
 use App\views\render\CoreView;
+use Axiom\Core\Traits\InstanceTrait;
 use Exception;
 use Core\facade\Log as logger;
 use Core\facade\Request as req;
@@ -13,35 +14,62 @@ use Core\http\Response;
 use Core\http\Router;
 use Core\support\Config;
 use Core\support\Log;
-use Core\traits\EnvironmentTrait;
 
+
+/**
+ * Class Application
+ *
+ * The main application class that manages the application lifecycle.
+ * It handles bootstrapping, environment detection, and exception handling.
+ */
 class Application
 {
     use EnvironmentTrait;
+    use InstanceTrait;
 
-    static $instance;
+    /**
+     * The singleton instance of the Application class.
+     *
+     * @var self|null
+     */
+    private static ?self $instance = null;
 
-    protected $isConsole=false;
+    /**
+     * Indicates whether the application is running in a console environment.
+     *
+     * @var bool
+     */
+    protected bool $isConsole = false;
 
+    /**
+     * Application constructor.
+     *
+     * Initializes the application and sets the singleton instance.
+     */
     public function __construct()
     {
         self::setInstance($this);
         return $this;
     }
 
-    static function setInstance($instance){
-        self::$instance = $instance;
-    }
-
-    static function getInstance(){
-        return self::$instance;
-    }
-    private function bootRequest(){
+    /**
+     * Bootstrap the request handling.
+     *
+     * @return self
+     */
+    private function bootRequest() :self
+    {
         Request::setInstance()->capture();
         return $this;
     }
 
-    private function bootResponse(){
+    /**
+     * Bootstrap the response handling
+     *
+     * @return self
+     */
+    private function bootResponse() :self
+    {
         new Response();
         return $this;
     }

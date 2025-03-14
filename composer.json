@@ -1,6 +1,6 @@
 {
-    "name": "eagleeye/boilerplat",
-    "description": "Boilerplat for php project",
+    "name": "eagleeye/axiomphp",
+    "description": "PHP Framwork",
     "type": "project",
     "license": "MIT",
     "authors": [
@@ -19,12 +19,11 @@
     },
     "autoload":{
         "psr-4":{
-            "App\\":"app/",
-            "Core\\":"core/",
-            "Project\\":"project/"
+            "Axiom\\": "src/",
+            "Axiom\\Project\\": "project/"
         },
         "files": [
-            "core/helpers/helper.php"
+            "src/Helpers/helper.php"
         ]
     }
 }
