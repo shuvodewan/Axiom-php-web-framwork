@@ -3,17 +3,14 @@
 namespace Axiom\Core;
 
 use App\views\render\CoreView;
-use Axiom\Core\Traits\InstanceTrait;
+use Axiom\Core\Http\Request;
+use Axiom\Core\Http\Response;
+use Axiom\Traits\InstanceTrait;
 use Exception;
 use Core\facade\Log as logger;
 use Core\facade\Request as req;
 use Core\facade\Response as Resp;
 use Core\facade\Router as Rtr;
-use Core\http\Request;
-use Core\http\Response;
-use Core\http\Router;
-use Core\support\Config;
-use Core\support\Log;
 
 
 /**

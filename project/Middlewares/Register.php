@@ -1,6 +1,6 @@
 <?php
 
-namespace Project\middlewares;
+namespace Axiom\Project\Middlewares;
 
 class Register{
     

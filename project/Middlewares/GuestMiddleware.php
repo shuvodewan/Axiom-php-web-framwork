@@ -1,10 +1,9 @@
 <?php
 
-namespace Project\middlewares;
+namespace Axiom\Project\Middlewares;
 
 use Core\contract\MiddlewareContract;
 use Core\facade\Auth;
-use Core\facade\Response;
 
 class GuestMiddleware implements MiddlewareContract
 {

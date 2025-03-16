@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\facade;
+namespace Axiom\Facade;
 
 use Core\contract\FacadeContract;
 use Core\http\Response as HttpResponse;

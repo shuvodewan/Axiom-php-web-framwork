@@ -23,9 +23,9 @@ trait InstanceTrait
      * @param self $instance The instance to store.
      * @return self The stored instance.
      */
-    public static function setInstance(self $instance): self
+    public static function setInstance(?self $instance = null): self
     {
-        return self::$instance = $instance;
+        return self::$instance = $instance??new static();
     }
 
     /**

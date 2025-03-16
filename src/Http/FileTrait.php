@@ -1,6 +1,6 @@
 <?php
 
-namespace Axiom\Core\Http;
+namespace Axiom\Http;
 
 use Axiom\Filesystem\Upload;
 use InvalidArgumentException;
