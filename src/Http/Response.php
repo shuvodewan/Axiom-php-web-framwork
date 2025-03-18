@@ -4,6 +4,12 @@ namespace Axiom\Http;
 
 use Axiom\Traits\InstanceTrait;
 
+/**
+ * Response Class
+ *
+ * Handles HTTP responses by setting headers, cookies, and content.
+ * This class supports JSON, plain text, HTML views, file downloads, and redirects.
+ */
 class Response
 {
     use InstanceTrait;
@@ -22,9 +28,6 @@ class Response
 
     /**
      * Constructor.
-     *
-     * @param string $viewsPath Path to the views directory.
-     * @param string $cachePath Path to the cache directory (optional).
      */
     public function __construct()
     {
@@ -61,7 +64,11 @@ class Response
             setcookie(
                 $cookie['name'],
                 $cookie['value'],
-                config('session.expire_on_close') ? $cookie['expires'] ?? config('session.lifetime') : 0
+                $cookie['expires'],
+                $cookie['path'] ?? '/',
+                $cookie['domain'] ?? '',
+                $cookie['secure'] ?? false,
+                $cookie['httponly'] ?? false
             );
         }
     }
@@ -70,10 +77,12 @@ class Response
      * Sets the response content.
      *
      * @param string $content The content to set.
+     * @return self
      */
-    public function setContent(string $content): void
+    public function setContent(string $content): self
     {
         $this->content = $content;
+        return $this;
     }
 
     /**
@@ -122,11 +131,30 @@ class Response
      * @param string $name The cookie name.
      * @param string $value The cookie value.
      * @param int $expires The expiration time in seconds.
+     * @param string $path The path on the server where the cookie is available.
+     * @param string $domain The domain where the cookie is available.
+     * @param bool $secure Whether the cookie should only be sent over HTTPS.
+     * @param bool $httponly Whether the cookie is accessible only through HTTP.
      * @return self
      */
-    public function cookie(string $name, string $value, int $expires = 0): self
-    {
-        $this->cookies[] = ['name' => $name, 'value' => $value, 'expires' => $expires];
+    public function cookie(
+        string $name,
+        string $value,
+        int $expires = 0,
+        string $path = '/',
+        string $domain = '',
+        bool $secure = false,
+        bool $httponly = false
+    ): self {
+        $this->cookies[] = [
+            'name' => $name,
+            'value' => $value,
+            'expires' => $expires,
+            'path' => $path,
+            'domain' => $domain,
+            'secure' => $secure,
+            'httponly' => $httponly,
+        ];
         return $this;
     }
 
@@ -161,15 +189,15 @@ class Response
     }
 
     /**
-     * Renders a Twig template and sends it as the response.
+     * Renders an HTML view and sends it as the response.
      *
-     * @param string $view The view name.
-     * @param array $data The data to pass to the view.
+     * @param string $content The HTML content.
+     * @param int $status The HTTP status code.
      * @return self
      */
-    public function view(string $content): self
+    public function view(string $content, int $status = 200): self
     {
-        $this->setStatus(200);
+        $this->setStatus($status);
         $this->header('Content-Type', 'text/html');
         $this->content = $content;
         return $this;
