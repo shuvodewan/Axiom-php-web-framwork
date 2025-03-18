@@ -8,8 +8,6 @@ use Twig\Loader\FilesystemLoader;
 
 class TwigDriver implements ViewDriverContract
 {
-    use InstanceTrait;
-
     /** @var Environment Twig environment instance. */
     private Environment $twig;
 

@@ -2,153 +2,238 @@
 
 namespace Axiom\Core;
 
-use App\views\render\CoreView;
-use Axiom\Core\Http\Request;
-use Axiom\Core\Http\Response;
+use Axiom\Http\Request;
+use Axiom\Http\Response;
+use Axiom\Http\Router;
 use Axiom\Traits\InstanceTrait;
+use Axiom\Views\CoreView;
 use Exception;
-use Core\facade\Log as logger;
-use Core\facade\Request as req;
-use Core\facade\Response as Resp;
-use Core\facade\Router as Rtr;
-
 
 /**
- * Class Application
+ * Application class.
  *
- * The main application class that manages the application lifecycle.
- * It handles bootstrapping, environment detection, and exception handling.
+ * This class manages the application lifecycle, including bootstrapping,
+ * environment detection, and exception handling.
  */
 class Application
 {
     use EnvironmentTrait;
     use InstanceTrait;
 
-    /**
-     * The singleton instance of the Application class.
-     *
-     * @var self|null
-     */
+    /** @var self|null The singleton instance of the Application class. */
     private static ?self $instance = null;
 
-    /**
-     * Indicates whether the application is running in a console environment.
-     *
-     * @var bool
-     */
+    /** @var bool Indicates whether the application is running in a console environment. */
     protected bool $isConsole = false;
 
     /**
-     * Application constructor.
+     * Constructor.
      *
      * Initializes the application and sets the singleton instance.
      */
     public function __construct()
     {
         self::setInstance($this);
-        return $this;
     }
 
     /**
-     * Bootstrap the request handling.
+     * Bootstraps the request handling.
      *
      * @return self
      */
-    private function bootRequest() :self
+    private function bootRequest(): self
     {
         Request::setInstance()->capture();
         return $this;
     }
 
     /**
-     * Bootstrap the response handling
+     * Bootstraps the response handling.
      *
      * @return self
      */
-    private function bootResponse() :self
+    private function bootResponse(): self
     {
         new Response();
         return $this;
     }
 
-    private function bootLogger(){
+    /**
+     * Bootstraps the logger.
+     *
+     * @return self
+     */
+    private function bootLogger(): self
+    {
         new Log();
         return $this;
     }
-    private function bootRoutes(){
+
+    /**
+     * Bootstraps the routes.
+     *
+     * @return self
+     */
+    private function bootRoutes(): self
+    {
         new Router(Request::getInstance());
         return $this;
     }
 
-    private function setConsole(){
+    /**
+     * Sets the application to console mode.
+     *
+     * @return self
+     */
+    private function setConsole(): self
+    {
         $this->isConsole = true;
         return $this;
     }
 
-    public function bootConfig(){
+    /**
+     * Bootstraps the configuration.
+     *
+     * @return self
+     */
+    public function bootConfig(): self
+    {
         new Config();
         return $this;
     }
 
-    public function boot(){
+    /**
+     * Bootstraps the application for web requests.
+     *
+     * @return self
+     */
+    public function boot(): self
+    {
         $this->loadEnv()
-        ->bootConfig()
-        ->bootRequest()
-        ->bootResponse()
-        ->bootRoutes()
-        ->bootLogger();
+            ->bootConfig()
+            ->bootRequest()
+            ->bootResponse()
+            ->bootRoutes()
+            ->bootLogger();
         return $this;
     }
 
-    public function bootConsole(){
+    /**
+     * Bootstraps the application for console commands.
+     *
+     * @return self
+     */
+    public function bootConsole(): self
+    {
         $this->setConsole()
-        ->loadEnv()
-        ->bootConfig()
-        ->bootLogger();
+            ->loadEnv()
+            ->bootConfig()
+            ->bootLogger();
         return $this;
     }
 
-    public function isConsole(){
+    /**
+     * Checks if the application is running in console mode.
+     *
+     * @return bool True if running in console mode, false otherwise.
+     */
+    public function isConsole(): bool
+    {
         return $this->isConsole;
     }
 
-    public function send(){
-        try{
-            Rtr::loadRoutes()->dispatch();
-        }catch(Exception $e){
+    /**
+     * Sends the response by dispatching the request.
+     *
+     * @return self
+     */
+    public function send(): self
+    {
+        try {
+            (new Router(Request::getInstance()))->loadRoutes()->dispatch();
+        } catch (Exception $e) {
             $this->handleException($e);
         }
         return $this;
     }
 
-    private function handleException($e){
-        logger::error($e->getMessage(),[
-            'trace'=> $e->getTraceAsString()
+    /**
+     * Handles exceptions by logging and displaying appropriate error responses.
+     *
+     * @param Exception $e The exception to handle.
+     */
+    private function handleException(Exception $e): void
+    {
+        (new Log())->error($e->getMessage(), [
+            'trace' => $e->getTraceAsString(),
         ]);
 
-        if(Req::isJsonResponse()){
+        if (Request::getInstance()->isJsonResponse()) {
             $this->handleJsonExceptionResponse($e);
-        }else{
+        } else {
             $this->handleHtmlExceptionResponse($e);
         }
-
     }
 
-    private function handleJsonExceptionResponse($e){
-        if(config('app.debug')){
-            resp::json(resp::getJsonErrorResponseData($e->getTraceAsString(),'error',$e->getMessage()))->send();       
-        }else{
-            resp::json(resp::getJsonErrorResponseData(null,'error','Something Went Wrong!'))->send();        
+    /**
+     * Handles JSON exception responses.
+     *
+     * @param Exception $e The exception to handle.
+     */
+    private function handleJsonExceptionResponse(Exception $e): void
+    {
+        if (config('app.debug')) {
+            Response::getInstance()->json($this->getJsonErrorResponseData($e->getTraceAsString(), 'error', $e->getMessage()))->send();
+        } else {
+            Response::getInstance()->json($this->getJsonErrorResponseData(null, 'error', 'Something Went Wrong!'))->send();
         }
     }
 
-    private function handleHtmlExceptionResponse($e){
-        if(config('app.debug')){
-            CoreView::init()->render('errors.debug',['message'=>$e->getMessage(),'trace'=>$e->getTraceAsString()]);
-        }else{
-            CoreView::init()->render('errors.production',['message'=>'Something Went Wrong!']);
+    /**
+     * Handles HTML exception responses.
+     *
+     * @param Exception $e The exception to handle.
+     */
+    private function handleHtmlExceptionResponse(Exception $e): void
+    {
+        if (config('app.debug')) {
+            CoreView::init()->render('errors.debug', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+        } else {
+            CoreView::init()->render('errors.production', ['message' => 'Something Went Wrong!']);
         }
-        
     }
-    
+
+    /**
+     * Generates a JSON response data structure.
+     *
+     * @param mixed|null $data The response data.
+     * @param string $status The response status.
+     * @param string $message The response message.
+     * @return array The JSON response data.
+     */
+    private function getJsonResponseData($data = null, string $status, string $message): array
+    {
+        return [
+            'status' => $status,
+            'message' => $message,
+            'data' => $data,
+        ];
+    }
+
+    /**
+     * Generates a JSON error response data structure.
+     *
+     * @param string|null $trace The error trace.
+     * @param string $status The response status.
+     * @param string $message The response message.
+     * @return array The JSON error response data.
+     */
+    private function getJsonErrorResponseData(?array $trace, string $status, string $message): array
+    {
+        return [
+            'status' => $status,
+            'message' => $message,
+            'trace' => $trace,
+        ];
+    }
 }

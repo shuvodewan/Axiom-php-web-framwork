@@ -19,7 +19,7 @@ interface MiddlewareContract
      * optionally pass it to the next middleware or handler in the pipeline.
      *
      * @param Request $request The incoming HTTP request.
-     * @param callable $next The next middleware or handler in the pipeline.
+     * @param Closure $next The next middleware or handler in the pipeline.
      */
-    public static function handle(Request $request, callable $next);
+    public static function handle(Request $request, Closure $next);
 }

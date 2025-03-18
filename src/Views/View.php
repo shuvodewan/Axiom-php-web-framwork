@@ -33,7 +33,6 @@ abstract class View
      */
     public function render(string $template, array $data = []): void
     {
-        // Merge provided data with composed data and render the template
         Response::getInstance()->view(
             $this->getTemplateData($template, [...$data, ...$this->composer()])
         )->send();
@@ -50,7 +49,7 @@ abstract class View
      */
     private function getTemplateData(string $template, array $data): string
     {
-        return TwigDriver::getInstance()->render($template, $data);
+        return (new TwigDriver(template_path(),storage_path('/cache/templates')))->render($template, $data);
     }
 
     /**

@@ -16,7 +16,8 @@
         "predis/predis": "^3.0@alpha",
         "league/flysystem": "^3.0",
         "league/flysystem-aws-s3-v3": "^3.0",
-        "twig/twig": "4.x-dev"
+        "twig/twig": "4.x-dev",
+        "league/climate": "dev-main"
     },
     "autoload":{
         "psr-4":{

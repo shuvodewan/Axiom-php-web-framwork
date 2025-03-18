@@ -5,6 +5,7 @@ namespace Axiom\Project\Middlewares;
 use Axiom\Http\MiddlewareContract;
 use Axiom\Http\Session;
 use Axiom\Http\Request;
+use Closure;
 
 /**
  * Middleware to start a session.
@@ -22,7 +23,7 @@ class StartSessionMiddleware implements MiddlewareContract
      * @param callable $next The next middleware or handler in the pipeline.
      * @return mixed The response from the next middleware or handler.
      */
-    public static function handle(Request $request, callable $next)
+    public static function handle(Request $request, Closure $next)
     {
         (new Session())->startSession();
         return $next($request);
