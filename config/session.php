@@ -1,6 +1,6 @@
 <?php
 
-use Core\facade\Str;
+use Axiom\Facade\Str;
 
 return [
 

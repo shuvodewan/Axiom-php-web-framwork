@@ -13,6 +13,5 @@ return [
     //
 
     'applications'=>[
-        'app.test'
     ]
 ];

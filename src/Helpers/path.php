@@ -2,7 +2,7 @@
 
 if (! function_exists('base_path')) {
     function base_path($path=null) {
-        $base =  dirname(dirname(dirname(__DIR__)));
+        $base =  dirname(dirname(__DIR__));
         return $path?$base.$path:$base;
     }
 }
@@ -16,7 +16,7 @@ if (! function_exists('app_path')) {
 
 if (! function_exists('src_path')) {
     function src_path($path=null) {
-        $base =  dirname(dirname(__DIR__));
+        $base =  base_path('/src');
         return $path?$base.$path:$base;
     }
 }

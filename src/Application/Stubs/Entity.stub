@@ -1,10 +1,10 @@
 <?php
 
-namespace App\{{NAMESPACE}}\models;
+namespace App\{{NAMESPACE}}\Entities;
 
-use Core\application\Model;
+use Axiom\Database\Entity;
 
-class {{CLASS_NAME}} extends Model
+class {{CLASS_NAME}} extends Entity
 {
     
 }

@@ -17,12 +17,16 @@
         "league/flysystem": "^3.0",
         "league/flysystem-aws-s3-v3": "^3.0",
         "twig/twig": "4.x-dev",
-        "league/climate": "dev-main"
+        "league/climate": "dev-main",
+        "doctrine/orm": "^3",
+        "doctrine/dbal": "^4",
+        "symfony/cache": "^7"
     },
     "autoload":{
         "psr-4":{
             "Axiom\\": "src/",
-            "Axiom\\Project\\": "project/"
+            "Axiom\\Project\\": "project/",
+            "App\\": "app/"
         },
         "files": [
             "src/Helpers/helper.php"

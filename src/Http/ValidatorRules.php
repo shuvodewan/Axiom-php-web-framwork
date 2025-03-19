@@ -21,6 +21,7 @@ trait ValidatorRules
     {
         if (empty($value) && !isset($this->files[$field])) {
             $this->addError($field, "$field is required.");
+            $this->terminate = true;
         }
     }
 

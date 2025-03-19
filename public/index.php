@@ -1,6 +1,6 @@
 <?php
 
-use Core\Application;
+use Axiom\Core\Application;
 
 require __DIR__.'/../vendor/autoload.php';
 

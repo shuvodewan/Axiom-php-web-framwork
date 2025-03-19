@@ -24,6 +24,9 @@ class Validator
     /** @var array The validation errors */
     protected array $errors = [];
 
+    /** @var array Terminate next field validation if required error add */
+    protected bool $terminate = false;
+
     /**
      * Validator constructor.
      *
@@ -66,15 +69,19 @@ class Validator
      * @return bool True if validation passes, false otherwise
      */
     public function validate(): bool
-    {
+    {   
         foreach ($this->rules as $field => $rules) {
             $value = $this->data[$field] ?? null;
-
+            $this->terminate=false;
             foreach (is_array($rules) ? $rules : explode('|', $rules) as $rule) {
                 if (is_callable($rule)) {
                     $rule($field, $value ?? $this->files[$field], $this);
                 } else {
                     $this->applyRule($field, $value, $rule);
+                }
+
+                if($this->terminate){
+                    break;
                 }
             }
         }

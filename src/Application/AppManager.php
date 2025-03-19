@@ -39,4 +39,10 @@ class AppManager
     {
         return in_array('app.' . Str::toLower($name), $this->registered);
     }
+
+    public function getEntityDirs(){
+        return array_map(function($app){
+            return base_path('/apps/' . str_replace('app.', '', ucfirst($app)) . '/Entities');
+        },$this->registered);
+    }
 }

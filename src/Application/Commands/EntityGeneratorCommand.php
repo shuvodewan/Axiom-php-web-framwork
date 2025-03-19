@@ -63,7 +63,7 @@ class EntityGeneratorCommand extends Command
 
         // Define the items to generate
         $this->items = [
-            "entity" => [
+            "Entity" => [
                 "dir" => ucfirst($this->app) . '/Entities/',
                 "file" => $this->getSingularClassName($this->name) . '.php',
             ],
