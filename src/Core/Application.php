@@ -2,6 +2,7 @@
 
 namespace Axiom\Core;
 
+use Axiom\Application\AppManager;
 use Axiom\Http\Request;
 use Axiom\Http\Response;
 use Axiom\Http\Router;
@@ -55,6 +56,17 @@ class Application
     private function bootResponse(): self
     {
         new Response();
+        return $this;
+    }
+
+    /**
+     * Bootstraps Project apps.
+     *
+     * @return self
+     */
+    private function bootProjectApps() :self
+    {
+        AppManager::getInstance();
         return $this;
     }
 
@@ -113,6 +125,7 @@ class Application
             ->bootConfig()
             ->bootRequest()
             ->bootResponse()
+            ->bootProjectApps()
             ->bootRoutes()
             ->bootLogger();
         return $this;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Entities;
+namespace App\Test\Controllers;
 
 
 class TestController 

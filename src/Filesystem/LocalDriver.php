@@ -3,6 +3,7 @@
 namespace Axiom\Filesystem;
 
 use League\Flysystem\Filesystem;
+use League\Flysystem\StorageAttributes;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 
 /**
@@ -50,5 +51,25 @@ class LocalDriver extends Filesystem implements FileSystemDriverContract
         }
 
         return $path;
+    }
+
+    /**
+     * Get all files from a directory.
+     *
+     * @param string $directory The directory path.
+     * @param bool $recursive Whether to list files recursively.
+     * @return array An array of file paths.
+     */
+    public function getFiles(string $directory, bool $recursive = false): array
+    {
+        $files = [];
+        $contents = $this->listContents($directory, $recursive);
+        foreach ($contents as $item) {
+            if ($item instanceof StorageAttributes && $item->isFile()) {
+                $files[] = $item->path();
+            }
+        }
+
+        return $files;
     }
 }

@@ -2,7 +2,10 @@
 
 namespace Axiom\Application;
 
+use Axiom\Application\Actions\RegisterRoutes;
 use Axiom\Facade\Str;
+use Axiom\Project\Registry;
+use Axiom\Traits\InstanceTrait;
 
 /**
  * AppManager Class
@@ -12,12 +15,13 @@ use Axiom\Facade\Str;
  */
 class AppManager
 {
+    use InstanceTrait;
     /**
      * List of registered applications.
      *
      * @var array
      */
-    protected array $registered = [];
+    static array $apps = [];
 
     /**
      * AppManager Constructor
@@ -26,7 +30,23 @@ class AppManager
      */
     public function __construct()
     {
-        $this->registered = config('app.applications',[]);
+        $this->load();
+    }
+
+    private function load(): self
+    {
+        foreach(Registry::$INSTALLED_APPS as $app){
+            $obj = new $app();
+            $appName = strtolower(str_replace('App', '',(new \ReflectionClass($obj))->getShortName()));
+            self::$apps[$appName] = $obj;
+        }
+
+        return $this;
+    }
+
+    private function getAppsName(): array
+    {
+        return array_keys(self::$apps);
     }
 
     /**
@@ -37,12 +57,23 @@ class AppManager
      */
     public function isRegistered(string $name): bool
     {
-        return in_array('app.' . Str::toLower($name), $this->registered);
+        return in_array(Str::toLower($name), $this->getAppsName());
     }
 
     public function getEntityDirs(){
         return array_map(function($app){
-            return base_path('/apps/' . str_replace('app.', '', ucfirst($app)) . '/Entities');
-        },$this->registered);
+            return app_path('/'.ucfirst($app) . '/' . self::$apps[$app]->entities);
+        },$this->getAppsName());
+    }
+
+    public function getControllerDirs(){
+        return array_map(function($app){
+            return app_path('/'.ucfirst($app) . '/' .self::$apps[$app]->controllers);
+        },$this->getAppsName());
+    }
+
+    public function registerRoute(): void
+    {
+        (new RegisterRoutes())->load($this->getControllerDirs());
     }
 }

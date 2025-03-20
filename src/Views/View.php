@@ -2,7 +2,7 @@
 
 namespace Axiom\Views;
 
-use Core\Http\Response;
+use Axiom\Http\Response;
 
 /**
  * Abstract base class for rendering views.

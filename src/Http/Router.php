@@ -2,6 +2,7 @@
 
 namespace Axiom\Http;
 
+use Axiom\Application\AppManager;
 use Axiom\Traits\InstanceTrait;
 use Exception;
 use Axiom\Project\Middlewares\Register;
@@ -53,12 +54,22 @@ class Router
         self::setInstance($this);
     }
 
+
+    public function loadRoutes(): self
+    {
+        if (config('app.route_load') === 'app') {
+            return $this->loadFromApp();
+        }
+
+        return $this->loadFromRoutes();
+    }
+
     /**
      * Loads routes from cache or files.
      *
      * @return self
      */
-    public function loadRoutes(): self
+    public function loadFromRoutes(): self
     {
         if (config('app.mode') === 'production' && !config('app.route_closure')) {
             if ($routes = $this->loadFromCache()) {
@@ -70,6 +81,12 @@ class Router
             $this->loadFromFile();
         }
 
+        return $this;
+    }
+
+    public function loadFromApp(): self
+    {
+        AppManager::getInstance()->registerRoute();
         return $this;
     }
 

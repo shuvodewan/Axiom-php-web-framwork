@@ -78,31 +78,6 @@ class Route
     }
 
     /**
-     * Loads route files from the routes directory.
-     *
-     * @return self
-     */
-    public function loadRoutes(): self
-    {
-        $files = $this->loadRouteFiles();
-        foreach ($files as $file) {
-            include route_path('/' . $file);
-        }
-        return $this;
-    }
-
-    /**
-     * Scans the routes directory for route files.
-     *
-     * @return array The list of route files.
-     */
-    private function loadRouteFiles(): array
-    {
-        $files = scandir(route_path());
-        return array_diff($files, ['.', '..']);
-    }
-
-    /**
      * Gets the name of the method that called the current route method.
      *
      * @return string The method name.
