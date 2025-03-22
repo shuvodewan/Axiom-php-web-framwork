@@ -71,9 +71,10 @@ class AppManager
             return app_path('/'.ucfirst($app) . '/' .self::$apps[$app]->controllers);
         },$this->getAppsName());
     }
+    
 
     public function registerRoute(): void
     {
-        (new RegisterRoutes())->load($this->getControllerDirs());
+        (new RegisterRoutes(self::$apps[$app]))->load($this->getControllerDirs());
     }
 }

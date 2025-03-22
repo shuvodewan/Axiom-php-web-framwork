@@ -101,3 +101,32 @@ if (! function_exists('setErrorsToResponse')) {
         }
     }
 }
+
+if (! function_exists('getNameSpaceFromFile')) {
+    function getNameSpaceFromFile($filePath) {
+        $tokens = token_get_all(file_get_contents($filePath));
+        $namespace = '';
+        $inNamespace = false;
+    
+        foreach ($tokens as $token) {
+            if (is_array($token)) {
+                if ($token[0] === T_NAMESPACE) {
+                    $inNamespace = true;
+                } elseif ($inNamespace && $token[0] === T_STRING) {
+                    $namespace .= $token[1] . '\\';
+                } elseif ($inNamespace && $token[0] === T_WHITESPACE) {
+                    // Do nothing
+                } elseif ($inNamespace && $token[0] === T_NS_SEPARATOR) {
+                    $namespace .= '\\';
+                } else {
+                    $inNamespace = false;
+                }
+            } elseif ($token === ';' || $token === '{') {
+                $inNamespace = false;
+            }
+        }
+    
+        return rtrim($namespace, '\\');
+    }
+}
+
