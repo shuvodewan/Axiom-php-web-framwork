@@ -6,16 +6,16 @@ use Attribute;
 use Axiom\Core\Enum\RouteEnum;
 use Axiom\Http\Route as HttpRoute;
 
-#[Attribute]
+#[Attribute(Attribute::TARGET_METHOD)]
 class Route
 {
-    protected $route;
-    protected $method;
-    protected $controller;
-    protected $action;
+    protected HttpRoute $route;
+    protected string $method;
+    protected string $controller;
+    protected string $action;
 
     /** @var string The route name. */
-    protected string $name = '';
+    protected ?string $name;
 
     /** @var array The middleware applied to the route. */
     protected array $middlewares = [];
@@ -27,7 +27,7 @@ class Route
     public function __construct(
         string $uri,
         array $middlewares = [],
-        string $name = '', 
+        ?string $name = null, 
         RouteEnum $method = RouteEnum::GET
         ) {
         $this->uri          =   $uri;
@@ -35,5 +35,25 @@ class Route
         $this->name         =   $name;
         $this->route        =   new HttpRoute();
         $this->method       =   $method->value;
+    }
+
+
+    public function register($controller, $action)
+    {
+        $this->controller = $controller;
+        $this->action = $action;
+        $this->setRoute();
+    }
+
+    protected function setRoute() :self
+    {
+        $method = $this->method;
+
+        $this->route->$method($this->uri, $this->controller, $this->action);
+
+        if(!empty($this->middlewares)){
+            $this->route->middlewares($this->middlewares);
+        }
+        return $this;
     }
 }

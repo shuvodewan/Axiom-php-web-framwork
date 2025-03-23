@@ -6,7 +6,8 @@ use Axiom\Core\Attribute\Get;
 
 class TestController 
 {
-    #[Get('/')]
+    #[Get('/')]   
+    #[Get('/index')]
     public function index(){
 
     }
