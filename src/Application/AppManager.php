@@ -4,6 +4,7 @@ namespace Axiom\Application;
 
 use Axiom\Application\Actions\RegisterRoutes;
 use Axiom\Facade\Str;
+use Axiom\Http\Router;
 use Axiom\Project\Registry;
 use Axiom\Traits\InstanceTrait;
 
@@ -16,12 +17,13 @@ use Axiom\Traits\InstanceTrait;
 class AppManager
 {
     use InstanceTrait;
+
     /**
      * List of registered applications.
      *
-     * @var array
+     * @var array<string, object> Array of application instances keyed by app name
      */
-    static array $apps = [];
+    public static array $apps = [];
 
     /**
      * AppManager Constructor
@@ -33,17 +35,27 @@ class AppManager
         $this->load();
     }
 
+    /**
+     * Loads all installed applications from registry.
+     *
+     * @return self
+     */
     private function load(): self
     {
-        foreach(Registry::$INSTALLED_APPS as $app){
+        foreach (Registry::$INSTALLED_APPS as $app) {
             $obj = new $app();
-            $appName = strtolower(str_replace('App', '',(new \ReflectionClass($obj))->getShortName()));
+            $appName = strtolower(str_replace('App', '', (new \ReflectionClass($obj))->getShortName()));
             self::$apps[$appName] = $obj;
         }
 
         return $this;
     }
 
+    /**
+     * Gets all registered application names.
+     *
+     * @return array<string> Array of application names
+     */
     private function getAppsName(): array
     {
         return array_keys(self::$apps);
@@ -60,19 +72,36 @@ class AppManager
         return in_array(Str::toLower($name), $this->getAppsName());
     }
 
-    public function getEntityDirs(){
-        return array_map(function($app){
-            return app_path('/'.ucfirst($app) . '/' . self::$apps[$app]->entities);
-        },$this->getAppsName());
+    /**
+     * Gets entity directories for all applications.
+     *
+     * @return array<string> Array of entity directory paths
+     */
+    public function getEntityDirs(): array
+    {
+        return array_map(function (string $app) {
+            return app_path('/' . ucfirst($app) . '/' . self::$apps[$app]->entities);
+        }, $this->getAppsName());
     }
 
-    public function getControllerDirs(){
-        return array_map(function($app){
-            return app_path('/'.ucfirst($app) . '/' .self::$apps[$app]->controllers);
-        },$this->getAppsName());
+    /**
+     * Gets controller directories for all applications.
+     *
+     * @return array<object> Array of application objects with dir and name properties
+     */
+    public function getControllerDirs(): array
+    {
+        return array_map(function (string $app) {
+            $appObj = self::$apps[$app];
+            $appObj->dir = app_path('/' . ucfirst($app) . '/' . self::$apps[$app]->controllers);
+            $appObj->name = $app;
+            return $appObj;
+        }, $this->getAppsName());
     }
-    
 
+    /**
+     * Registers routes for all applications.
+     */
     public function registerRoute(): void
     {
         (new RegisterRoutes())->load($this->getControllerDirs());

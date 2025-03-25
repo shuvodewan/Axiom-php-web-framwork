@@ -4,6 +4,9 @@ namespace Axiom\Application;
 
 class App 
 {
-    public $controllers = "Controllers";
-    public $entities = 'Entities';
+    public string $controllers = "Controllers";
+    public string $entities = 'Entities';
+    public ?string $group=null;
+    public bool   $appRoute=false;
+    public array  $middlewares=[];
 }
