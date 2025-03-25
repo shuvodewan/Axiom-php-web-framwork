@@ -5,7 +5,7 @@ namespace Axiom\Core\Attribute;
 use Attribute;
 use Axiom\Core\Enum\RouteEnum;
 
-#[Attribute]
+#[Attribute(Attribute::TARGET_METHOD)]
 class Post extends Route 
 {
     public function __construct(
@@ -14,5 +14,11 @@ class Post extends Route
         string $name = ''
         ) {
         parent::__construct($uri, $middlewares, $name, RouteEnum::POST);
+    }
+
+    protected function setRoute() :self
+    {
+        $this->commonSetup()->route->post($this->uri, $this->controller, $this->action);
+        return $this;
     }
 }

@@ -157,7 +157,6 @@ class Router
 
         $uri = count($this->prefixes) ? trim(implode('/', $this->prefixes), '/') . '/' . $route->uri : trim($route->uri, '/');
         $name = count($this->names) ? implode('', $this->names) . '' . $route->name : $route->name;
-
         $this->routes[$method][$uri] = $params;
         if ($name) {
             $this->routes['names'][$name] = $uri;

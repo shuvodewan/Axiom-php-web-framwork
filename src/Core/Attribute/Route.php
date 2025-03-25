@@ -45,15 +45,25 @@ class Route
         $this->setRoute();
     }
 
+    public function commonSetup() :self
+    {
+        if(!empty($this->middlewares)){
+        
+            $this->route->middlewares($this->middlewares);
+        }
+
+        if(!empty($this->name)){
+            $this->route->name($this->name);
+        }
+
+        return $this;
+    }
+
     protected function setRoute() :self
     {
         $method = $this->method;
-
         $this->route->$method($this->uri, $this->controller, $this->action);
 
-        if(!empty($this->middlewares)){
-            $this->route->middlewares($this->middlewares);
-        }
         return $this;
     }
 }

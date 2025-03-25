@@ -10,11 +10,7 @@ class Get extends Route
 
     protected function setRoute() :self
     {
-        $this->route->get($this->uri, $this->controller, $this->action);
-
-        if(!empty($this->middlewares)){
-            $this->route->middlewares($this->middlewares);
-        }
+        $this->commonSetup()->route->get($this->uri, $this->controller, $this->action);
         return $this;
     }
 }

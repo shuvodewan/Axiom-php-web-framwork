@@ -75,6 +75,6 @@ class AppManager
 
     public function registerRoute(): void
     {
-        (new RegisterRoutes(self::$apps[$app]))->load($this->getControllerDirs());
+        (new RegisterRoutes())->load($this->getControllerDirs());
     }
 }

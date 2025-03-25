@@ -209,7 +209,6 @@ class Route
         $this->uri = $this->setUri($uri);
         $this->controller = $controller;
         $this->action = $action;
-
         $this->router->registerRoutes($this->getMethodName(), $this);
     }
 

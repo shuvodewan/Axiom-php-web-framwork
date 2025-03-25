@@ -4,6 +4,7 @@ namespace Axiom\Application\Actions;
 
 use Axiom\Core\Attribute\Delete;
 use Axiom\Core\Attribute\Get;
+use Axiom\Core\Attribute\Group;
 use Axiom\Core\Attribute\Patch;
 use Axiom\Core\Attribute\Post;
 use Axiom\Core\Attribute\Put;
@@ -44,6 +45,20 @@ class RegisterRoutes
 
     protected function generateRoute(ReflectionClass $reflection, $className){
 
+        if($group = $this->groupAttribute($reflection)){
+            $group->newInstance()->setGroup(function() use($reflection, $className){
+                $this->processRoutes($reflection, $className);
+            });
+        }else{
+            $this->processRoutes($reflection, $className);
+        }
+
+
+        dd(Router::getInstance());
+        
+    }
+
+    protected function processRoutes(ReflectionClass $reflection, $className){
         foreach ($reflection->getMethods() as $method) {
             $attributes = [];
 
@@ -53,14 +68,9 @@ class RegisterRoutes
             ->patchRouteAttribute($method, $attributes)
             ->deleteRouteAttribute($method, $attributes);
             foreach ($attributes as $attribute) {
-                dd($attribute->newInstance());
                 $attribute->newInstance()->register($className, $method->getName());
-                dd('sdf');
             }
         }
-
-        dd(Router::getInstance());
-        
     }
 
     protected function getClassFromFile(string $content): ?string
@@ -121,5 +131,13 @@ class RegisterRoutes
         $attributes = array_merge($attributes, $items);
         
         return $this;
+    }
+
+    protected function groupAttribute($class)
+    {
+        $items = $class->getAttributes(Group::class);
+
+        return empty($items)?null:$items[0];
+        
     }
 }
