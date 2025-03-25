@@ -52,9 +52,6 @@ class RegisterRoutes
         }else{
             $this->processRoutes($reflection, $className);
         }
-
-
-        dd(Router::getInstance());
         
     }
 

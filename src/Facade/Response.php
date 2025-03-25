@@ -2,7 +2,7 @@
 
 namespace Axiom\Facade;
 
-use Axiom\Http\Response as HttpResponse;
+use Axiom\Http\Response as res;
 
 /**
  * Response Facade
@@ -24,8 +24,8 @@ class Response implements FacadeContract
      * @return HttpResponse The underlying `HttpResponse` instance
      * @throws \RuntimeException If the `HttpResponse` instance cannot be resolved
      */
-    public static function getInstance(): HttpResponse
+    public static function getInstance(): res
     {
-        return HttpResponse::getInstance();
+        return new res();
     }
 }
