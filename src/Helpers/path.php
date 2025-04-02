@@ -14,6 +14,13 @@ if (! function_exists('app_path')) {
     }
 }
 
+if (! function_exists('database_path')) {
+    function database_path($path=null) {
+        $base =  base_path().'/database';
+        return $path?$base.$path:$base;
+    }
+}
+
 if (! function_exists('project_path')) {
     function project_path($path=null) {
         $base =  base_path().'/project';

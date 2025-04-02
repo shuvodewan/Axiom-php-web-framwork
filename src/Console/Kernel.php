@@ -4,8 +4,12 @@ namespace Axiom\Console;
 
 use Axiom\Application\Commands\CreateApplicationCommand;
 use Axiom\Application\Commands\DeleteApplicationCommand;
+use Axiom\Application\Commands\EntityHelpCommand;
 use Axiom\Console\Commands\AppCashClearCommand;
 use Axiom\Console\Commands\AppServeCommand;
+use Axiom\Database\Commands\GenerateMigrationCommand;
+use Axiom\Database\Commands\MigrateCommand;
+use Axiom\Database\Commands\RollbackCommand;
 use Axiom\Facade\Log;
 use Exception;
 
@@ -32,6 +36,14 @@ class Kernel
             'project-start' => AppServeCommand::class,
             'app-create' => CreateApplicationCommand::class,
             'app-delete' => DeleteApplicationCommand::class,
+            
+            //Help
+            'help:entity' => EntityHelpCommand::class,
+
+            // Migration commands
+            'migrate' => MigrateCommand::class,
+            'migrate:rollback' => RollbackCommand::class,
+            'make:migration' => GenerateMigrationCommand::class,
         ];
     }
 

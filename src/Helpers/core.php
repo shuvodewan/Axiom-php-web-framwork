@@ -24,7 +24,7 @@ if (!function_exists('dd')) {
     {
         if(Application::getInstance()->isConsole()){
             foreach ($vars as $var) {
-              Preview::info($var);
+              Preview::info(json_encode($var));
             }
         }else{
             echo '<style>';

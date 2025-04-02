@@ -40,6 +40,34 @@ trait ValidatorRules
     }
 
     /**
+     * Validate that a field is a string.
+     *
+     * @param string $field
+     * @param mixed $value
+     * @return void
+     */
+    protected function validateString(string $field, $value): void
+    {
+        if (!is_string($value)) {
+            $this->addError($field, "$field must be a string.");
+        }
+    }
+
+    /**
+     * Validate that a field is a boolean.
+     *
+     * @param string $field
+     * @param mixed $value
+     * @return void
+     */
+    protected function validateBoolean(string $field, $value): void
+    {
+        if (!is_bool($value) && $value !== '0' && $value !== '1') {
+            $this->addError($field, "$field must be a boolean.");
+        }
+    }
+
+    /**
      * Validate that a field is unique in the database.
      *
      * @param string $field
@@ -196,6 +224,19 @@ trait ValidatorRules
         if (!in_array($value, array_map('trim', $allowedValues))) {
             $this->addError($field, "$field must be one of the following: " . implode(', ', $allowedValues) . ".");
         }
+    }
+
+    /**
+     * Validate that a field is optional (nullable).
+     * If the field is empty or null, other validation rules for this field will be skipped.
+     *
+     * @param string $field
+     * @param mixed $value
+     * @return bool Returns true if the field is nullable (validation should continue), false otherwise
+     */
+    protected function validateNullable(string $field, $value): bool
+    {
+        return empty($value) && !is_numeric($value) && !isset($this->files[$field]);
     }
 
     /**

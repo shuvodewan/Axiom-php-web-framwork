@@ -20,7 +20,8 @@
         "league/climate": "dev-main",
         "doctrine/orm": "^3",
         "doctrine/dbal": "^4",
-        "symfony/cache": "^7"
+        "symfony/cache": "^7",
+        "doctrine/migrations": "4.0.x-dev"
     },
     "autoload":{
         "psr-4":{

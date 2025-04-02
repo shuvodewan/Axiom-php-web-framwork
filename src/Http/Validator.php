@@ -74,6 +74,12 @@ class Validator
             $value = $this->data[$field] ?? null;
             $this->terminate=false;
             foreach (is_array($rules) ? $rules : explode('|', $rules) as $rule) {
+
+
+                if($rule=='nullable' && !$value){
+                    break ;
+                }
+
                 if (is_callable($rule)) {
                     $rule($field, $value ?? $this->files[$field], $this);
                 } else {
@@ -109,6 +115,7 @@ class Validator
 
         if (method_exists($this, $method)) {
             $this->$method($field, $value, $params);
+
         } else {
             $this->addError($field, "Validation rule '$rule' does not exist.");
         }
