@@ -2,6 +2,7 @@
 
 namespace Axiom\Database\Commands;
 
+use Symfony\Component\Console\Input\InputArgument;
 
 class GenerateMigrationCommand extends MigrationCommand
 {
@@ -20,14 +21,13 @@ class GenerateMigrationCommand extends MigrationCommand
     protected function prepareInput(): array
     {
         return [
-            'name' => $this->argument('name'),
-            '--namespace' => 'Database\\Migrations', 
+            '--namespace' => 'Database\\Migrations',
         ];
     }
 
     public function handle(): void
     {
         parent::handle();
-        $this->info('MIgration created successfully.');
+        $this->info('Migration created successfully.');
     }
 }

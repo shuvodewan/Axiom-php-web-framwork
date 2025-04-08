@@ -41,9 +41,9 @@ class Kernel
             'help:entity' => EntityHelpCommand::class,
 
             // Migration commands
-            'migrate' => MigrateCommand::class,
-            'migrate:rollback' => RollbackCommand::class,
-            'make:migration' => GenerateMigrationCommand::class,
+            'migrations:migrate' => MigrateCommand::class,
+            'migrations:rollback' => RollbackCommand::class,
+            'migrations:generate' => GenerateMigrationCommand::class,
         ];
     }
 

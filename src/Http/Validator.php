@@ -43,6 +43,19 @@ class Validator
     }
 
     /**
+     * Validator make.
+     *
+     * @param array $data The data to validate
+     * @param array $rules The validation rules
+     */
+    public function make(array|Request $data, array $rules)
+    {
+        $this->rules = $rules;
+        $this->setData($data);
+        return $this;
+    }
+
+    /**
      * Set the data and files to validate.
      *
      * @param mixed $data The data to validate (can be an array or a Request object)
@@ -91,7 +104,6 @@ class Validator
                 }
             }
         }
-
         return empty($this->errors);
     }
 

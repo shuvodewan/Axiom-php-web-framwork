@@ -8,6 +8,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Tools\Console\ConsoleRunner;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
@@ -25,7 +26,7 @@ abstract class MigrationCommand extends Command
         $config = new Configuration();
         $config->addMigrationsDirectory(
             'Database\Migrations', 
-            database_path('migrations')
+            database_path('/migrations')
         );
         $config->setAllOrNothing(true);
         $config->setCheckDatabasePlatform(false);
@@ -38,13 +39,20 @@ abstract class MigrationCommand extends Command
 
     public function handle(): void
     {
-        $command = $this->dependencyFactory->getConsoleCommand(
-            $this->getMigrationCommandName()
-        );
+        $commandName = $this->getMigrationCommandName();
         
-        $input = new ArrayInput($this->arguments);
+        // Create a new application with migration commands
+        $application = new \Symfony\Component\Console\Application('Doctrine Migrations');
+        ConsoleRunner::addCommands($application, $this->dependencyFactory);
+        
+        // Find and execute the command
+        $command = $application->find($commandName);
+        $input = new ArrayInput(array_merge(
+            ['command' => $commandName],
+            $this->prepareInput()
+        ));
+        
         $output = new ConsoleOutput();
-        
         $command->run($input, $output);
     }
 
