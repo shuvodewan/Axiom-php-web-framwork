@@ -7,16 +7,16 @@ class RollbackCommand extends MigrationCommand
     protected function validator(): array
     {
         return [
-            '--dry-run' => 'boolean|optional',
-            '--query-time' => 'boolean|optional',
-            '--all' => 'boolean|optional',
-            '--force' => 'boolean|optional',
+            '--dry-run' => 'nullablew|boolean',
+            '--query-time' => 'required|boolean',
+            '--all' => 'required|boolean',
+            '--force' => 'required|boolean',
         ];
     }
 
     protected function getMigrationCommandName(): string
     {
-        return 'migrations:rollup'; // or 'migrations:execute --down' for more control
+        return 'migrations:rollup'; 
     }
 
     protected function prepareInput(): array
