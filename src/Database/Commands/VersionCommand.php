@@ -20,8 +20,8 @@ class VersionCommand extends MigrationCommand
     {
         return [
             'version' => $this->argument('version'),
-            '--add' => $this->option('add') ?: false,
-            '--delete' => $this->option('delete') ?: false,
+            '--add' => $this->argument('add') ?: false,
+            '--delete' => $this->argument('delete') ?: false,
         ];
     }
 

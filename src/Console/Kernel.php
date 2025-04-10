@@ -7,9 +7,15 @@ use Axiom\Application\Commands\DeleteApplicationCommand;
 use Axiom\Application\Commands\EntityHelpCommand;
 use Axiom\Console\Commands\AppCashClearCommand;
 use Axiom\Console\Commands\AppServeCommand;
+use Axiom\Database\Commands\ExecuteMigrationCommand;
 use Axiom\Database\Commands\GenerateMigrationCommand;
+use Axiom\Database\Commands\LatestCommand;
+use Axiom\Database\Commands\ListCommand;
 use Axiom\Database\Commands\MigrateCommand;
 use Axiom\Database\Commands\RollbackCommand;
+use Axiom\Database\Commands\StatusCommand;
+use Axiom\Database\Commands\SyncMetadataCommand;
+use Axiom\Database\Commands\VersionCommand;
 use Axiom\Facade\Log;
 use Exception;
 
@@ -44,6 +50,12 @@ class Kernel
             'migrations:migrate' => MigrateCommand::class,
             'migrations:rollback' => RollbackCommand::class,
             'migrations:generate' => GenerateMigrationCommand::class,
+            'migrations:latest' => LatestCommand::class,
+            'migrations:list' => ListCommand::class,
+            'migrations:status' => StatusCommand::class,
+            'migrations:sync' => SyncMetadataCommand::class,
+            'migrations:version' => VersionCommand::class,
+            'migrations:execute' => ExecuteMigrationCommand::class,
         ];
     }
 
@@ -66,7 +78,7 @@ class Kernel
             Log::error($e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
-
+            
             Preview::error($e->getMessage());
         }
     }
