@@ -16,13 +16,7 @@ use Symfony\Component\Console\Input\InputArgument;
  * Usage Examples:
  * 
  * 1. Create a basic migration:
- *    php axiom migrations:generate CreateUsersTable
- * 
- * 2. Generate migration with specific name:
- *    php axiom migrations:generate "AddEmailVerificationColumns"
- * 
- * 3. Create namespaced migration:
- *    php axiom migrations:generate "Core\\CreatePermissionsTable"
+ *    php axiom migrations:generate
  * 
  * Generated files include:
  * - Up() method for applying changes
@@ -47,9 +41,7 @@ class GenerateMigrationCommand extends MigrationCommand
      */
     protected function validator(): array
     {
-        return [
-            'name' => 'required|string',
-        ];
+        return [];
     }
 
     /**
@@ -83,9 +75,6 @@ class GenerateMigrationCommand extends MigrationCommand
         return [
             // Fixed namespace for organization
             '--namespace' => 'Database\\Migrations',
-            
-            // Pass the migration name to Doctrine
-            'name' => $this->argument('name')
         ];
     }
 
@@ -105,8 +94,7 @@ class GenerateMigrationCommand extends MigrationCommand
         parent::handle();
         
         $this->info(sprintf(
-            'Migration template "%s" created successfully in Database\Migrations namespace',
-            $this->argument('name')
+            'Migration template created successfully in Database\Migrations namespace',
         ));
         
         $this->line('Next steps:');

@@ -27,7 +27,8 @@
         "psr-4":{
             "Axiom\\": "src/",
             "Axiom\\Project\\": "project/",
-            "App\\": "app/"
+            "App\\": "app/",
+            "Database\\": "database/"
         },
         "files": [
             "src/Helpers/helper.php"

@@ -78,13 +78,7 @@ class DiffCommand extends MigrationCommand
             '--namespace' => 'Database\\Migrations',
             
             // Table filter (supports regex patterns)
-            '--filter-expression' => $this->argument('filter') ?: null,
-            
-            // Always generate formatted SQL
-            '--formatted' => true,
-            
-            // Optional dry-run mode
-            '--dry-run' => $this->argument('dry-run') ?: false
+            '--filter-expression' => $this->argument('filter') ?: '',
         ];
     }
 

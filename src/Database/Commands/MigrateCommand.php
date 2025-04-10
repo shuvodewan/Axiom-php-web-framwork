@@ -17,19 +17,19 @@ use Symfony\Component\Console\Input\InputOption;
  * Usage Examples:
  * 
  * 1. Migrate to latest version:
- *    php axiom migrate
+ *    php axiom migrations:migrate
  * 
  * 2. Migrate to specific version:
- *    php axiom migrate 20230101000000
+ *    php axiom migrations:migrate 20230101000000
  * 
  * 3. Dry-run simulation (show SQL without executing):
- *    php axiom migrate --dry-run
+ *    php axiom migrations:migrate --dry-run
  * 
  * 4. With query timing analysis:
- *    php axiom migrate --query-time
+ *    php axiom migrations:migrate --query-time
  * 
  * 5. Allow empty migration sets:
- *    php axiom migrate --allow-no-migration
+ *    php axiom migrations:migrate --allow-no-migration
  */
 class MigrateCommand extends MigrationCommand
 {
@@ -50,23 +50,9 @@ class MigrateCommand extends MigrationCommand
             'dry-run' => 'nullable|boolean',
             'query-time' => 'nullable|boolean',
             'allow-no-migration' => 'nullable|boolean',
-            'timeout' => 'nullable|integer|min:1' // New timeout option
         ];
     }
 
-    /**
-     * Configure the command options.
-     */
-    protected function configure()
-    {
-        $this->addOption(
-            'timeout',
-            null,
-            InputOption::VALUE_OPTIONAL,
-            'Database operation timeout in seconds',
-            null
-        );
-    }
 
     /**
      * Specifies the underlying Doctrine migration command.
@@ -88,9 +74,6 @@ class MigrateCommand extends MigrationCommand
      */
     protected function prepareInput(): array
     {
-        $input = [
-            '--no-interaction' => !$this->isInteractive(),
-        ];
 
         if ($version = $this->argument('version')) {
             $input['version'] = $version;
@@ -101,11 +84,6 @@ class MigrateCommand extends MigrationCommand
             if ($this->argument($option)) {
                 $input['--'.$option] = true;
             }
-        }
-
-        // Add timeout if specified
-        if ($timeout = $this->option('timeout')) {
-            $input['--timeout'] = $timeout;
         }
 
         return $input;
@@ -131,13 +109,5 @@ class MigrateCommand extends MigrationCommand
             $this->line('Consider using --dry-run to diagnose issues');
             throw $e;
         }
-    }
-
-    /**
-     * Check if command is running in interactive mode.
-     */
-    protected function isInteractive(): bool
-    {
-        return $this->input->isInteractive() && !$this->option('no-interaction');
     }
 }

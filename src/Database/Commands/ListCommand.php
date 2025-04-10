@@ -19,14 +19,6 @@ use Symfony\Component\Console\Input\InputOption;
  * 1. Basic list with default formatting:
  *    php axiom migrations:list
  * 
- * 2. Show details in JSON format:
- *    php axiom migrations:list --format=json
- * 
- * 3. Filter by status (available values: executed, pending, all):
- *    php axiom migrations:list --status=pending
- * 
- * 4. Show execution time details:
- *    php axiom migrations:list --show-execution-time
  * 
  * Typical Output Format:
  * +----------------+-------------------+-----------+---------------------+
@@ -41,22 +33,12 @@ class ListCommand extends MigrationCommand
     /**
      * Defines validation rules for command options.
      * 
-     * Available options:
-     * --format: Output format (text/json/csv)
-     * --status: Filter by status (executed/pending/all)
-     * --show-versions: Show full version information
-     * --show-execution-time: Include execution duration
      * 
      * @return array Validation rules for input parameters
      */
     protected function validator(): array
     {
-        return [
-            'format' => 'nullable|in:text,json,csv',
-            'status' => 'nullable|in:executed,pending,all',
-            'show-versions' => 'nullable|boolean',
-            'show-execution-time' => 'nullable|boolean'
-        ];
+        return [];
     }
 
     /**
@@ -90,25 +72,8 @@ class ListCommand extends MigrationCommand
      */
     protected function prepareInput(): array
     {
-        $input = [];
-
-        if ($format = $this->argument('format')) {
-            $input['--format'] = $format;
-        }
-
-        if ($status = $this->argument('status')) {
-            $input['--status'] = $status;
-        }
-
-        if ($this->argument('show-versions')) {
-            $input['--show-versions'] = true;
-        }
-
-        if ($this->argument('show-execution-time')) {
-            $input['--show-execution-time'] = true;
-        }
-
-        return $input;
+       
+        return [];
     }
 
     /**
@@ -123,10 +88,5 @@ class ListCommand extends MigrationCommand
     public function handle(): void
     {
         parent::handle();
-
-        // Could add post-processing here to:
-        // - Add color to output
-        // - Calculate statistics
-        // - Format tables differently
     }
 }

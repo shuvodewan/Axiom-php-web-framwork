@@ -7,6 +7,7 @@ use Axiom\Application\Commands\DeleteApplicationCommand;
 use Axiom\Application\Commands\EntityHelpCommand;
 use Axiom\Console\Commands\AppCashClearCommand;
 use Axiom\Console\Commands\AppServeCommand;
+use Axiom\Database\Commands\DiffCommand;
 use Axiom\Database\Commands\ExecuteMigrationCommand;
 use Axiom\Database\Commands\GenerateMigrationCommand;
 use Axiom\Database\Commands\LatestCommand;
@@ -56,6 +57,7 @@ class Kernel
             'migrations:sync' => SyncMetadataCommand::class,
             'migrations:version' => VersionCommand::class,
             'migrations:execute' => ExecuteMigrationCommand::class,
+            'migrations:diff' => DiffCommand::class,
         ];
     }
 

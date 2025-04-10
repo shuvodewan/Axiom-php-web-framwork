@@ -9,6 +9,7 @@ use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\ConsoleRunner;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
@@ -25,16 +26,27 @@ abstract class MigrationCommand extends Command
     {
         $config = new Configuration();
         $config->addMigrationsDirectory(
-            'Database\Migrations', 
-            database_path('/migrations')
+            'Database\\Migrations', 
+            database_path('/Migrations')
         );
         $config->setAllOrNothing(true);
         $config->setCheckDatabasePlatform(false);
 
-        return DependencyFactory::fromConnection(
-            new ExistingConfiguration($config),
-            new ExistingConnection(DatabaseManager::getInstance()->getConnection())
-        );
+        // Get both the connection and entity manager
+        $dbManager = DatabaseManager::getInstance();
+        $connection = $dbManager->getConnection();
+        $em = $dbManager->getEntityManager();
+
+        // Use fromEntityManager when available, fallback to fromConnection
+        return $em instanceof EntityManager
+            ? DependencyFactory::fromEntityManager(
+                new ExistingConfiguration($config),
+                new \Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager($em)
+            )
+            : DependencyFactory::fromConnection(
+                new ExistingConfiguration($config),
+                new ExistingConnection($connection)
+            );
     }
 
     public function handle(): void

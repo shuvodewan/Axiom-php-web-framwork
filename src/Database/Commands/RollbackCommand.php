@@ -50,7 +50,7 @@ class RollbackCommand extends MigrationCommand
             'query-time' => 'nullable|boolean',
             'all' => 'nullable|boolean',
             'force' => 'nullable|boolean',
-            'version' => 'nullable|string|regex:/^\d{14}$/'
+            'version' => 'required|string|regex:/^\d{14}$/'
         ];
     }
 

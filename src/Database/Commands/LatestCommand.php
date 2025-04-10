@@ -16,12 +16,6 @@ namespace Axiom\Database\Commands;
  * 1. Basic version check:
  *    php axiom migrations:latest
  * 
- * 2. Show details in JSON format:
- *    php axiom migrations:latest --format=json
- * 
- * 3. Check against specific connection:
- *    php axiom migrations:latest --db=secondary
- * 
  * Typical Output:
  * "Latest version: 20230101000000 (CreateUsersTable)"
  * "Status: Not migrated"
@@ -71,17 +65,7 @@ class LatestCommand extends MigrationCommand
      */
     protected function prepareInput(): array
     {
-        $input = [];
-
-        if ($format = $this->argument('format')) {
-            $input['--format'] = $format;
-        }
-
-        if ($db = $this->argument('db')) {
-            $input['--db'] = $db;
-        }
-
-        return $input;
+        return [];
     }
 
     /**
