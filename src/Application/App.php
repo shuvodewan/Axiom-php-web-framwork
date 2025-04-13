@@ -2,11 +2,48 @@
 
 namespace Axiom\Application;
 
+/**
+ * Application configuration class for defining paths, route groups, and middleware.
+ */
 class App 
 {
+    /**
+     * The base directory path where controller classes are located.
+     * Defaults to "Controllers".
+     * 
+     * @var string
+     */
     public string $controllers = "Controllers";
+
+    /**
+     * The base directory path where entity classes are located.
+     * Defaults to "Entities".
+     * 
+     * @var string
+     */
     public string $entities = 'Entities';
-    public ?string $group=null;
-    public bool   $appRoute=false;
-    public array  $middlewares=[];
+
+    /**
+     * An optional route group prefix for all application routes.
+     * If set, all routes will be nested under this group.
+     * 
+     * @var string|null
+     */
+    public ?string $group = null;
+
+    /**
+     * If true, all routes will automatically be grouped under the application name.
+     * Useful for API versioning or modular routing.
+     * 
+     * @var bool
+     */
+    public bool $appRoute = false;
+
+    /**
+     * An array of middleware to apply globally when `appRoute` is used.
+     * Middlewares will be executed in the order they are defined.
+     * 
+     * @var array<string>
+     */
+    public array $middlewares = [];
 }

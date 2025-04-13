@@ -8,6 +8,6 @@ class TestController
 {
     #[Get(uri:'/', name:'index')]
     public function index(){
-       
+       dd('test');
     }
 }
