@@ -46,4 +46,16 @@ class App
      * @var array<string>
      */
     public array $middlewares = [];
+
+
+    /**
+     * Bootstraps the application by registering container dependencies.
+     * This method should be called during application initialization to set up
+     * any required services, bindings, or dependencies in the DI container.
+     * 
+     * @return void
+     */
+    public function boot(){
+        //register container dependencies
+    }
 }

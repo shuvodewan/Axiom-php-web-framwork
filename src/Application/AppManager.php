@@ -35,6 +35,20 @@ class AppManager
         $this->load();
     }
 
+
+    /**
+     * boot all installed applications from registry.
+     *
+     * @return self
+     */
+    public function boot() :self
+    {
+        foreach(self::$apps as $app){
+            $app->boot();
+        }
+        return $this;
+    } 
+
     /**
      * Loads all installed applications from registry.
      *

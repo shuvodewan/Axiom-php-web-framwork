@@ -6,6 +6,7 @@ use Axiom\Application\AppManager;
 use Axiom\Http\Request;
 use Axiom\Http\Response;
 use Axiom\Http\Router;
+use Axiom\Project\Registry;
 use Axiom\Traits\InstanceTrait;
 use Axiom\Views\CoreView;
 use Exception;
@@ -56,6 +57,17 @@ class Application
     private function bootResponse(): self
     {
         new Response();
+        return $this;
+    }
+
+    /**
+     * Bootstraps Project.
+     *
+     * @return self
+     */
+    private function bootProject() :self
+    {
+        Registry::boot();
         return $this;
     }
 
@@ -114,6 +126,18 @@ class Application
         return $this;
     }
 
+     /**
+     * Bootstraps the containerfor dependency injection.
+     *
+     * @return self
+     */
+    public function bootContainer() :self
+    {
+        new Container(); 
+        
+        return $this;
+    }
+
     /**
      * Bootstraps the application for web requests.
      *
@@ -125,6 +149,8 @@ class Application
             ->bootConfig()
             ->bootRequest()
             ->bootResponse()
+            ->bootContainer()
+            ->bootProject()
             ->bootProjectApps()
             ->bootRoutes()
             ->bootLogger();
