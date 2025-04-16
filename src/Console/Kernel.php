@@ -39,10 +39,10 @@ class Kernel
     public function __construct()
     {
         $this->commands = [
-            'project-cache:clear' => AppCashClearCommand::class,
-            'project-start' => AppServeCommand::class,
-            'app-create' => CreateApplicationCommand::class,
-            'app-delete' => DeleteApplicationCommand::class,
+            'cache:clear' => AppCashClearCommand::class,
+            'project:start' => AppServeCommand::class,
+            'app:create' => CreateApplicationCommand::class,
+            'app:delete' => DeleteApplicationCommand::class,
             
             //Help
             'help:entity' => EntityHelpCommand::class,

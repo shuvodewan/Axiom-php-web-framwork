@@ -3,6 +3,7 @@
 namespace Axiom\Core;
 
 use Axiom\Application\AppManager;
+use Axiom\Exception\Handler;
 use Axiom\Http\Request;
 use Axiom\Http\Response;
 use Axiom\Http\Router;
@@ -138,6 +139,18 @@ class Application
         return $this;
     }
 
+     /**
+     * Bootstraps the containerfor dependency injection.
+     *
+     * @return self
+     */
+    public function bootExceptionHandler() :self
+    {
+        (new Handler())->register(); 
+        
+        return $this;
+    }
+
     /**
      * Bootstraps the application for web requests.
      *
@@ -150,6 +163,7 @@ class Application
             ->bootRequest()
             ->bootResponse()
             ->bootContainer()
+            ->bootExceptionHandler()
             ->bootProject()
             ->bootProjectApps()
             ->bootRoutes()
@@ -188,91 +202,7 @@ class Application
      */
     public function send(): self
     {
-        try {
-            (new Router(Request::getInstance()))->loadRoutes()->dispatch();
-        } catch (Exception $e) {
-            $this->handleException($e);
-        }
+        (new Router(Request::getInstance()))->loadRoutes()->dispatch();
         return $this;
-    }
-
-    /**
-     * Handles exceptions by logging and displaying appropriate error responses.
-     *
-     * @param Exception $e The exception to handle.
-     */
-    private function handleException(Exception $e): void
-    {
-        (new Log())->error($e->getMessage(), [
-            'trace' => $e->getTraceAsString(),
-        ]);
-
-        if (Request::getInstance()->isJsonResponse()) {
-            $this->handleJsonExceptionResponse($e);
-        } else {
-            $this->handleHtmlExceptionResponse($e);
-        }
-    }
-
-    /**
-     * Handles JSON exception responses.
-     *
-     * @param Exception $e The exception to handle.
-     */
-    private function handleJsonExceptionResponse(Exception $e): void
-    {
-        if (config('app.debug')) {
-            Response::getInstance()->json($this->getJsonErrorResponseData($e->getTraceAsString(), 'error', $e->getMessage()))->send();
-        } else {
-            Response::getInstance()->json($this->getJsonErrorResponseData(null, 'error', 'Something Went Wrong!'))->send();
-        }
-    }
-
-    /**
-     * Handles HTML exception responses.
-     *
-     * @param Exception $e The exception to handle.
-     */
-    private function handleHtmlExceptionResponse(Exception $e): void
-    {
-        if (config('app.debug')) {
-            CoreView::init()->render('errors.debug', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-        } else {
-            CoreView::init()->render('errors.production', ['message' => 'Something Went Wrong!']);
-        }
-    }
-
-    /**
-     * Generates a JSON response data structure.
-     *
-     * @param mixed|null $data The response data.
-     * @param string $status The response status.
-     * @param string $message The response message.
-     * @return array The JSON response data.
-     */
-    private function getJsonResponseData($data = null, string $status, string $message): array
-    {
-        return [
-            'status' => $status,
-            'message' => $message,
-            'data' => $data,
-        ];
-    }
-
-    /**
-     * Generates a JSON error response data structure.
-     *
-     * @param string|null $trace The error trace.
-     * @param string $status The response status.
-     * @param string $message The response message.
-     * @return array The JSON error response data.
-     */
-    private function getJsonErrorResponseData(?array $trace, string $status, string $message): array
-    {
-        return [
-            'status' => $status,
-            'message' => $message,
-            'trace' => $trace,
-        ];
     }
 }

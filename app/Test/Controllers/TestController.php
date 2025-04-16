@@ -11,11 +11,11 @@ class TestController  extends Controller
     protected $serviceable = TestService::class;
 
     #[Get(uri:'/', name:'index')]
-    public function index(){
-        $features = $this->service->index();
+    // public function index(){
+    //     $features = $this->service->index();
 
-       $this->view(template: 'landing.home', data: [
-        'features' => $features
-     ]);
-    }
+    //    $this->view(template: 'landing.home', data: [
+    //     'features' => $features
+    //  ]);
+    // }
 }
