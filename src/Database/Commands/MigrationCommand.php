@@ -26,8 +26,8 @@ abstract class MigrationCommand extends Command
     {
         $config = new Configuration();
         $config->addMigrationsDirectory(
-            'Database\\Migrations', 
-            database_path('/Migrations')
+            key(config('database.migrations.migrations_paths')), 
+            config('database.migrations.migrations_paths')[key(config('database.migrations.migrations_paths'))]
         );
         $config->setAllOrNothing(true);
         $config->setCheckDatabasePlatform(false);
@@ -54,7 +54,7 @@ abstract class MigrationCommand extends Command
         $commandName = $this->getMigrationCommandName();
         
         // Create a new application with migration commands
-        $application = new \Symfony\Component\Console\Application('Doctrine Migrations');
+        $application = new \Symfony\Component\Console\Application('Axiom Migrations');
         ConsoleRunner::addCommands($application, $this->dependencyFactory);
         
         // Find and execute the command
@@ -66,6 +66,12 @@ abstract class MigrationCommand extends Command
         
         $output = new ConsoleOutput();
         $command->run($input, $output);
+    }
+
+
+    public function getVersion(string $version) :string
+    {
+        return key(config('database.migrations.migrations_paths')). '\\' . 'Version' . $version;
     }
 
     abstract protected function getMigrationCommandName(): string;

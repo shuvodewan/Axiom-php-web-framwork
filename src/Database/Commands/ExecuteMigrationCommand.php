@@ -68,7 +68,7 @@ class ExecuteMigrationCommand extends MigrationCommand
     protected function prepareInput(): array
     {
         $input = [
-            'versions' => explode(',', $this->argument('version')),
+            'versions' => explode(',', $this->getVersion($this->argument('version'))),
             '--up' => $this->argument('up') ?: false,
             '--down' => $this->argument('down') ?: false,
         ];

@@ -42,6 +42,9 @@ class CreateApplicationCommand extends Command
     {
         return [
             'name' => 'required|max:50',
+            'entity'=>'nullable|max:50',
+            'controller'=>'nullable|max:50',
+            'service'=>'nullable|max:50',
         ];
     }
 
@@ -133,9 +136,11 @@ class CreateApplicationCommand extends Command
     {
         $this->info('Generating application files...');
 
-        $name = $this->argument('name');
-        (new EntityGeneratorCommand())->handle($name, $name);
-
+        $app = $this->argument('name');
+        (new AppGeneratorCommand())->handle($app, $app);
+        (new EntityGeneratorCommand())->handle($app, $this->argument('entity')??$app);
+        (new ServiceGeneratorCommand())->handle($app, $this->argument('service')??$app);
+        (new ControllerGeneratorCommand())->handle($app, $this->argument('controller')??$app);
         return $this;
     }
 }

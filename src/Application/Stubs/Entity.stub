@@ -2,9 +2,22 @@
 
 namespace App\{{NAMESPACE}}\Entities;
 
-use Axiom\Database\Entity;
+use Axiom\Database\Entity as ModelEntity;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\GeneratedValue;
 
-class {{CLASS_NAME}} extends Entity
+
+/**
+ * {{CLASS_NAME}} Entity
+ * 
+ * Maps to the {{TABLE}} table in the database.
+ */
+#[Entity]
+#[Table(name: '{{TABLE}}')]
+class {{CLASS_NAME}} extends ModelEntity
 {
     
 }

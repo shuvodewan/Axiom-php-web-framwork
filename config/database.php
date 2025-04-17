@@ -41,9 +41,10 @@ return [
             'execution_time_column_name' => 'execution_time',
         ],
         'migrations_paths' => [
-            'Database\Migrations' => database_path('migrations'),
+            'Database\Migrations' => database_path('/Migrations'),
         ],
         'all_or_nothing' => true,
         'check_database_platform' => true,
+        'namespace'=>'Database\\Migrations',
     ],
 ];

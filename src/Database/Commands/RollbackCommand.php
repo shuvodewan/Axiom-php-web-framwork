@@ -50,21 +50,8 @@ class RollbackCommand extends MigrationCommand
             'query-time' => 'nullable|boolean',
             'all' => 'nullable|boolean',
             'force' => 'nullable|boolean',
-            'version' => 'required|string|regex:/^\d{14}$/'
+            'version' => 'nullable|regex:/^\d{14}$/',
         ];
-    }
-
-    /**
-     * Configure the command options.
-     */
-    protected function configure()
-    {
-        $this->addOption(
-            'pretend',
-            null,
-            InputOption::VALUE_NONE,
-            'Dump the SQL queries that would be run'
-        );
     }
 
     /**
@@ -94,7 +81,7 @@ class RollbackCommand extends MigrationCommand
 
         // Handle version-specific rollback
         if ($version = $this->argument('version')) {
-            $input['versions'] = [$version];
+            $input['versions'] = [$this->getVersion($version)];
         }
 
         // Set options from arguments

@@ -2,7 +2,7 @@
 
 namespace Axiom\Project;
 
-use App\Test\TestApp;
+use App\Authentication\AuthenticationApp;
 
 /**
  * Application registry that maintains system-wide configurations and components.
@@ -19,7 +19,7 @@ class Registry
      * @var array<class-string>
      */
     static $INSTALLED_APPS = [
-        TestApp::class
+        AuthenticationApp::class
     ];
 
     /**

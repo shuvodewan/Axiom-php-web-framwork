@@ -3,10 +3,10 @@
 namespace Axiom\Core;
 
 use Axiom\Application\AppManager;
-use Axiom\Exception\Handler;
 use Axiom\Http\Request;
 use Axiom\Http\Response;
 use Axiom\Http\Router;
+use Axiom\Project\Exceptions\Handler;
 use Axiom\Project\Registry;
 use Axiom\Traits\InstanceTrait;
 use Axiom\Views\CoreView;

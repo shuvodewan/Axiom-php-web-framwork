@@ -46,7 +46,7 @@ class MigrateCommand extends MigrationCommand
     protected function validator(): array
     {
         return [
-            'version' => 'nullable|regex:/^\d{14}$/', // Validate version format
+            'version' => 'nullable|regex:/^\d{14}$/',
             'dry-run' => 'nullable|boolean',
             'query-time' => 'nullable|boolean',
             'allow-no-migration' => 'nullable|boolean',
@@ -75,8 +75,10 @@ class MigrateCommand extends MigrationCommand
     protected function prepareInput(): array
     {
 
+        $input = [];
+
         if ($version = $this->argument('version')) {
-            $input['version'] = $version;
+            $input['version'] = $this->getVersion($version);
         }
 
         // Set options from arguments

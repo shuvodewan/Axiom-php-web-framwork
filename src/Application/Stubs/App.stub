@@ -1,0 +1,10 @@
+<?php
+
+namespace App\{{NAMESPACE}};
+
+use Axiom\Application\App;
+
+class {{CLASS_NAME}}App extends App
+{
+
+}

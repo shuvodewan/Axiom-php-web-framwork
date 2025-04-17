@@ -31,7 +31,7 @@ class DiffCommand extends MigrationCommand
      * Defines validation rules for command options.
      * 
      * Currently no validation needed as:
-     * - Namespace is hardcoded to 'Database\Migrations'
+     * - Namespace is hardcoded to 'Axiom\Database\Migrations'
      * - Filter accepts any valid regex pattern
      * - Dry-run is boolean flag
      * 
@@ -75,7 +75,7 @@ class DiffCommand extends MigrationCommand
     {
         return [
             // Fixed namespace for generated migrations
-            '--namespace' => 'Database\\Migrations',
+            '--namespace' => key(config('database.migrations.migrations_paths')),
             
             // Table filter (supports regex patterns)
             '--filter-expression' => $this->argument('filter') ?: '',

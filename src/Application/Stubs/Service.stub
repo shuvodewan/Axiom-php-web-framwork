@@ -1,0 +1,23 @@
+<?php
+
+namespace App\{{NAMESPACE}}\Services;
+
+use App\{{NAMESPACE}}\Entities\{{ENTITY}};
+use Axiom\Application\Base\Service;
+
+
+/**
+ * Service layer for domain business logic
+ *
+ * Handles all business logic operations related to Entities.
+ * Serves as an intermediary between controllers and the data access layer (Doctrine entities).
+ * 
+ * @package App\{{NAMESPACE}}\Services
+ */
+class {{CLASS_NAME}}Service extends Service
+{
+     /**
+     * @var The Doctrine entity class this service manages
+     */
+    protected $entity = {{ENTITY}}::class;
+}

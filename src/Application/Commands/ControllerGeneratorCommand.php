@@ -4,7 +4,6 @@ namespace Axiom\Application\Commands;
 
 use Axiom\Application\ApplicationGeneratorTrait;
 use Axiom\Console\Command;
-use Axiom\Facade\Str;
 use Axiom\Filesystem\LocalDriver;
 
 /**
@@ -13,7 +12,7 @@ use Axiom\Filesystem\LocalDriver;
  * A console command for generating model files in the application.
  * This command uses stubs to create model files with the appropriate namespace and class name.
  */
-class EntityGeneratorCommand extends Command
+class ControllerGeneratorCommand extends Command
 {
     use ApplicationGeneratorTrait;
 
@@ -53,7 +52,7 @@ class EntityGeneratorCommand extends Command
      */
     protected function setData(?string $app = null, ?string $name = null): void
     {
-        $this->info('Generating entity...');
+        $this->info('Generating controller...');
 
         // Initialize the filesystem instance
         $this->filesystem = new LocalDriver(['root' => app_path()]);
@@ -64,9 +63,9 @@ class EntityGeneratorCommand extends Command
 
         // Define the items to generate
         $this->items = [
-            "Entity" => [
-                "dir" => ucfirst($this->app) . '/Entities/',
-                "file" => $this->getSingularClassName($this->name) . '.php',
+            "Controller" => [
+                "dir" => ucfirst($this->app) . '/Controllers/',
+                "file" => $this->getSingularClassName($this->name) . 'Controller.php',
             ],
         ];
     }
@@ -80,8 +79,8 @@ class EntityGeneratorCommand extends Command
     {
         return [
             'NAMESPACE' => ucfirst($this->app),
-            'TABLE'=>Str::plural(Str::pascalToSnake($this->name)),
             'CLASS_NAME' => $this->getSingularClassName($this->name),
+            'SERVICE' => $this->getSingularClassName($this->name),
         ];
     }
 }

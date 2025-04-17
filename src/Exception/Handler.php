@@ -7,6 +7,7 @@ use ErrorException;
 use Axiom\Core\Log;
 use Axiom\Http\Request;
 use Axiom\Http\Response;
+use Axiom\Views\CoreView;
 
 /**
  * Global exception handler for the Axiom framework
@@ -21,6 +22,9 @@ class Handler
      * @var array
      */
     protected array $dontReport = [];
+
+
+    protected $errorTemplatePath = 'errors';
 
     /**
      * Sensitive server keys to filter from logs and output
@@ -77,7 +81,7 @@ class Handler
     public function handleException(Throwable $e): void
     {
         $this->report($e);
-        $this->render($e)->send();
+        $this->render($e);
         exit(1);
     }
 
@@ -175,7 +179,7 @@ class Handler
      * @param Throwable $e The exception to render
      * @return Response
      */
-    public function render(Throwable $e): Response
+    public function render(Throwable $e)
     {
         foreach ($this->getCustomHandlers() as $handler) {
             if ($handler->canHandle($e)) {
@@ -204,7 +208,7 @@ class Handler
      * @param Throwable $e The exception to render
      * @return Response
      */
-    protected function renderJsonResponse(Throwable $e): Response
+    protected function renderJsonResponse(Throwable $e)
     {
         $status = $this->getStatusCode($e);
         $data = [
@@ -223,7 +227,8 @@ class Handler
 
         return Response::getInstance()
             ->json($data)
-            ->setStatus($status);
+            ->setStatus($status)
+            ->send();
     }
 
     /**
@@ -232,7 +237,7 @@ class Handler
      * @param Throwable $e The exception to render
      * @return Response
      */
-    protected function renderHttpException(Throwable $e): Response
+    protected function renderHttpException(Throwable $e)
     {
         return config('app.debug')
             ? (new WhoopsHandler($this->sensitiveServerKeys, $e))->renderWithWhoops()
@@ -245,18 +250,10 @@ class Handler
      * @param Throwable $e The exception to render
      * @return Response
      */
-    protected function renderProductionError(Throwable $e): Response
+    protected function renderProductionError(Throwable $e): void
     {
-        $statusCode = $this->getStatusCode($e);
-        $view = $this->getErrorViewPath($statusCode);
-        
-        ob_start();
-        extract(['exception' => $e, 'statusCode' => $statusCode]);
-        include $view;
-        
-        return (new Response())
-            ->setContent(ob_get_clean())
-            ->setStatus($statusCode);
+        $this->renderErrorViewPathFromProject($e);
+        $this->renderErrorViewPathFromCore($e);
     }
 
     /**
@@ -265,10 +262,35 @@ class Handler
      * @param int $statusCode The HTTP status code
      * @return string The full path to the view file
      */
-    protected function getErrorViewPath(int $statusCode): string
+    private function renderErrorViewPathFromProject(Throwable $e): void
     {
+        $statusCode = $this->getStatusCode($e);
+        $view = template_path("/{$this->errorTemplatePath}") . "/{$statusCode}.twig";
+        if(file_exists($view)){
+            (new CoreView())->render($this->errorTemplatePath. '.' . $statusCode,['exception' => $e, 'statusCode' => $statusCode]);
+        }
+    }
+
+     /**
+     * Get the path to the error view file
+     * 
+     * @param int $statusCode The HTTP status code
+     * @return string The full path to the view file
+     */
+    private function renderErrorViewPathFromCore(Throwable $e): void
+    {   
+        $statusCode = $this->getStatusCode($e);
         $view = __DIR__ . "/templates/{$statusCode}.php";
-        return file_exists($view) ? $view : __DIR__ . "/templates/500.php";
+        $view = file_exists($view) ? $view : __DIR__ . "/templates/500.php";
+
+        ob_start();
+        extract(['exception' => $e, 'statusCode' => $statusCode]);
+        include $view;
+        
+        (new Response())
+            ->setContent(ob_get_clean())
+            ->setStatus($statusCode)
+            ->send();
     }
 
     /**

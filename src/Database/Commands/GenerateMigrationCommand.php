@@ -74,7 +74,7 @@ class GenerateMigrationCommand extends MigrationCommand
     {
         return [
             // Fixed namespace for organization
-            '--namespace' => 'Database\\Migrations',
+            '--namespace' => key(config('database.migrations.migrations_paths')),
         ];
     }
 
@@ -94,7 +94,7 @@ class GenerateMigrationCommand extends MigrationCommand
         parent::handle();
         
         $this->info(sprintf(
-            'Migration template created successfully in Database\Migrations namespace',
+            'Migration template created successfully in Axiom\Database\Migrations namespace',
         ));
         
         $this->line('Next steps:');
