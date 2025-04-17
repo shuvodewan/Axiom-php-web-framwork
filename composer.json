@@ -23,7 +23,8 @@
         "symfony/cache": "^7",
         "doctrine/migrations": "^3.0",
         "php-di/php-di": "dev-master",
-        "filp/whoops": "^2.18"
+        "filp/whoops": "^2.18",
+        "phpmailer/phpmailer": "dev-master"
     },
     "autoload":{
         "psr-4":{

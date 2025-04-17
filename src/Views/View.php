@@ -49,7 +49,7 @@ abstract class View
      */
     private function getTemplateData(string $template, array $data): string
     {
-        return (new TwigDriver(project_path('/templates'),storage_path('/cache/templates')))->render($template, $data);
+        return (new TwigDriver())->render($template, $data);
     }
 
     /**

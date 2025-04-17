@@ -17,11 +17,11 @@ class TwigDriver implements ViewDriverContract
      * @param string $viewsPath Path to the views directory.
      * @param string $cachePath Path to the cache directory (optional).
      */
-    public function __construct(string $viewsPath, string $cachePath = '')
+    public function __construct()
     {
-        $loader = new FilesystemLoader($viewsPath);
+        $loader = new FilesystemLoader(project_path('/templates'));
         $this->twig = new Environment($loader, [
-            'cache' => $cachePath, 
+            'cache' => storage_path('/cache/templates'), 
             'debug' => true,      
         ]);
     }
