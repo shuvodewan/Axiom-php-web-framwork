@@ -24,7 +24,12 @@
         "doctrine/migrations": "^3.0",
         "php-di/php-di": "dev-master",
         "filp/whoops": "^2.18",
-        "phpmailer/phpmailer": "dev-master"
+        "phpmailer/phpmailer": "dev-master",
+        "symfony/messenger": "6.4.x-dev",
+        "symfony/amqp-messenger": "5.4.x-dev",
+        "symfony/doctrine-messenger": "7.2.x-dev",
+        "symfony/redis-messenger": "5.4.x-dev",
+        "symfony/amazon-sqs-messenger": "^7.2@beta"
     },
     "autoload":{
         "psr-4":{

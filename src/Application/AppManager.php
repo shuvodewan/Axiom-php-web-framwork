@@ -113,6 +113,15 @@ class AppManager
         }, $this->getAppsName());
     }
 
+
+    public function getJobs(): array
+    {
+        return array_merge(array_map(function (string $app) {
+            $appObj = self::$apps[$app];
+            return $appObj->jobs;
+        }, $this->getAppsName()));
+    }
+
     /**
      * Registers routes for all applications.
      */
@@ -120,4 +129,5 @@ class AppManager
     {
         (new RegisterRoutes())->load($this->getControllerDirs());
     }
+
 }

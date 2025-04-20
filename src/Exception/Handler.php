@@ -239,6 +239,7 @@ class Handler
      */
     protected function renderHttpException(Throwable $e)
     {
+
         return config('app.debug')
             ? (new WhoopsHandler($this->sensitiveServerKeys, $e))->renderWithWhoops()
             : $this->renderProductionError($e);

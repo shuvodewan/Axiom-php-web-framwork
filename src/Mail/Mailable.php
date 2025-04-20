@@ -5,24 +5,24 @@ namespace Axiom\Mail;
 
 abstract class Mailable
 {
-    protected $view;
-    protected $mailer;
-    protected $to;
+    private $mailer;
 
-    public function __construct($view)
+    public function __construct()
     {
-        $this->view = $view;
         $this->mailer = New MailService();
-
     }
 
+    abstract public function mailTo() :string;
     abstract public function build();
+    abstract public function subject() :string;
+
 
     public function send()
     {
         $this->build();
         
-        return $this->mailer->to($this->to)
+        return $this->mailer->to($this->mailTo())
+            ->subject($this->subject())
             ->from(config('mail.global.from.address'),config('mail.global.from.name'))
             ->send();
     }

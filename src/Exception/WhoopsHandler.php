@@ -43,7 +43,7 @@ class WhoopsHandler
      *
      * @return Response Prepared HTTP response
      */
-    public function renderWithWhoops(): Response
+    public function renderWithWhoops()
     {
         $whoops = new Whoops();
         $whoops->pushHandler($this->getPageHandler());
@@ -55,7 +55,8 @@ class WhoopsHandler
         
         return (new Response())
             ->setContent($content)
-            ->setStatus($this->getStatusCode());
+            ->setStatus($this->getStatusCode())
+            ->send();
     }
 
     /**

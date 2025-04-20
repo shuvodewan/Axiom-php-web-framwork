@@ -3,8 +3,9 @@
 namespace App\Authentication\Services;
 
 use App\Authentication\Entities\User;
+use App\Authentication\Transports\Jobs\MailJob;
 use Axiom\Application\Base\Service;
-
+use Axiom\Facade\Messenger;
 
 /**
  * Service layer for domain business logic
@@ -25,6 +26,8 @@ class UserService extends Service
 
     public function index($data)
     {
-        $this->entity->create($data);
+        // $this->entity->create($data);
+
+        Messenger::dispatch(new MailJob());
     }
 }

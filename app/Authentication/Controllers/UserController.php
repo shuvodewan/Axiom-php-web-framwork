@@ -4,7 +4,7 @@ namespace App\Authentication\Controllers;
 
 use Axiom\Application\Base\Controller;
 use App\Authentication\Services\UserService;
-
+use Axiom\Core\Attribute\Get;
 
 /**
  * Controller for handling HTTP requests
@@ -22,4 +22,9 @@ class UserController  extends Controller
      * @see UserService
      */
     protected $serviceable = UserService::class;
+
+    #[Get(uri:'/users', name:'users.index')]
+    public function index($request){
+        $this->service->index($request->body);
+    }
 }
