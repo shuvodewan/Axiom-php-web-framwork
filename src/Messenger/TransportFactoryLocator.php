@@ -2,29 +2,31 @@
 
 namespace Axiom\Messenger;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Configuration as DBALConfiguration;
+use Axiom\Database\DatabaseManager;
+use Axiom\Database\DoctrineRegistry;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransportFactory;
+use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 
 class TransportFactoryLocator
 {
-    private ?Connection $doctrineConnection = null;
+    private $registry = null;
     private array $factories = [];
-    private  $bus;
 
-    public function __construct($bus)
+    
+    public function __construct()
     {
-        $this->bus = $bus;
+        $this->registry = new DoctrineRegistry(DatabaseManager::getInstance()->getConnection());
         $this->initializeDefaultFactories();
     }
 
     private function initializeDefaultFactories(): void
     {
-        // Sync transport now receives the bus
-        $this->addFactory('sync', new \Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory($this->bus));
+        $this->addFactory('sync', new \Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory(
+            new MessageBus(),
+            new PhpSerializer()
+        ));
         
-        // Other factories remain unchanged
         $this->addFactory('amqp', new \Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory());
         $this->addFactory('redis', new \Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory());
         $this->addFactory('sqs', new \Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory());
@@ -43,7 +45,6 @@ class TransportFactoryLocator
             }
         }
 
-        // Special handling for Doctrine
         if (str_starts_with($dsn, 'doctrine://')) {
             return $this->getDoctrineFactory();
         }
@@ -55,20 +56,10 @@ class TransportFactoryLocator
     {
         if (!isset($this->factories['doctrine'])) {
             $this->factories['doctrine'] = new DoctrineTransportFactory(
-                $this->getDoctrineConnection()
+                $this->registry
             );
         }
         return $this->factories['doctrine'];
     }
 
-    private function getDoctrineConnection()
-    {
-        if (!$this->doctrineConnection) {
-            $this->doctrineConnection = DriverManager::getConnection(
-                ['url' => env('DATABASE_URL')],
-                new DBALConfiguration()
-            );
-        }
-        return $this->doctrineConnection;
-    }
 }

@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'default_transport' => env('MESSENGER_TRANSPORT', 'sync'),
+    'default_transport' => env('MESSENGER_TRANSPORT', 'doctrine'),
 
     'transports' => [
         'sync' => [
@@ -29,18 +29,7 @@ return [
                 'table_name' => 'messenger_messages',
                 'queue_name' => 'default',
                 'redeliver_timeout' => 3600,
-                'connection' => env('DATABASE_CONNECTION', 'mysql'), // Reuse DB connection
-                'table_name' => 'messenger_messages',
-                'queue_name' => 'default',
                 'auto_setup' => true,
-                'connection_options' => [
-                    'dbname' => env('DB_DATABASE', 'forge'),
-                    'user' => env('DB_USERNAME', 'forge'),
-                    'password' => env('DB_PASSWORD', ''),
-                    'host' => env('DB_HOST', '127.0.0.1'),
-                    'port' => env('DB_PORT', 3306),
-                    'charset' => 'utf8mb4'
-                ]
             ]
         ],
         

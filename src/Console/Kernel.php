@@ -18,6 +18,8 @@ use Axiom\Database\Commands\StatusCommand;
 use Axiom\Database\Commands\SyncMetadataCommand;
 use Axiom\Database\Commands\VersionCommand;
 use Axiom\Facade\Log;
+use Axiom\Messenger\Commands\WorkerCommand;
+use Axiom\Messenger\QueueWorker;
 use Exception;
 
 /**
@@ -43,6 +45,8 @@ class Kernel
             'project:start' => AppServeCommand::class,
             'app:create' => CreateApplicationCommand::class,
             'app:delete' => DeleteApplicationCommand::class,
+
+            'queue:work'=>WorkerCommand::class,
             
             //Help
             'help:entity' => EntityHelpCommand::class,
