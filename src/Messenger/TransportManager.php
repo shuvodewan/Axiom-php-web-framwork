@@ -3,6 +3,8 @@
 
 namespace Axiom\Messenger;
 
+use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory;
@@ -39,17 +41,12 @@ class TransportManager
             
             $transportConfig = $this->config['transports'][$name];
             $factory = $this->factoryLocator->getFactory($transportConfig['dsn']);
-            
             return $factory->createTransport(
                 $transportConfig['dsn'],
                 $transportConfig['options'] ?? [],
                 $this->getSyncSerializer() 
             );
-            // Normal case for other transports
-            return $factory->createTransport(
-                $transportConfig['dsn'],
-                $transportConfig['options'] ?? []
-            );
+            
         }
     
         private function getSyncSerializer(): SerializerInterface
@@ -65,5 +62,34 @@ class TransportManager
     public function getWorkerConfig(): array
     {
         return $this->config['worker'] ?? [];
+    }
+
+    public function initializeTransport(string $transportName): void
+    {
+        if (!isset($this->transports[$transportName])) {
+            $this->transports[$transportName] = $this->createTransport($transportName);
+        }
+    }
+    
+    public function getReceiver(string $transportName): ReceiverInterface
+    {
+        $transport = $this->getTransport($transportName);
+        // Some transports implement ReceiverInterface directly
+        if ($transport instanceof ReceiverInterface) {
+            return $transport;
+        }
+        // Standard Symfony transports have a get() method
+        $receiver = $transport->get();
+        
+        if (!$receiver instanceof ReceiverInterface) {
+            throw new \RuntimeException(sprintf(
+                'Receiver for transport "%s" must implement %s, %s given',
+                $transportName,
+                ReceiverInterface::class,
+                is_object($receiver) ? get_class($receiver) : gettype($receiver)
+            ));
+        }
+        
+        return $receiver;
     }
 }

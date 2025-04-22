@@ -8,5 +8,9 @@ use Axiom\Application\App;
 
 class AuthenticationApp extends App
 {
-    public array $jobs=[MailJob::class=>[MailHandler::class]];
+
+    public function registerJobs() :array
+    {
+        return [MailJob::class=>[ new MailHandler()]];
+    }
 }

@@ -116,9 +116,9 @@ class AppManager
 
     public function getJobs(): array
     {
-        return array_merge(array_map(function (string $app) {
+        return array_merge(...array_map(function (string $app) {
             $appObj = self::$apps[$app];
-            return $appObj->jobs;
+            return $appObj->registerJobs();
         }, $this->getAppsName()));
     }
 

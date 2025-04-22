@@ -48,9 +48,6 @@ class App
     public array $middlewares = [];
 
 
-    public array $jobs=[];
-
-
     /**
      * Bootstraps the application by registering container dependencies.
      * This method should be called during application initialization to set up
@@ -60,5 +57,10 @@ class App
      */
     public function boot(){
         //register container dependencies
+    }
+
+    public function registerJobs() :array
+    {
+        return [];
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Axiom\Messenger;
 
+use App\Authentication\Transports\Handlers\MailHandler;
+use App\Authentication\Transports\Jobs\MailJob;
 use Symfony\Component\Messenger\{
     MessageBus,
     Envelope,
@@ -51,6 +53,7 @@ class MessageManager
 
     private function createHandleMessageMiddleware(): MiddlewareInterface
     {
+    
         return new HandleMessageMiddleware(
             new HandlersLocator(AppManager::getInstance()->getJobs())
         );
@@ -77,6 +80,7 @@ class MessageManager
             }
         };
     }
+    
 
     public function dispatch(object $message, ?string $transport = null,?int $delayMs = null,array $stamps = []
     ): Envelope {

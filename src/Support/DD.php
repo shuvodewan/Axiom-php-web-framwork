@@ -11,7 +11,7 @@ class DD
         
         if ($isConsole) {
             foreach ($vars as $var) {
-                Preview::info(json_encode($var, JSON_PRETTY_PRINT));
+                Preview::info(print_r($var, true));
             }
         } else {
             echo <<<HTML

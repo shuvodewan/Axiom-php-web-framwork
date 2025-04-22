@@ -8,7 +8,6 @@ class MailHandler implements HandlerContract
 {
     public function __invoke($job)
     {
-        dd($job);
         $job->sendMail();
     }
 }
