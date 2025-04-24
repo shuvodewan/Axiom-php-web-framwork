@@ -4,13 +4,33 @@ namespace Axiom\Mail\Transports;
 
 use Axiom\Mail\Contracts\Transport;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use RuntimeException;
 
+/**
+ * Mailgun API transport for sending emails through Mailgun's HTTP API.
+ */
 class MailgunTransport implements Transport
 {
-    protected $client;
-    protected $config;
+    /**
+     * @var Client The HTTP client instance
+     */
+    protected Client $client;
 
+    /**
+     * @var array Configuration array
+     */
+    protected array $config;
+
+    /**
+     * Create a new Mailgun transport instance.
+     *
+     * @param array $config Configuration array containing:
+     *                      - domain: Mailgun domain
+     *                      - secret: Mailgun API key
+     *                      - endpoint: API endpoint (e.g., api.mailgun.net)
+     *                      - scheme: HTTP scheme (https)
+     */
     public function __construct(array $config)
     {
         $this->config = $config;
@@ -20,7 +40,24 @@ class MailgunTransport implements Transport
         ]);
     }
 
-    public function send(array $message)
+    /**
+     * Send an email through Mailgun API.
+     *
+     * @param array $message The message data containing:
+     *                       - from: Sender address
+     *                       - to: Recipient address
+     *                       - subject: Email subject
+     *                       - html: HTML content
+     *                       - text: Plain text content (optional)
+     *                       - cc: CC addresses (optional)
+     *                       - bcc: BCC addresses (optional)
+     *                       - attachments: File attachments (optional)
+     *
+     * @return array Mailgun API response
+     *
+     * @throws RuntimeException When the API request fails
+     */
+    public function send(array $message): array
     {
         try {
             $response = $this->client->post(
@@ -31,8 +68,9 @@ class MailgunTransport implements Transport
                 ]
             );
 
-            return json_decode($response->getBody()->getContents(), true);
-        } catch (\Exception $e) {
+            $contents = $response->getBody()->getContents();
+            return json_decode($contents, true) ?? [];
+        } catch (GuzzleException $e) {
             throw new RuntimeException(
                 "Mailgun API Error: " . $e->getMessage(),
                 $e->getCode(),
@@ -41,7 +79,14 @@ class MailgunTransport implements Transport
         }
     }
 
-    protected function buildFormParams(array $message)
+    /**
+     * Build form parameters for Mailgun API request.
+     *
+     * @param array $message The message data
+     *
+     * @return array Form parameters for the API request
+     */
+    protected function buildFormParams(array $message): array
     {
         $params = [
             'from' => $this->formatAddress($message['from']),
@@ -54,25 +99,37 @@ class MailgunTransport implements Transport
             $params['text'] = $message['text'];
         }
 
-        foreach ($message['cc'] as $cc) {
-            $params['cc'] = $this->formatAddress($cc);
+        if (!empty($message['cc'])) {
+            $params['cc'] = array_map([$this, 'formatAddress'], $message['cc']);
         }
 
-        foreach ($message['bcc'] as $bcc) {
-            $params['bcc'] = $this->formatAddress($bcc);
+        if (!empty($message['bcc'])) {
+            $params['bcc'] = array_map([$this, 'formatAddress'], $message['bcc']);
         }
 
-        foreach ($message['attachments'] as $attachment) {
-            $params['attachment'][] = [
-                'filePath' => $attachment['file'],
-                'filename' => $attachment['options']['name'] ?? basename($attachment['file']),
-            ];
+        if (!empty($message['attachments'])) {
+            $params['attachment'] = array_map(
+                fn (array $attachment) => [
+                    'filePath' => $attachment['file'],
+                    'filename' => $attachment['options']['name'] ?? basename($attachment['file']),
+                ],
+                $message['attachments']
+            );
         }
 
         return $params;
     }
 
-    protected function formatAddress(array $address)
+    /**
+     * Format an email address with optional name.
+     *
+     * @param array $address Address array containing:
+     *                       - address: Email address
+     *                       - name: Optional display name
+     *
+     * @return string Formatted address string
+     */
+    protected function formatAddress(array $address): string
     {
         return isset($address['name'])
             ? "{$address['name']} <{$address['address']}>"

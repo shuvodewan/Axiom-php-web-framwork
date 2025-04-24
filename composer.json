@@ -8,7 +8,7 @@
             "name": "Golam Mahiuddin"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "require": {
         "vlucas/phpdotenv": "^5.6@dev",
         "monolog/monolog": "^3.0@dev",
@@ -30,7 +30,12 @@
         "symfony/doctrine-messenger": "7.2.x-dev",
         "symfony/redis-messenger": "5.4.x-dev",
         "symfony/amazon-sqs-messenger": "^7.2@beta",
-        "symfony/event-dispatcher": "7.3.x-dev"
+        "symfony/event-dispatcher": "7.3.x-dev",
+        "symfony/mailer": "^7.2",
+        "symfony/mailgun-mailer": "^7.2",
+        "symfony/http-client": "^7.2",
+        "symfony/postmark-mailer": "^7.2",
+        "guzzlehttp/guzzle": "^7.0"
     },
     "autoload":{
         "psr-4":{

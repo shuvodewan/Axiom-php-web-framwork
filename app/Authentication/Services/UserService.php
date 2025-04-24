@@ -4,6 +4,7 @@ namespace App\Authentication\Services;
 
 use App\Authentication\Entities\User;
 use App\Authentication\Transports\Jobs\MailJob;
+use App\Authentication\Transports\Mails\PasswordResetMail;
 use Axiom\Application\Base\Service;
 use Axiom\Facade\Messenger;
 
@@ -29,5 +30,6 @@ class UserService extends Service
         // $this->entity->create($data);
 
         Messenger::dispatch(new MailJob());
+        // (new PasswordResetMail())->send();
     }
 }

@@ -1,31 +1,22 @@
 <?php
-// Axiom/Mail/Transports/SmtpTransport.php
+// Axiom/Mail/Transports/SendmailTransport.php
 
 namespace Axiom\Mail\Transports;
 
-use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
-use Symfony\Component\Mailer\Mailer;
-use Symfony\Component\Mime\Email;
-use Axiom\Mail\Contracts\Transport;
 
-class SmtpTransport implements Transport
+use Symfony\Component\Mailer\Mailer;
+use Axiom\Mail\Contracts\Transport;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mailer\Transport\SendmailTransport as TransportSendmailTransport;
+
+class SendmailTransport implements Transport
 {
-    protected $config;
     protected $mailer;
 
     public function __construct(array $config)
     {
-        $this->config = $config;
-        $transport = new EsmtpTransport(
-            $config['host'],
-            $config['port'],
-            $config['encryption'] === 'tls',
-            null
-        );
-
-        $transport->setUsername($config['username']);
-        $transport->setPassword($config['password']);
-
+        $command = $config['command'] ?? '/usr/sbin/sendmail -bs';
+        $transport = new TransportSendmailTransport($command);
         $this->mailer = new Mailer($transport);
     }
 

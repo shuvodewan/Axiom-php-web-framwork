@@ -1,31 +1,22 @@
 <?php
-// Axiom/Mail/Transports/SmtpTransport.php
+// src/Axiom/Mail/Transports/PostmarkTransport.php
 
 namespace Axiom\Mail\Transports;
 
-use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Axiom\Mail\MailException;
+use Axiom\Mail\Contracts\Transport;
+use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkApiTransport;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mime\Email;
-use Axiom\Mail\Contracts\Transport;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
-class SmtpTransport implements Transport
+class PostmarkTransport implements Transport
 {
-    protected $config;
     protected $mailer;
 
-    public function __construct(array $config)
+    public function __construct(string $apiToken)
     {
-        $this->config = $config;
-        $transport = new EsmtpTransport(
-            $config['host'],
-            $config['port'],
-            $config['encryption'] === 'tls',
-            null
-        );
-
-        $transport->setUsername($config['username']);
-        $transport->setPassword($config['password']);
-
+        $transport = PostmarkApiTransport::create($apiToken);
         $this->mailer = new Mailer($transport);
     }
 
