@@ -26,6 +26,20 @@ class TwigDriver implements ViewDriverContract
         ]);
     }
 
+
+    /**
+     * Registers the Twig extension with the environment.
+     *
+     * Adds the custom TwigExtension to provide additional functions and filters.
+     * 
+     * @return self Returns the instance for method chaining.
+     */
+    public function register()
+    {
+        $this->twig->addExtension(new TwigExtension($this->twig));
+        return $this;
+    }
+
     /**
      * Renders a Twig template.
      *
