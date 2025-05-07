@@ -45,8 +45,10 @@ class Vite
      */
     public function loadAssets(array $entrypoints): string
     {
-        return $this->isDevMode() 
-            ? $this->loadFromDevServer($entrypoints)
+        $dev = $this->isDevMode();
+
+        return $dev  
+            ? $this->loadFromDevServer($entrypoints, $dev)
             : $this->loadFromBuild($entrypoints);
     }
 
@@ -57,9 +59,11 @@ class Vite
      * 
      * @return bool True if in development mode, false otherwise
      */
-    private function isDevMode(): bool
+    private function isDevMode()
     {
-        return file_exists($this->getBuildPath($this->config['hot_file']));
+        if(file_exists(public_path('/' . $this->config['hot_file']))){
+            return $devServerUrl = trim(file_get_contents(public_path('/' . $this->config['hot_file'])));
+        }
     }
 
     /**
@@ -70,14 +74,12 @@ class Vite
      * @param array $entrypoints Array of entry points to load
      * @return string HTML tags for development assets
      */
-    private function loadFromDevServer(array $entrypoints): string
+    private function loadFromDevServer(array $entrypoints, $hotFile): string
     {
         $tags = [];
-        $devServer = rtrim($this->config['dev_server'], '/');
-        
+        $devServer = rtrim($hotFile, '/');
         foreach ($entrypoints as $entry) {
             $url = $devServer . '/' . ltrim($entry, '/');
-            
             if ($this->isJsFile($entry)) {
                 $tags[] = sprintf('<script type="module" src="%s"></script>', $url);
             } elseif ($this->isCssFile($entry)) {
@@ -127,8 +129,7 @@ class Vite
      */
     private function readManifest(): array
     {
-        $manifestPath = $this->getBuildPath($this->config['manifest_file']);
-        
+        $manifestPath = public_path('/' . $this->getBuildPath($this->config['manifest_file']));
         if (!file_exists($manifestPath)) {
             throw new \RuntimeException("Vite manifest file not found at {$manifestPath}");
         }

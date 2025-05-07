@@ -6,19 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ app_name }} - Home</title>
     
-    {# Tailwind CSS CDN #}
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    {# Custom styles #}
-    <style>
-        .hero-gradient {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-        }
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    {{vite(['project/templates/assets/css/app.css','project/templates/assets/js/app.js'])|raw}}
+
 </head>
 <body class="font-sans antialiased text-gray-800">
     {# Navigation #}

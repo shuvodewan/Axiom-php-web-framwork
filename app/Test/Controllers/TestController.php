@@ -14,7 +14,7 @@ class TestController  extends Controller
     #[Get(uri:'/', name:'index')]
     public function index(){
         $features = $this->service->index();
-        dd(Vite::load([]));
+       
        $this->view(template: 'frontend.home', data: [
         'features' => $features
      ]);

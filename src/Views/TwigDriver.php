@@ -24,6 +24,7 @@ class TwigDriver implements ViewDriverContract
             'cache' => storage_path('/cache/templates'), 
             'debug' => true,      
         ]);
+        $this->register();
     }
 
 

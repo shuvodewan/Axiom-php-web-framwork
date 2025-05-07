@@ -1,0 +1,13 @@
+{
+  "project/templates/assets/css/app.css": {
+    "file": "assets/app-DPztNdZ9.css",
+    "src": "project/templates/assets/css/app.css",
+    "isEntry": true
+  },
+  "project/templates/assets/js/app.js": {
+    "file": "assets/app-l0sNRNKZ.js",
+    "name": "app",
+    "src": "project/templates/assets/js/app.js",
+    "isEntry": true
+  }
+}
