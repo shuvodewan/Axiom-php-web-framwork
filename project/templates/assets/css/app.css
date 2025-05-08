@@ -3,10 +3,14 @@
 @import "tailwindcss/utilities";
 
 
-.hero-gradient {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+.gradient-bg {
+    background: radial-gradient(ellipse at bottom, rgba(7, 42, 74, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
 }
-.feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+.premium-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.code-block {
+    background: linear-gradient(135deg, #0b426f 0%, #072a4a 100%);
 }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation -   {% block title %}{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    {{vite(['project/templates/assets/css/app.css','project/templates/assets/js/app.js'])|raw}}
+</head>
+<body class="font-sans antialiased text-gray-800 bg-gray-50">
+    <!-- Premium Navigation -->
+   {% include 'layouts/frontend/partials/docheader.twig' %}
+   <!--body-->
+    <!-- Main Content -->
+    <div class="flex pt-20">
+    {% include 'layouts/frontend/partials/sidebar.twig' %}
+    {% block body %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    {% include 'layouts/frontend/partials/footer.twig' %}
+
+
+
+    <script>
+        // Toggle version dropdown
+        const versionDropdownButton = document.getElementById('version-dropdown-button');
+        const versionDropdown = document.getElementById('version-dropdown');
+        
+        versionDropdownButton.addEventListener('click', () => {
+            versionDropdown.classList.toggle('hidden');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!versionDropdownButton.contains(event.target)) {
+                versionDropdown.classList.add('hidden');
+            }
+        });
+        
+        // Mobile sidebar toggle (you'll need to implement the button in your mobile header)
+        const mobileSidebar = document.getElementById('mobile-sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        
+        function toggleMobileSidebar() {
+            mobileSidebar.classList.toggle('translate-x-0');
+            mobileSidebar.classList.toggle('-translate-x-full');
+            sidebarOverlay.style.display = sidebarOverlay.style.display === 'block' ? 'none' : 'block';
+        }
+        
+    </script>
+</body>
+</html>

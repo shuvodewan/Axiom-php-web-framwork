@@ -16,8 +16,8 @@ use Doctrine\ORM\Mapping\GeneratedValue;
  * Maps to the axioms table in the database.
  */
 #[Entity]
-#[Table(name: 'axioms')]
-class Axiom extends ModelEntity
+#[Table(name: 'menues')]
+class Menue extends ModelEntity
 {
     
 }
