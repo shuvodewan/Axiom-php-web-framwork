@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{config('app.name')}} - {% block title %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {{vite(['project/templates/assets/css/app.css','project/templates/assets/js/app.js'])|raw}}
+</head>
+<body class="bg-gray-50">
+   
+    <!-- sidebar -->
+    {% include 'layouts/backend/partials/sidebar.twig' %}
+    <!-- Main Content -->
+    <div class="main-content min-h-screen">
+        <!-- Topbar -->
+         {% include 'layouts/backend/partials/topbar.twig' %}
+
+        <!-- Dashboard Content -->
+        <main class="p-6">
+          {% block body %}{% endblock %}
+        </main>
+
+    </div>
+
+    <script>
+        // Toggle sidebar
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+        });
+        
+        // Responsive behavior - collapse sidebar on small screens
+        function handleResize() {
+            if (window.innerWidth < 768) {
+                document.querySelector('.sidebar').classList.add('collapsed');
+            }
+        }
+        
+        // Initial check
+        handleResize();
+        
+        // Add event listener
+        window.addEventListener('resize', handleResize);
+    </script>
+</body>
+</html>

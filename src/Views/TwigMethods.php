@@ -19,4 +19,19 @@ class TwigMethods
     {
         return Vite::load($resouces);
     }
+
+    public function route(string $name, array $params= []) 
+    {
+        return route($name,$params);
+    }
+
+    public function config(string $name) 
+    {
+        return config($name);
+    }
+
+    public function env(string $name) 
+    {
+        return env($name);
+    }
 }

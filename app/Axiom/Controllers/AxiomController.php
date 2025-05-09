@@ -23,19 +23,15 @@ class AxiomController  extends Controller
      */
     protected $serviceable = AxiomService::class;
 
-    #[Get(uri:'/', name:'index')]
+    #[Get(uri:'/', name:'axiom.home')]
     public function index($request){
-        $features = $this->service->index();
-       $this->view(template: 'frontend.home', data: [
-        'features' => $features
-     ]);
+       $this->view(template: 'frontend.home');
     }
 
 
 
-    #[Get(uri:'/documentation/{version}', name:'index')]
-    public function documentation($request, $version){
-        $features = $this->service->index();
-       $this->view(template: 'frontend.documentation', data: $this->service->get($version));
+    #[Get(uri:'/documentation/{version}/{page}', name:'axiom.docs')]
+    public function documentation($request, $version,$page){
+        $this->view(template: 'frontend.documentation', data: $this->service->document($version, $page));
     }
 }

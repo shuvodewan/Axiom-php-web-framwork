@@ -16,11 +16,11 @@ use Axiom\Application\Base\Service;
  */
 class AxiomService extends Service
 {
-     /**
-     * @var The Doctrine entity class this service manages
-     */
-    protected $entity = Axiom::class;
-
-    
-
+     
+    public function document($version, $page){
+        return [
+            'page'=>'frontend/docs/' . $version. '/' . $page .'.twig',
+            'title'=>$page
+        ];
+    }
 }

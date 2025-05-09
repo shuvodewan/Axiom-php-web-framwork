@@ -14,3 +14,37 @@
 .code-block {
     background: linear-gradient(135deg, #0b426f 0%, #072a4a 100%);
 }
+.sidebar {
+    transition: all 0.3s ease;
+}
+.sidebar.collapsed {
+    width: 80px;
+}
+.sidebar.collapsed .sidebar-text {
+    display: none;
+}
+.sidebar.collapsed .logo-text {
+    display: none;
+}
+.sidebar.collapsed .sidebar-item {
+    justify-content: center;
+}
+.main-content {
+    transition: all 0.3s ease;
+}
+.sidebar:not(.collapsed) + .main-content {
+    margin-left: 250px;
+}
+.sidebar.collapsed + .main-content {
+    margin-left: 80px;
+}
+.axiom-gradient-text {
+    background: linear-gradient(135deg, #0c94eb 0%, #36adfa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.quick-link-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}

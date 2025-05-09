@@ -3,7 +3,8 @@
 namespace Axiom\Project;
 
 use App\Authentication\AuthenticationApp;
-use App\Test\TestApp;
+use App\Axiom\AxiomApp;
+use App\Dashboard\DashboardApp;
 use Axiom\Application\ProjectRegistry;
 
 /**
@@ -22,7 +23,8 @@ class Registry extends ProjectRegistry
      */
     static $INSTALLED_APPS = [
         AuthenticationApp::class,
-        TestApp::class
+        AxiomApp::class,
+        DashboardApp::class
     ];
 
     /**
@@ -42,6 +44,11 @@ class Registry extends ProjectRegistry
         'global'=>[
             'middlewares'=>['admin'],
             'prefix'=>'global'
+        ],
+
+        'admin'=>[
+            'middlewares'=>[],
+            'prefix'=>'admin'
         ]
     ];
 
