@@ -15,5 +15,5 @@ use Axiom\Application\Base\Service;
  */
 class DashboardService extends Service
 {
-
+    
 }
