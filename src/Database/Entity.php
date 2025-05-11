@@ -3,37 +3,74 @@
 namespace Axiom\Database;
 
 use App\Database\Builder;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Base Entity class providing common database operations
+ * 
+ * This abstract class serves as the foundation for all Doctrine entities in the system,
+ * providing CRUD operations, relationship management, and query building capabilities.
+ * Implements active record pattern with Doctrine ORM integration.
+ */
 class Entity
 {
+    /**
+     * The Doctrine EntityManager instance
+     * 
+     * @var EntityManager
+     */
     protected static EntityManager $entityManager;
+
+    /**
+     * The fully qualified class name of the concrete entity
+     * 
+     * @var string
+     */
     protected static string $entityClass;
 
-     /**
-     * Whether to automatically manage timestamps
+    /**
+     * Whether to automatically manage timestamp fields
+     * 
      * @var bool
      */
     protected bool $timestamps = true;
     
-    #[ORM\Column(type: "datetime", nullable: true)]
+    /**
+     * The creation timestamp of the entity
+     * 
+     * @var \DateTimeInterface|null
+     */
+    #[ORM\Column(type: "datetime", name:'created_at', nullable: true)]
     protected ?\DateTimeInterface $createdAt = null;
     
-    #[ORM\Column(type: "datetime", nullable: true)]
+    /**
+     * The last update timestamp of the entity
+     * 
+     * @var \DateTimeInterface|null
+     */
+    #[ORM\Column(type: "datetime", name:'updated_at' ,nullable: true)]
     protected ?\DateTimeInterface $updatedAt = null;
 
-
-
+    /**
+     * Entity constructor
+     * 
+     * Initializes the EntityManager and sets up collection properties
+     */
     public function __construct()
     {
         self::initialize();
+        $this->addMappedCollections();
     }
     
-
     /**
      * Initialize the Entity system with Doctrine EntityManager
+     * 
+     * @return void
+     * @throws \RuntimeException If EntityManager cannot be initialized
      */
     public static function initialize(): void
     {
@@ -41,7 +78,31 @@ class Entity
     }
 
     /**
+     * Initialize all Collection properties with empty ArrayCollections
+     * 
+     * @return self
+     */
+    public function addMappedCollections(): self
+    {
+        $reflectionClass = new \ReflectionClass(static::class);
+
+        foreach ($reflectionClass->getProperties() as $property) {
+            if ($property->getType()?->getName() === Collection::class) {
+                $name = $property->getName();
+                $this->$name = new ArrayCollection();
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Handle static method calls
+     * 
+     * @param string $method The method name being called
+     * @param array $arguments The method arguments
+     * @return mixed
+     * @throws \BadMethodCallException If method doesn't exist
      */
     public static function __callStatic(string $method, array $arguments)
     {
@@ -65,18 +126,23 @@ class Entity
         ));
     }
 
-      /**
+    /**
      * Handle dynamic method calls on instances
+     * 
+     * @param string $method The method name being called
+     * @param array $args The method arguments
+     * @return mixed
+     * @throws \BadMethodCallException If method doesn't exist
      */
     public function __call(string $method, array $args)
     {
-        // Getters
+        // Handle getter methods
         if (str_starts_with($method, 'get')) {
             $property = lcfirst(substr($method, 3));
             return $this->$property ?? null;
         }
 
-        // Setters
+        // Handle setter methods
         if (str_starts_with($method, 'set')) {
             $property = lcfirst(substr($method, 3));
             $this->$property = $args[0] ?? null;
@@ -88,6 +154,8 @@ class Entity
 
     /**
      * Get the Doctrine repository instance
+     * 
+     * @return EntityRepository
      */
     protected static function getRepository(): EntityRepository
     {
@@ -96,6 +164,8 @@ class Entity
 
     /**
      * Create a new query builder instance
+     * 
+     * @return Builder
      */
     public static function query(): Builder
     {
@@ -105,7 +175,7 @@ class Entity
     /**
      * Create a new entity and persist it
      *
-     * @param array $props
+     * @param array $props The properties to set on the new entity
      * @return static
      */
     public static function create(array $props)
@@ -113,7 +183,6 @@ class Entity
         $entity = new static();
         $entity->fill($props);
 
-          
         if ($entity->timestamps) {
             $now = new \DateTime();
             $entity->createdAt = $now;
@@ -128,7 +197,7 @@ class Entity
     /**
      * Update an existing entity
      *
-     * @param array $props
+     * @param array $props The properties to update
      * @return $this
      */
     public function update(array $props)
@@ -136,8 +205,7 @@ class Entity
         $this->fill($props);
 
         if ($this->timestamps) {
-            $now = new \DateTime();
-            $this->updatedAt = $now;
+            $this->updatedAt = new \DateTime();
         }
 
         self::$entityManager->flush();
@@ -147,7 +215,7 @@ class Entity
     /**
      * Fill entity attributes (mass assignment)
      *
-     * @param array $attributes
+     * @param array $attributes The attributes to set
      * @return $this
      */
     public function fill(array $attributes)

@@ -2,6 +2,7 @@
 
 namespace App\Dashboard\Controllers;
 
+use App\Authentication\Entities\Module;
 use Axiom\Application\Base\Controller;
 use App\Dashboard\Services\DashboardService;
 use Axiom\Core\Attribute\Get;
@@ -25,6 +26,7 @@ class DashboardController  extends Controller
 
     #[Get(uri:'/', name:'index')]
     public function index($request){
+        dd(new Module());
         $this->view('backend.intruduction');
     }
 }

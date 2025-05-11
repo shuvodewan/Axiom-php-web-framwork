@@ -7,7 +7,7 @@ use Axiom\Console\Command;
 use Axiom\Filesystem\LocalDriver;
 
 /**
- * EntityGeneratorCommand Class
+ * ControllerGeneratorCommand Class
  *
  * A console command for generating model files in the application.
  * This command uses stubs to create model files with the appropriate namespace and class name.

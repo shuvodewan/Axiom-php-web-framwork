@@ -4,6 +4,7 @@ namespace Axiom\Console;
 
 use Axiom\Application\Commands\CreateApplicationCommand;
 use Axiom\Application\Commands\DeleteApplicationCommand;
+use Axiom\Application\Commands\EntityGeneratorCommand;
 use Axiom\Application\Commands\EntityHelpCommand;
 use Axiom\Console\Commands\AppCashClearCommand;
 use Axiom\Console\Commands\AppServeCommand;
@@ -45,6 +46,7 @@ class Kernel
             'project:start' => AppServeCommand::class,
             'app:create' => CreateApplicationCommand::class,
             'app:delete' => DeleteApplicationCommand::class,
+            'app:entity'=> EntityGeneratorCommand::class,
 
             'queue:work'=>WorkerCommand::class,
             

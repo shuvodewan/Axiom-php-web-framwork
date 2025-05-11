@@ -23,8 +23,8 @@ class Registry extends ProjectRegistry
      */
     static $INSTALLED_APPS = [
         AuthenticationApp::class,
-        AxiomApp::class,
-        DashboardApp::class
+        // AxiomApp::class,
+        // DashboardApp::class
     ];
 
     /**

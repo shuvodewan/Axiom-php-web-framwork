@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\GeneratedValue;
 
-
 /**
  * User Entity
  * 
@@ -26,6 +25,12 @@ class User extends ModelEntity
     #[GeneratedValue]
     #[Column(type: 'integer')]
     protected int $id;
+
+    /**
+     * The user's name
+     */
+    #[Column(type: 'string', length: 255)]
+    protected string $name;
 
     /**
      * The unique username
@@ -56,5 +61,11 @@ class User extends ModelEntity
      */
     #[Column(type: 'string', length: 100, nullable: true)]
     protected ?string $remember_token = null;
+
+    /**
+     * The user's profile photo URL
+     */
+    #[Column(type: 'string', length: 2048, nullable: true)]
+    protected ?string $avatar = null;
 
 }
