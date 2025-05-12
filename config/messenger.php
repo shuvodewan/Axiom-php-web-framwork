@@ -29,7 +29,7 @@ return [
                 'table_name' => 'messenger_messages',
                 'queue_name' => 'default',
                 'redeliver_timeout' => 3600,
-                'auto_setup' => true,
+                'auto_setup' => false,
             ]
         ],
         
