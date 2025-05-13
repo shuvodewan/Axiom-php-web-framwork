@@ -12,6 +12,7 @@ use Axiom\Facade\Str;
  */
 trait ApplicationGeneratorTrait
 {
+
     /**
      * Map the stub variables present in the stub to their values.
      *
@@ -68,7 +69,7 @@ trait ApplicationGeneratorTrait
      */
     public function getStubPath(string $item): string
     {
-        return src_path('/Application/Stubs/') . $item . '.stub';
+        return src_path($this->stub??'/Application/Stubs/') . $item . '.stub';
     }
 
     /**
@@ -110,10 +111,12 @@ trait ApplicationGeneratorTrait
             $this->makeDirectory($dir);
 
             $contents = $this->getSourceFile($item);
-
+            
             if (!$this->filesystem->fileExists($dir . $file)) {
                 $this->filesystem->write($dir . $file, $contents);
             }
         }
+
+        method_exists($this,'closing')? $this->closing():'';
     }
 }

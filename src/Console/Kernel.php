@@ -13,7 +13,9 @@ use Axiom\Database\Commands\ExecuteMigrationCommand;
 use Axiom\Database\Commands\GenerateMigrationCommand;
 use Axiom\Database\Commands\LatestCommand;
 use Axiom\Database\Commands\ListCommand;
+use Axiom\Database\Commands\MakeSeederCommand;
 use Axiom\Database\Commands\MigrateCommand;
+use Axiom\Database\Commands\PopulateSeeder;
 use Axiom\Database\Commands\RollbackCommand;
 use Axiom\Database\Commands\StatusCommand;
 use Axiom\Database\Commands\SyncMetadataCommand;
@@ -64,6 +66,11 @@ class Kernel
             'migrations:version' => VersionCommand::class,
             'migrations:execute' => ExecuteMigrationCommand::class,
             'migrations:diff' => DiffCommand::class,
+
+            //seeders
+
+            'seeder:generate'=>MakeSeederCommand::class,
+            'seeder:populate'=>PopulateSeeder::class,
         ];
     }
 

@@ -47,5 +47,8 @@
         "files": [
             "src/Helpers/helper.php"
         ]
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.24"
     }
 }

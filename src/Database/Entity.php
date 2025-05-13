@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Faker\Factory;
 
 /**
  * Base Entity class providing common database operations
@@ -31,6 +32,12 @@ class Entity
      * @var string
      */
     protected static string $entityClass;
+
+    /**
+     * Faker to generate fake data
+     * 
+     */
+    protected $faker;
 
     /**
      * Whether to automatically manage timestamp fields
@@ -64,6 +71,7 @@ class Entity
     {
         self::initialize();
         $this->addMappedCollections();
+        $this->faker =  Factory::create();
     }
     
     /**
