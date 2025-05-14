@@ -3,6 +3,7 @@
 namespace Axiom\Application;
 
 use Axiom\Facade\Str;
+use Exception;
 
 /**
  * ApplicationGeneratorTrait
@@ -102,7 +103,13 @@ trait ApplicationGeneratorTrait
      */
     public function handle(?string $app = null, ?string $name = null): void
     {
+
         $this->setData($app, $name);
+
+        if ($this->app && !AppManager::getInstance()->isRegistered($this->app)) {
+
+            throw new Exception("Invalid app name!");
+        }
 
         foreach ($this->items as $item => $path) {
             $dir = $path["dir"];

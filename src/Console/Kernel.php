@@ -6,6 +6,7 @@ use Axiom\Application\Commands\CreateApplicationCommand;
 use Axiom\Application\Commands\DeleteApplicationCommand;
 use Axiom\Application\Commands\EntityGeneratorCommand;
 use Axiom\Application\Commands\EntityHelpCommand;
+use Axiom\Application\Commands\ServiceGeneratorCommand;
 use Axiom\Console\Commands\AppCashClearCommand;
 use Axiom\Console\Commands\AppServeCommand;
 use Axiom\Database\Commands\DiffCommand;
@@ -49,6 +50,7 @@ class Kernel
             'app:create' => CreateApplicationCommand::class,
             'app:delete' => DeleteApplicationCommand::class,
             'app:entity'=> EntityGeneratorCommand::class,
+            'app:service'=> ServiceGeneratorCommand::class,
 
             'queue:work'=>WorkerCommand::class,
             
