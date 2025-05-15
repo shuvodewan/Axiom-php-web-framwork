@@ -20,4 +20,10 @@ class RoleService extends Service
      * @var The Doctrine entity class this service manages
      */
     protected $entity = Role::class;
+
+
+    public function index()
+    {
+        $this->entity::filters(['test'=>1223]);
+    }
 }

@@ -28,7 +28,7 @@ class Router
     protected array $names = [];
 
     /** @var Request The current request. */
-    public Request $request;
+    public ?Request $request;
 
     /** @var bool Whether the current route is part of a group. */
     public bool $groupParent = false;
@@ -48,7 +48,7 @@ class Router
      *
      * @param Request $request The current request.
      */
-    public function __construct(Request $request)
+    public function __construct(?Request $request = null)
     {
         $this->request = $request;
         self::setInstance($this);
@@ -123,7 +123,18 @@ class Router
 
     public function loadFromApp(): self
     {
-        AppManager::getInstance()->registerRoute();
+
+        if (config('app.mode') === 'production') {
+            if ($routes = $this->loadFromCache()) {
+                $this->routes = $routes;
+            } else {
+                AppManager::getInstance()->registerRoute();
+                $this->setRoutesInCache();
+            }
+        } else {
+            AppManager::getInstance()->registerRoute();
+        }
+
         return $this;
     }
 

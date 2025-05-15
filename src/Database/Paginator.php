@@ -2,38 +2,42 @@
 
 namespace Axiom\Database;
 
+use Axiom\Facade\Url;
 use Axiom\Http\Request;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\Tools\Pagination\Paginator as Paginate;
 
-class LengthAwarePaginator
+class Paginator
 {
-    private $items;
+    private $items = [];
     private $total;
     private $perPage;
     private $currentPage;
     private $lastPage;
-    private $from;
-    private $to;
-    private $queryParams;
+    private $pageName;
+    private $from = 0;
+    private $to = 0;
+    private $queryParams = [];
     private $request;
 
     public function __construct($items, int $total, int $perPage, int $currentPage, string $page)
     {
         $this->request= Request::getInstance();
-        $this->items = $items;
+        $this->setProperties($items,$total,$perPage,$currentPage,$page);
+    }
+
+    public function setProperties($items, int $total, int $perPage, int $currentPage, string $page){
         $this->total = $total;
+        $this->pageName = $page;
         $this->perPage = $perPage;
         $this->currentPage = $currentPage??$this->request->getQuery($page);
         $this->lastPage = max((int) ceil($total / $perPage), 1);
 
-        if($this->currentPage > $this->lastPage){
-            $this->items = [];
+        if($this->currentPage <= $this->lastPage){
+            $this->items = $items;
+            $this->from = $this->currentPage > 1 ? ($this->currentPage - 1) * $this->perPage + 1 : 1;
+            $this->to = min($this->currentPage * $this->perPage, $this->total);
         }
-
-        $this->from = $this->currentPage > 1 ? ($this->currentPage - 1) * $this->perPage + 1 : 1;
-        $this->to = min($this->currentPage * $this->perPage, $this->total);
-
     }
 
     public static function fromQueryBuilder(QueryBuilder $queryBuilder, int $perPage = 15, int $currentPage = 0, $page='page'): self
@@ -43,7 +47,7 @@ class LengthAwarePaginator
         $query->setFirstResult(($currentPage - 1) * $perPage)
               ->setMaxResults($perPage);
 
-        $paginator = new Paginator($query, true);
+        $paginator = new Paginate($query, true);
         $total = count($paginator);
         $results = iterator_to_array($paginator);
 
@@ -66,17 +70,51 @@ class LengthAwarePaginator
     public function isEmpty(): bool { return empty($this->items); }
     public function isNotEmpty(): bool { return !$this->isEmpty(); }
 
+    public function append(array $params=[]){
+        $this->queryParams = $params;
+    }
 
-
-    private function url(int $page): string
+    private function url(): string
     {
-        if ($page < 1 || $page > $this->lastPage) {
-            throw new \InvalidArgumentException('Page number out of range');
-        }
-
         $queryParams = $this->queryParams;
-        $queryParams[$this->pageName] = $page;
+        $queryParams[$this->pageName] = $this->currentPage;
 
-        return $this->path . '?' . http_build_query($queryParams);
+        return Url::to(parameters: $queryParams);
+    }
+
+
+    public function meta():array
+    {
+        return [
+            'current_page' => $this->currentPage(),
+            'from' => $this->firstItem(),
+            'last_page' => $this->lastPage(),
+            'per_page' => $this->perPage(),
+            'to' => $this->lastItem(),
+            'total' => $this->total(),
+            'path' => Url::base(),
+        ];
+    }
+
+
+
+    public function links():array
+    {
+        return [
+            'first' => $this->url(1),
+            'last' => $this->url($this->lastPage()),
+            'prev' => $this->currentPage() > 1 ? $this->url($this->currentPage() - 1) : null,
+            'next' => $this->hasMorePages() ? $this->url($this->currentPage() + 1) : null,
+        ];
+    }
+
+
+    public function toArray(): array
+    {
+        return [
+            'data' => $this->items(),
+            'meta' => $this->meta(),
+            'links' => $this->links(),
+        ];
     }
 }

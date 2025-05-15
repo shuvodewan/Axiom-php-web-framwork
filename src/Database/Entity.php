@@ -2,7 +2,7 @@
 
 namespace Axiom\Database;
 
-use App\Database\Builder;
+use Axiom\Database\Builder;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;

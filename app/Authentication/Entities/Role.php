@@ -53,4 +53,12 @@ class Role extends ModelEntity
     #[ManyToMany(targetEntity:Permission::class, inversedBy:'roles', cascade: ['persist', 'remove'])]
     #[JoinTable(name:'permission_role')]
     protected Collection $permissions;
+
+
+
+    //scopes
+
+    public function scopeSearch($query, $value){
+        $query->where('title','LIKE','%'. $value .'%');
+    }
 }

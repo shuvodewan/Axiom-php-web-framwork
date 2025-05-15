@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Database;
+namespace Axiom\Database;
 
+use Axiom\Database\Paginator;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr\Join;
@@ -284,9 +285,9 @@ class Builder
      * @param int $perPage The number of items per page
      * @return $this
      */
-    public function paginate(int $page, int $perPage): self
+    public function paginate(int $perPage = 15,$page='page', int $currentPage = 0, ): Paginator
     {
-        return $this->offset(($page - 1) * $perPage)->limit($perPage);
+        return Paginator::fromQueryBuilder( $this->queryBuilder, $perPage, $currentPage, $page);
     }
 
     /**
@@ -377,5 +378,31 @@ class Builder
     protected function createParameterName(string $column): string
     {
         return str_replace(['.', ' '], '_', uniqid($column.'_'));
+    }
+
+    
+    /**
+     * Filter entity from the database
+     *
+     * @return self
+     */
+   public function filters(array $params): self
+    {
+        foreach ($params as $method => $paramValue) {
+            $scopeMethod = 'scope' . ucfirst($method);
+            $entityClass = $this->queryBuilder->getRootEntities()[0];
+            
+            if (!method_exists($entityClass, $scopeMethod)) {
+                throw new \BadMethodCallException(sprintf(
+                    'Scope method %s::%s does not exist', 
+                    $entityClass,
+                    $scopeMethod
+                ));
+            }
+
+            (new $entityClass())->$scopeMethod($this, $paramValue);
+        }
+        
+        return $this;
     }
 }

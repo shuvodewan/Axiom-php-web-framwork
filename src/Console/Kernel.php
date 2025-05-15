@@ -2,6 +2,7 @@
 
 namespace Axiom\Console;
 
+use Axiom\Application\Commands\ControllerGeneratorCommand;
 use Axiom\Application\Commands\CreateApplicationCommand;
 use Axiom\Application\Commands\DeleteApplicationCommand;
 use Axiom\Application\Commands\EntityGeneratorCommand;
@@ -22,6 +23,7 @@ use Axiom\Database\Commands\StatusCommand;
 use Axiom\Database\Commands\SyncMetadataCommand;
 use Axiom\Database\Commands\VersionCommand;
 use Axiom\Facade\Log;
+use Axiom\Http\Commands\RouteListCommand;
 use Axiom\Messenger\Commands\WorkerCommand;
 use Axiom\Messenger\QueueWorker;
 use Exception;
@@ -51,6 +53,7 @@ class Kernel
             'app:delete' => DeleteApplicationCommand::class,
             'app:entity'=> EntityGeneratorCommand::class,
             'app:service'=> ServiceGeneratorCommand::class,
+            'app:controller'=> ControllerGeneratorCommand::class,
 
             'queue:work'=>WorkerCommand::class,
             
@@ -73,6 +76,10 @@ class Kernel
 
             'seeder:generate'=>MakeSeederCommand::class,
             'seeder:populate'=>PopulateSeeder::class,
+
+            //Routes
+
+            'route:list'=>RouteListCommand::class
         ];
     }
 
