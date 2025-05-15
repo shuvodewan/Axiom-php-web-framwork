@@ -49,6 +49,7 @@
         ]
     },
     "require-dev": {
-        "fakerphp/faker": "^1.24"
+        "fakerphp/faker": "^1.24",
+        "symfony/var-dumper": "^7.2"
     }
 }

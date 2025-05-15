@@ -3,6 +3,7 @@
 namespace App\Authentication\Services;
 
 use App\Authentication\Entities\Role;
+use Axiom\Application\Base\ResourceTrait;
 use Axiom\Application\Base\Service;
 
 
@@ -16,14 +17,16 @@ use Axiom\Application\Base\Service;
  */
 class RoleService extends Service
 {
+    use ResourceTrait;
      /**
      * @var The Doctrine entity class this service manages
      */
     protected $entity = Role::class;
 
 
+
     public function index()
     {
-        $this->entity::filters(['test'=>1223]);
+        dd($this->getEntityInstance()->getFillables());
     }
 }

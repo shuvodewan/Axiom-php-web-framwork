@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Faker\Factory;
 
 /**
@@ -45,6 +46,13 @@ class Entity
      * @var bool
      */
     protected bool $timestamps = true;
+
+    /**
+     * Add list of properties to guarded to prevent users to modify by mistake
+     * 
+     * @var array
+     */
+    protected array $guarded = ['id','createdAt','updatedAt'];
     
     /**
      * The creation timestamp of the entity
@@ -105,6 +113,46 @@ class Entity
     }
 
     /**
+     * Get the Doctrine metadata for the current entity class
+     * 
+     * @return ClassMetadata The Doctrine metadata containing all mapping information
+     */
+    public function getMeta(): ClassMetadata
+    {
+        return self::$entityManager->getClassMetadata(static::class);
+    }
+
+    /**
+     * Get all association names for this entity
+     * 
+     * @return array List of association/relationship names from Doctrine mappings
+     */
+    public function associats(): array
+    {
+        return array_keys($this->getMeta()->associationMappings);
+    }
+
+    /**
+     * Get all field names for this entity (excluding associations)
+     * 
+     * @return array List of field/property names from Doctrine mappings
+     */
+    public function getFields(): array
+    {
+        return array_keys($this->getMeta()->fieldMappings);
+    }
+
+    /**
+     * Get all fillable fields (associations + fields excluding guarded)
+     * 
+     * @return array Combined list of fields safe for mass assignment
+     */
+    public function getFillables(): array
+    {
+        return array_merge($this->associats(), array_values(array_diff($this->getFields(), $this->guarded)));
+    }
+
+    /**
      * Handle static method calls
      * 
      * @param string $method The method name being called
@@ -153,6 +201,11 @@ class Entity
         // Handle setter methods
         if (str_starts_with($method, 'set')) {
             $property = lcfirst(substr($method, 3));
+
+            if ($this->checkGuarded($property)) {
+                throw new \RuntimeException("Cannot set guarded property: {$property}");
+            }
+
             $this->$property = $args[0] ?? null;
             return $this;
         }
@@ -178,6 +231,16 @@ class Entity
     public static function query(): Builder
     {
         return new Builder(static::$entityManager, static::class);
+    }
+
+     /**
+     * Check property to gurded list before insert to database
+     * 
+     * @return boolean
+     */
+    public function checkGuarded($property): bool
+    {
+        return in_array($property, $this->guarded);
     }
 
     /**
@@ -229,7 +292,7 @@ class Entity
     public function fill(array $attributes)
     {
         foreach ($attributes as $key => $value) {
-            if (property_exists($this, $key)) {
+            if (property_exists($this, $key) && !$this->checkGuarded($key)) {
                 $setter = 'set' . ucfirst($key);
                 $this->$setter($value);
             }

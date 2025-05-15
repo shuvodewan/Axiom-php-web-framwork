@@ -24,7 +24,7 @@ class RoleController  extends Controller
     protected $serviceable = RoleService::class;
 
     #[Get('roles/index', name:'roles')]
-    public function index()
+    public function index($request)
     {
         $this->service->index();
     }
