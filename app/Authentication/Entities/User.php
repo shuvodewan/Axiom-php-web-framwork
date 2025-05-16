@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\GeneratedValue;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
 
 /**
  * User Entity
@@ -67,5 +69,10 @@ class User extends ModelEntity
      */
     #[Column(type: 'string', length: 2048, nullable: true)]
     protected ?string $avatar = null;
+
+
+    #[ManyToOne(targetEntity:Role::class, inversedBy:'role')]
+    #[JoinColumn(name:'role_id', referencedColumnName:'id', onDelete:'SET NULL')]
+    protected ?Role $role = null;
 
 }

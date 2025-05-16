@@ -74,6 +74,6 @@ class Module extends ModelEntity
      *   - Changes tracked by Doctrine
      *   - Collection automatically initialized
      */
-    #[OneToMany(targetEntity: Permission::class, mappedBy: 'module')]
+    #[OneToMany(targetEntity: Permission::class, mappedBy: 'module', cascade: ['persist'])]
     protected Collection $permissions;
 }

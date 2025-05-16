@@ -74,8 +74,8 @@ class Permission extends ModelEntity
      * Cascade operations: persist and remove
      * Owning side of the Module-Permission relationship
      */
-    #[ManyToOne(targetEntity: Module::class, inversedBy: 'permissions', cascade: ['persist', 'remove'])]
-    #[JoinColumn(name: 'module_id', referencedColumnName: 'id')]
+    #[ManyToOne(targetEntity: Module::class, inversedBy: 'permissions')]
+    #[JoinColumn(name: 'module_id', referencedColumnName: 'id', onDelete:'CASCADE')]
     protected ?Module $module;
 
     /**

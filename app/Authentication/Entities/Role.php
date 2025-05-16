@@ -9,8 +9,12 @@ use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\GeneratedValue;
+use Doctrine\ORM\Mapping\InverseJoinColumn;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\JoinTable;
 use Doctrine\ORM\Mapping\ManyToMany;
+use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\OneToMany;
 
 /**
  * Role Entity
@@ -50,9 +54,19 @@ class Role extends ModelEntity
      /**
      * Role and permissions many to many relationships
      */
-    #[ManyToMany(targetEntity:Permission::class, inversedBy:'roles', cascade: ['persist', 'remove'])]
-    #[JoinTable(name:'permission_role')]
+    #[ManyToMany(targetEntity: Permission::class, inversedBy: 'roles')]
+    #[JoinTable(name: 'permission_role')]
+    #[JoinColumn(name: 'role_id', onDelete: 'CASCADE')]
+    #[InverseJoinColumn(name: 'permission_id', onDelete: 'CASCADE')]
     protected Collection $permissions;
+
+
+    #[OneToMany(targetEntity:User::class, mappedBy:'role', cascade:['persist'])]
+    protected Collection $users;
+
+    #[ManyToOne(targetEntity:Module::class, inversedBy:'module')]
+    #[JoinColumn(name:'module_id', onDelete:'SET NULL')]
+    protected Module $module;
 
 
 

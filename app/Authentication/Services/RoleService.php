@@ -27,6 +27,6 @@ class RoleService extends Service
 
     public function index()
     {
-        dd($this->getEntityInstance()->getFillables());
+        dd($this->getEntityInstance()->permissions()->get());
     }
 }

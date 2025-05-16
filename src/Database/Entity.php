@@ -3,6 +3,11 @@
 namespace Axiom\Database;
 
 use Axiom\Database\Builder;
+use Axiom\Database\Relations\BelongsTo;
+use Axiom\Database\Relations\BelongsToMany;
+use Axiom\Database\Relations\HasMany;
+use Axiom\Database\Relations\HasOne;
+use Axiom\Database\Relations\Relation;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
@@ -53,6 +58,12 @@ class Entity
      * @var array
      */
     protected array $guarded = ['id','createdAt','updatedAt'];
+
+    protected array $fillables = [];
+
+    protected array $associats = [];
+
+    protected bool $persist = true;
     
     /**
      * The creation timestamp of the entity
@@ -80,6 +91,8 @@ class Entity
         self::initialize();
         $this->addMappedCollections();
         $this->faker =  Factory::create();
+        $this->fillables = array_values(array_diff($this->getFields(), $this->guarded));
+        $this->associats = array_keys($this->getMeta()->associationMappings);
     }
     
     /**
@@ -123,16 +136,6 @@ class Entity
     }
 
     /**
-     * Get all association names for this entity
-     * 
-     * @return array List of association/relationship names from Doctrine mappings
-     */
-    public function associats(): array
-    {
-        return array_keys($this->getMeta()->associationMappings);
-    }
-
-    /**
      * Get all field names for this entity (excluding associations)
      * 
      * @return array List of field/property names from Doctrine mappings
@@ -140,16 +143,6 @@ class Entity
     public function getFields(): array
     {
         return array_keys($this->getMeta()->fieldMappings);
-    }
-
-    /**
-     * Get all fillable fields (associations + fields excluding guarded)
-     * 
-     * @return array Combined list of fields safe for mass assignment
-     */
-    public function getFillables(): array
-    {
-        return array_merge($this->associats(), array_values(array_diff($this->getFields(), $this->guarded)));
     }
 
     /**
@@ -192,6 +185,11 @@ class Entity
      */
     public function __call(string $method, array $args)
     {
+
+        if (in_array($method, $this->associats)) {
+            return $this->relation($method);
+        }
+
         // Handle getter methods
         if (str_starts_with($method, 'get')) {
             $property = lcfirst(substr($method, 3));
@@ -244,6 +242,43 @@ class Entity
     }
 
     /**
+     * Get a relationship query builder
+     * 
+     * @param string $relation The relationship name
+     * @return Relation
+     * @throws \RuntimeException If relationship doesn't exist
+     */
+    public function relation(string $relation): Relation
+    {      
+        $mapping = $this->getMeta()->getAssociationMapping($relation);
+        $relatedClass = $mapping['targetEntity'];
+        return $this->createRelation($relation, $relatedClass, $mapping);
+    }
+
+    /**
+     * Create the appropriate relation instance
+     */
+    protected function createRelation(string $relation, string $relatedClass, $mapping)
+    {
+        $builder = new Builder(static::$entityManager, $relatedClass, initiation:false);
+
+        switch ($mapping['type']) {
+            case ClassMetadata::ONE_TO_ONE:
+                return new HasOne($builder, $this, $relatedClass, $relation);
+            case ClassMetadata::ONE_TO_MANY:
+                return new HasMany($builder, $this, $relatedClass, $relation);
+            case ClassMetadata::MANY_TO_ONE:
+                return new BelongsTo($builder, $this, $relatedClass, $relation);
+            case ClassMetadata::MANY_TO_MANY:
+                return new BelongsToMany($builder, $this, $relatedClass, $relation);
+            default:
+                throw new \RuntimeException("Unsupported relationship type");
+        }
+    }
+
+
+
+    /**
      * Create a new entity and persist it
      *
      * @param array $props The properties to set on the new entity
@@ -260,8 +295,11 @@ class Entity
             $entity->updatedAt = $now;
         }
         
-        self::$entityManager->persist($entity);
-        self::$entityManager->flush();
+        if($entity->persist){
+            self::$entityManager->persist($entity);
+            self::$entityManager->flush();
+        }
+
         return $entity;
     }
 
@@ -279,7 +317,10 @@ class Entity
             $this->updatedAt = new \DateTime();
         }
 
-        self::$entityManager->flush();
+        if($this->persist){
+            self::$entityManager->flush();
+        }
+
         return $this;
     }
 

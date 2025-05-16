@@ -19,7 +19,12 @@ class Builder
     protected QueryBuilder $queryBuilder;
 
     /** @var string The root alias used in the query */
-    protected string $alias;
+    public string $alias;
+
+      /** @var EntityManager The root alias used in the query */
+      protected EntityManager $em;
+
+    public $entityClass;   
 
     /** @var array Track of bound parameters */
     protected array $parameters = [];
@@ -31,11 +36,28 @@ class Builder
      * @param string $entityClass The fully-qualified entity class name
      * @param string $alias The alias to use for the root entity (default: 'e')
      */
-    public function __construct(EntityManager $entityManager, string $entityClass, string $alias = 'e')
+    public function __construct(EntityManager $entityManager, string $entityClass, string $alias = 'e',$initiation=true)
     {
         $this->queryBuilder = $entityManager->createQueryBuilder();
+        $this->em = $entityManager;
         $this->alias = $alias;
-        $this->queryBuilder->select($alias)->from($entityClass, $alias);
+        $this->entityClass = $entityClass;
+        if($initiation){
+            $this->queryBuilder->select($alias)->from($entityClass, $alias);
+        }
+    }
+
+
+    protected function setOperator(string &$column, string &$operator, &$value=null)
+    {
+        $column = $column;
+
+        if (func_num_args() === 2) {
+            $value = $operator;
+            $operator = '=';
+        }
+
+        return $this;
     }
 
     /**
@@ -46,9 +68,10 @@ class Builder
      * @param mixed $value The value to compare against
      * @return $this
      */
-    public function where(string $column, string $operator, $value): self
+    public function where(string $column, string $operator, $value=null): self
     {
-        $param = $this->createParameterName($column);
+
+        $param = $this->setOperator($column, $operator, $value)->createParameterName($column);
         $this->queryBuilder->andWhere("{$this->alias}.{$column} {$operator} :{$param}")
                            ->setParameter($param, $value);
         return $this;
@@ -64,7 +87,7 @@ class Builder
      */
     public function orWhere(string $column, string $operator, $value): self
     {
-        $param = $this->createParameterName($column);
+        $param = $this->setOperator($column, $operator, $value)->createParameterName($column);
         $this->queryBuilder->orWhere("{$this->alias}.{$column} {$operator} :{$param}")
                            ->setParameter($param, $value);
         return $this;
@@ -404,5 +427,26 @@ class Builder
         }
         
         return $this;
+    }
+
+
+    /**
+     * Get the underlying Doctrine QueryBuilder instance
+     * 
+     * @return QueryBuilder The Doctrine QueryBuilder instance
+     */
+    public function getQueryBuilder(): QueryBuilder
+    {
+        return $this->queryBuilder;
+    }
+
+    /**
+     * Get the EntityManager instance associated with this builder
+     * 
+     * @return EntityManager The Doctrine EntityManager instance
+     */
+    public function getEm(): EntityManager
+    {
+        return $this->em;
     }
 }
