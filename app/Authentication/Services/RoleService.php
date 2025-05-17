@@ -17,16 +17,9 @@ use Axiom\Application\Base\Service;
  */
 class RoleService extends Service
 {
-    use ResourceTrait;
      /**
      * @var The Doctrine entity class this service manages
      */
     protected $entity = Role::class;
 
-
-
-    public function index()
-    {
-        dd($this->getEntityInstance()->permissions()->get());
-    }
 }

@@ -2,6 +2,8 @@
 
 namespace Axiom\Application;
 
+use App\Authentication\Seeders\RoleSeeder;
+
 /**
  * Application configuration class for defining paths, route groups, and middleware.
  */
@@ -47,6 +49,16 @@ class App
      */
     public array $middlewares = [];
 
+    /**
+     * An array of database seeder classes to run when seeding the application.
+     * 
+     * Seeders will be executed in the order they are defined in this array.
+     *
+     * @var array<class-string> Array of seeder class names
+     */
+    public array $seeders = [
+        RoleSeeder::class
+    ];
 
     /**
      * Bootstraps the application by registering container dependencies.

@@ -155,6 +155,25 @@ class Builder
     }
 
     /**
+     * Add a GROUP BY clause to the query.
+     *
+     * @param string|array $columns The column(s) to group by
+     * @return $this
+     */
+    public function groupBy($columns): self
+    {
+        if (is_array($columns)) {
+            foreach ($columns as $column) {
+                $this->queryBuilder->addGroupBy("{$this->alias}.{$column}");
+            }
+        } else {
+            $this->queryBuilder->groupBy("{$this->alias}.{$columns}");
+        }
+        
+        return $this;
+    }
+
+    /**
      * Eager load a relationship with optional callback for constraints.
      *
      * @param string $relation The relationship to load
