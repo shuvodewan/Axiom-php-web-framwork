@@ -342,6 +342,58 @@ class Entity
     }
 
     /**
+     * Find the first entity matching the attributes or create it.
+     *
+     * @param array $attributes Attributes to match
+     * @param array $values Additional values to set if creating
+     * @return static
+     */
+    public static function firstOrCreate(array $attributes, array $values = []): static
+    {
+        if (!is_null($instance = static::where($attributes)->first())) {
+            return $instance;
+        }
+
+        return static::create(array_merge($attributes, $values));
+    }
+
+    /**
+     * Find the first entity matching the attributes or instantiate it (without persisting).
+     *
+     * @param array $attributes Attributes to match
+     * @param array $values Additional values to set if instantiating
+     * @return static
+     */
+    public static function firstOrNew(array $attributes, array $values = []): static
+    {
+        if (!is_null($instance = static::where($attributes)->first())) {
+            return $instance;
+        }
+
+        $instance = new static();
+        $instance->fill(array_merge($attributes, $values));
+        return $instance;
+    }
+
+    /**
+     * Update an existing entity or create it if it doesn't exist.
+     *
+     * @param array $attributes Attributes to match
+     * @param array $values Values to update/create with
+     * @return static
+     */
+    public static function updateOrCreate(array $attributes, array $values = []): static
+    {
+        if (!is_null($instance = static::where($attributes)->first())) {
+            $instance->update($values);
+            return $instance;
+        }
+
+        return static::create(array_merge($attributes, $values));
+    }
+
+
+    /**
      * Delete the entity from the database
      *
      * @return bool True if deletion was successful

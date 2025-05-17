@@ -61,20 +61,54 @@ class Builder
     }
 
     /**
-     * Add a basic WHERE clause to the query.
+     * Add a basic WHERE clause to the query with Laravel-style syntax support.
      *
-     * @param string $column The column name
-     * @param string $operator The comparison operator (=, <>, >, etc.)
-     * @param mixed $value The value to compare against
+     * Supports multiple formats:
+     * 1. where('column', 'value') - assumes = operator
+     * 2. where('column', 'operator', 'value')
+     * 3. where(['column' => 'value']) - assumes = operator
+     * 4. where(['column' => ['operator', 'value']])
+     * 
+     * @param string|array $column Column name or array of conditions
+     * @param mixed $operator Operator or value (when using 2-parameter syntax)
+     * @param mixed $value The value to compare against (when using 3-parameter syntax)
      * @return $this
      */
-    public function where(string $column, string $operator, $value=null): self
+    public function where($column, $operator = null, $value = null): self
     {
+        if (is_array($column)) {
+            foreach ($column as $key => $val) {
+                if (is_array($val)) {
+                    $this->addWhereCondition($key, $val[0], $val[1]);
+                } else {
+                    $this->addWhereCondition($key, '=', $val);
+                }
+            }
+            return $this;
+        }
 
+        if (is_null($value)) {
+            $value = $operator;
+            $operator = '=';
+        }
+
+        $this->addWhereCondition($column, $operator, $value);
+        
+        return $this;
+    }
+
+    /**
+     * Internal method to add a single where condition.
+     * 
+     * @param string $column
+     * @param string $operator
+     * @param mixed $value
+     */
+    protected function addWhereCondition(string $column, string $operator, $value): void
+    {
         $param = $this->setOperator($column, $operator, $value)->createParameterName($column);
         $this->queryBuilder->andWhere("{$this->alias}.{$column} {$operator} :{$param}")
-                           ->setParameter($param, $value);
-        return $this;
+                        ->setParameter($param, $value);
     }
 
     /**
