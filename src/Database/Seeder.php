@@ -40,8 +40,9 @@ abstract class Seeder
      * 
      * @return void
      */
-    public function call($seeder){
-        $seeder = new $seeder();
+    public function call($seeder=null){
+        
+        $seeder = $seeder? new $seeder():$this;
 
         Preview::warn(get_class($seeder) . ' Seeding...............');
         $seeder->run();

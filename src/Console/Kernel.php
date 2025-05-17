@@ -16,6 +16,7 @@ use Axiom\Database\Commands\ExecuteMigrationCommand;
 use Axiom\Database\Commands\GenerateMigrationCommand;
 use Axiom\Database\Commands\LatestCommand;
 use Axiom\Database\Commands\ListCommand;
+use Axiom\Database\Commands\ListSeederCommand;
 use Axiom\Database\Commands\MakeSeederCommand;
 use Axiom\Database\Commands\MigrateCommand;
 use Axiom\Database\Commands\PopulateSeeder;
@@ -78,6 +79,7 @@ class Kernel
 
             'seeder:generate'=>MakeSeederCommand::class,
             'seeder:populate'=>PopulateSeeder::class,
+            'seeder:list'=>ListSeederCommand::class,
 
             //Routes
 

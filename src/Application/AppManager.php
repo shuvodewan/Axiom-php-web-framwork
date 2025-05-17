@@ -106,7 +106,14 @@ class AppManager
     public function getSeeders(): array
     {
         return array_merge(...array_map(function (string $app) {
-            return self::$apps[$app]->seeders;
+            return array_reduce(
+                self::$apps[$app]->seeders,
+                function ($carry, $seed) use($app){
+                    $carry[$app . '.' . basename(str_replace('\\', '/', $seed))] = $seed;
+                    return $carry;
+                },
+                []
+            );
         }, $this->getAppsName()));
     }
 
