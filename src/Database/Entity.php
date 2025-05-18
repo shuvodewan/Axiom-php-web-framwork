@@ -66,6 +66,7 @@ use Faker\Factory;
     #[ORM\PostLoad]
     public function initializeAfterHydration(): void
     {
+        $this->addMappedCollections();
         $this->initializeDefaults();
     }
     
@@ -423,8 +424,9 @@ use Faker\Factory;
      */
     public function delete(): bool
     {
-        DB::getEntityManager()->remove($this);
-        DB::getEntityManager()->flush();
+        DB::transaction(function() {
+            DB::remove($this);
+        });
         return true;
     }
 }
