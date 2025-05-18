@@ -37,6 +37,16 @@ class DB
         return $this->entityManager->createQueryBuilder();
     }
 
+     /**
+     * Get em instance.
+     * 
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function getEntityManager()
+    {
+        return $this->entityManager;
+    }
+
     /**
      * Starts a database transaction.
      */
@@ -63,6 +73,97 @@ class DB
         if ($this->entityManager->getConnection()->isTransactionActive()) {
             $this->entityManager->commit();
         }
+    }
+
+    /**
+     * Execute a callback within a transaction.
+     *
+     * @param callable $callback
+     * @return mixed
+     * @throws \Throwable
+     */
+    public function transaction(callable $callback)
+    {
+        $this->begin();
+        try {
+            $result = $callback();
+            $this->commit();
+            return $result;
+        } catch (\Throwable $e) {
+            $this->rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * Persist an entity (optionally flush immediately).
+     *
+     * @param object $entity
+     * @param bool $flush Whether to flush immediately
+     * @return void
+     */
+    public function persist(object $entity, bool $flush = true): void
+    {
+        if (!$this->entityManager->contains($entity) && !$this->entityManager->getMetadataFactory()->isTransient(get_class($entity))) {
+            throw new \InvalidArgumentException('Entity is not manageable by this EntityManager');
+        }
+
+        $this->entityManager->persist($entity);
+        if ($flush) {
+            $this->flush();
+        }
+    }
+
+    /**
+     * Persist multiple entities with single flush
+     * 
+     * @param object[] $entities
+     * @param bool $flush Whether to flush immediately
+     */
+    public function persistAll(array $entities, bool $flush = true): void
+    {
+        foreach ($entities as $entity) {
+            $this->persist($entity, false);
+        }
+        if ($flush) {
+            $this->flush();
+        }
+    }
+
+    /**
+     * Remove an entity (optionally flush immediately).
+     *
+     * @param object $entity
+     * @param bool $flush Whether to flush immediately
+     * @return void
+     */
+    public function remove(object $entity, bool $flush = true): void
+    {
+        $this->entityManager->remove($entity);
+        if ($flush) {
+            $this->flush();
+        }
+    }
+
+    /**
+     * Flush all pending changes to the database.
+     *
+     * @return void
+     */
+    public function flush(): void
+    {
+        $this->entityManager->flush();
+    }
+
+    /**
+     * Refresh an entity state from the database.
+     *
+     * @param object $entity
+     * @return void
+     */
+    public function refresh(object $entity): void
+    {
+        $this->entityManager->refresh($entity);
     }
 
     /**

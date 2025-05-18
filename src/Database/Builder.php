@@ -3,6 +3,7 @@
 namespace Axiom\Database;
 
 use Axiom\Database\Paginator;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr\Join;
@@ -381,9 +382,10 @@ class Builder
      *
      * @return array
      */
-    public function get(): array
+    public function get(): ArrayCollection
     {
-        return $this->getQuery()->getResult();
+        $results = $this->getQuery()->getResult();
+        return new ArrayCollection($results);
     }
 
     /**

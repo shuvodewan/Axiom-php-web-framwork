@@ -8,6 +8,7 @@ use Axiom\Database\Relations\BelongsToMany;
 use Axiom\Database\Relations\HasMany;
 use Axiom\Database\Relations\HasOne;
 use Axiom\Database\Relations\Relation;
+use Axiom\Facade\DB;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
@@ -23,14 +24,10 @@ use Faker\Factory;
  * providing CRUD operations, relationship management, and query building capabilities.
  * Implements active record pattern with Doctrine ORM integration.
  */
-class Entity
+#[ORM\MappedSuperclass]
+#[ORM\HasLifecycleCallbacks]
+ class Entity
 {
-    /**
-     * The Doctrine EntityManager instance
-     * 
-     * @var EntityManager
-     */
-    protected static EntityManager $entityManager;
 
     /**
      * The fully qualified class name of the concrete entity
@@ -64,6 +61,13 @@ class Entity
     protected array $associats = [];
 
     protected bool $persist = true;
+
+
+    #[ORM\PostLoad]
+    public function initializeAfterHydration(): void
+    {
+        $this->initializeDefaults();
+    }
     
     /**
      * The creation timestamp of the entity
@@ -88,22 +92,16 @@ class Entity
      */
     public function __construct()
     {
-        self::initialize();
-        $this->addMappedCollections();
-        $this->faker =  Factory::create();
-        $this->fillables = array_values(array_diff($this->getFields(), $this->guarded));
-        $this->associats = array_keys($this->getMeta()->associationMappings);
+        $this->initializeDefaults();
     }
     
-    /**
-     * Initialize the Entity system with Doctrine EntityManager
-     * 
-     * @return void
-     * @throws \RuntimeException If EntityManager cannot be initialized
-     */
-    public static function initialize(): void
+
+    protected function initializeDefaults(): void
     {
-        static::$entityManager = DatabaseManager::getInstance()->getEntityManager();
+        $this->addMappedCollections();
+        $this->faker = \Faker\Factory::create();
+        $this->fillables = array_diff($this->getFields(), $this->guarded);
+        $this->associats = array_keys($this->getMeta()->associationMappings);
     }
 
     /**
@@ -132,7 +130,7 @@ class Entity
      */
     public function getMeta(): ClassMetadata
     {
-        return self::$entityManager->getClassMetadata(static::class);
+        return DB::getEntityManager()->getClassMetadata(static::class);
     }
 
     /**
@@ -155,14 +153,13 @@ class Entity
      */
     public static function __callStatic(string $method, array $arguments)
     {
-        self::initialize();
 
         $repository = static::getRepository();
         if (method_exists($repository, $method)) {
             return $repository->$method(...$arguments);
         }
         
-        $builder = new Builder(static::$entityManager, static::class);
+        $builder = new Builder( DB::getEntityManager(), static::class);
 
         if (method_exists($builder, $method)) {
             return $builder->$method(...$arguments);
@@ -218,7 +215,7 @@ class Entity
      */
     protected static function getRepository(): EntityRepository
     {
-        return static::$entityManager->getRepository(static::class);
+        return  DB::getEntityManager()->getRepository(static::class);
     }
 
     /**
@@ -228,7 +225,7 @@ class Entity
      */
     public static function query(): Builder
     {
-        return new Builder(static::$entityManager, static::class);
+        return new Builder( DB::getEntityManager(), static::class);
     }
 
      /**
@@ -260,7 +257,7 @@ class Entity
      */
     protected function createRelation(string $relation, string $relatedClass, $mapping)
     {
-        $builder = new Builder(static::$entityManager, $relatedClass, initiation:false);
+        $builder = new Builder( DB::getEntityManager(), $relatedClass, initiation:false);
 
         switch ($mapping['type']) {
             case ClassMetadata::ONE_TO_ONE:
@@ -296,8 +293,8 @@ class Entity
         }
         
         if($entity->persist){
-            self::$entityManager->persist($entity);
-            self::$entityManager->flush();
+            DB::getEntityManager()->persist($entity);
+            DB::getEntityManager()->flush();
         }
 
         return $entity;
@@ -318,21 +315,21 @@ class Entity
         }
 
         if($this->persist){
-            self::$entityManager->flush();
+            DB::getEntityManager()->flush();
         }
 
         return $this;
     }
 
     /**
-     * Fill entity attributes (mass assignment)
+     * Fill entity props (mass assignment)
      *
-     * @param array $attributes The attributes to set
+     * @param array $props The props to set
      * @return $this
      */
-    public function fill(array $attributes)
+    public function fill(array $props)
     {
-        foreach ($attributes as $key => $value) {
+        foreach ($props as $key => $value) {
             if (property_exists($this, $key) && !$this->checkGuarded($key)) {
                 $setter = 'set' . ucfirst($key);
                 $this->$setter($value);
@@ -342,54 +339,80 @@ class Entity
     }
 
     /**
-     * Find the first entity matching the attributes or create it.
+     * Find the first entity matching the props or create it.
      *
-     * @param array $attributes Attributes to match
+     * @param array $props props to match
      * @param array $values Additional values to set if creating
      * @return static
      */
-    public static function firstOrCreate(array $attributes, array $values = []): static
+    public static function firstOrCreate(array $props, array $values = []): static
     {
-        if (!is_null($instance = static::where($attributes)->first())) {
+        if (!is_null($instance = static::where($props)->first())) {
             return $instance;
         }
 
-        return static::create(array_merge($attributes, $values));
+        return static::create(array_merge($props, $values));
     }
 
     /**
-     * Find the first entity matching the attributes or instantiate it (without persisting).
+     * instantiate it (without persisting).
      *
-     * @param array $attributes Attributes to match
+     * @param array $props props to match
+     * @return static
+     */
+    public static function new(array $props): static
+    {
+        $instance = new static();
+        $instance->fill($props);
+        return $instance;
+    }
+
+    /**
+     * Find the first entity matching the props or instantiate it (without persisting).
+     *
+     * @param array $props props to match
      * @param array $values Additional values to set if instantiating
      * @return static
      */
-    public static function firstOrNew(array $attributes, array $values = []): static
+    public static function firstOrNew(array $props, array $values = []): static
     {
-        if (!is_null($instance = static::where($attributes)->first())) {
+        if (!is_null($instance = static::where($props)->first())) {
             return $instance;
         }
 
-        $instance = new static();
-        $instance->fill(array_merge($attributes, $values));
-        return $instance;
+       return self::new(array_merge($props, $values));
     }
 
     /**
      * Update an existing entity or create it if it doesn't exist.
      *
-     * @param array $attributes Attributes to match
+     * @param array $props props to match
      * @param array $values Values to update/create with
      * @return static
      */
-    public static function updateOrCreate(array $attributes, array $values = []): static
+    public static function updateOrCreate(array $props, array $values = []): static
     {
-        if (!is_null($instance = static::where($attributes)->first())) {
+        if (!is_null($instance = static::where($props)->first())) {
             $instance->update($values);
             return $instance;
         }
 
-        return static::create(array_merge($attributes, $values));
+        return static::create(array_merge($props, $values));
+    }
+
+
+     /**
+     * Save initiated instance.
+     *
+     * @return self
+     */
+    public function save(): self
+    {
+        DB::transaction(function() {
+            DB::persist($this);
+        });
+
+        return $this;
     }
 
 
@@ -400,8 +423,8 @@ class Entity
      */
     public function delete(): bool
     {
-        self::$entityManager->remove($this);
-        self::$entityManager->flush();
+        DB::getEntityManager()->remove($this);
+        DB::getEntityManager()->flush();
         return true;
     }
 }

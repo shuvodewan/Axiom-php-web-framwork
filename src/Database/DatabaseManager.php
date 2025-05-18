@@ -2,7 +2,6 @@
 
 namespace Axiom\Database;
 
-use App\Database\Builder;
 use Axiom\Application\AppManager;
 use Axiom\Traits\InstanceTrait;
 use Doctrine\DBAL\Connection as DBALConnection;

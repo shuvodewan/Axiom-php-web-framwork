@@ -2,31 +2,54 @@
 
 namespace Axiom\Database\Relations;
 
+use Axiom\Database\Builder;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Mapping\ClassMetadata;
+use RuntimeException;
 
 class HasMany extends Relation
 {
-    public function initiate()
-    {   
-       if (!isset($this->mapping['mappedBy']) || empty($this->mapping['mappedBy'])) {
-        throw new \RuntimeException('HasMany relationship requires a mappedBy property in the mapping');
-        }
+    /**
+     * Initialize the relationship query
+     */
+    public function initiate(): Builder
+    {
+        $this->validateMapping();
+        $this->validateParent();
+        $this->buildBaseQuery();
+        $this->configureBuilder();
+        
+        return $this->builder;
+    }
 
-        $parentId = $this->parent->getId();
-        if ($parentId === null) {
-            throw new \RuntimeException('Cannot query HasMany relationship for unsaved parent entity');
-        }
+    protected function validateMapping(): void
+{
+    if (empty($this->mapping['mappedBy'])) {
+        throw new RuntimeException(
+            sprintf('HasMany relationship %s on %s requires mappedBy',
+            $this->relationName, 
+            get_class($this->parent))
+        );
+    }
+}
 
+    protected function validateParent(): void
+    {
+        if ($this->parent->getId() === null) {
+            throw new RuntimeException(
+                sprintf('Cannot query unsaved parent in %s::%s',
+                    get_class($this->parent),
+                    $this->relationName
+                )
+            );
+        }
+    }
+
+    protected function buildBaseQuery(): void
+    {
         $this->queryBuilder
             ->select($this->relatedAlias)
             ->from($this->related, $this->relatedAlias)
             ->where("{$this->relatedAlias}.{$this->mapping['mappedBy']} = :parent_id")
-            ->setParameter('parent_id', $parentId);
-
-        $this->builder->setEntityClass($this->related);
-        $this->builder->setAlias($this->relatedAlias);
-        
-        return $this->builder;
+            ->setParameter('parent_id', $this->parent->getId());
     }
 }

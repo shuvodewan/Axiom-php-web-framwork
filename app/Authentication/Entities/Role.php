@@ -64,10 +64,6 @@ class Role extends ModelEntity
     #[OneToMany(targetEntity:User::class, mappedBy:'role', cascade:['persist'])]
     protected Collection $users;
 
-    #[ManyToOne(targetEntity:Module::class, inversedBy:'module')]
-    #[JoinColumn(name:'module_id', onDelete:'SET NULL')]
-    protected Module $module;
-
 
 
     //scopes

@@ -6,7 +6,6 @@ use App\Authentication\Entities\Role;
 use Axiom\Application\Base\ResourceTrait;
 use Axiom\Application\Base\Service;
 
-
 /**
  * Service layer for domain business logic
  *
@@ -21,5 +20,10 @@ class RoleService extends Service
      * @var The Doctrine entity class this service manages
      */
     protected $entity = Role::class;
+
+
+    public function index(){  
+        dd(Role::first()->permissions()->get());
+    }
 
 }
