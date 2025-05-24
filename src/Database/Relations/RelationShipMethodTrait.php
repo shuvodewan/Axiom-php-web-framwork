@@ -3,6 +3,7 @@
 namespace Axiom\Database\Relations;
 
 use Axiom\Facade\DB;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use RuntimeException;
 
@@ -49,11 +50,13 @@ trait RelationShipMethodTrait
         // Verify persistence requirements based on relationship type
         $this->verifyPersistenceRequirements($mapping, $action, $relatedEntity);
 
-        if ($action === 'add') {
-            $this->addToRelationship($property, $relatedEntity, $mapping);
+        if ($action === 'add' || $action === 'sync') {
+            $this->addToRelationship($property, $relatedEntity, $mapping, $action=='sync');
         } else {
             $this->removeFromRelationship($property, $relatedEntity, $mapping);
         }
+
+        $this->save();
 
         return $this;
     }
@@ -63,13 +66,32 @@ trait RelationShipMethodTrait
      */
     protected function verifyPersistenceRequirements( $mapping, string $action, $relatedEntity): void
     {
-        // Always require persisted host entity for owning side operations
-        if (!$this->isOwningSide($mapping)) {
-            $this->ensurePersisted();
-        }else{
-            $this->ensurePersisted($relatedEntity);
+        
+    
+        if ($action === 'sync') {
+            if (!is_array($relatedEntity)) {
+                throw new RuntimeException(
+                    'Related entities should be provided as an array for sync operation'
+                );
+            }
+            
+            foreach ($relatedEntity as $entity) {
+                if (!$entity->isPersisted()) {
+                    throw new RuntimeException(
+                        sprintf('Cannot sync unsaved %s entity to ManyToMany relationship', 
+                        get_class($entity))
+                    );
+                }
+            }
+            return;
         }
 
+        if (!$this->isOwningSide($mapping)) {
+            $this->ensurePersisted();
+        } else {
+            $this->ensurePersisted($relatedEntity);
+        }
+    
         // For ManyToMany, both entities must be persisted
         if ($mapping['type'] === ClassMetadata::MANY_TO_MANY) {
             if (!$relatedEntity->isPersisted()) {
@@ -86,7 +108,7 @@ trait RelationShipMethodTrait
         return $mapping['isOwningSide'] ?? false;
     }
 
-    protected function addToRelationship(string $property, $relatedEntity, $mapping): void
+    protected function addToRelationship(string $property, $relatedEntity, $mapping, $sync=false): void
     {
         $this->validateEntityType($relatedEntity, $mapping['targetEntity']);
 
@@ -98,7 +120,9 @@ trait RelationShipMethodTrait
                 $this->addToManyToOne($property, $relatedEntity, $mapping);
                 break;
             case ClassMetadata::MANY_TO_MANY:
-                $this->addToManyToMany($property, $relatedEntity, $mapping);
+                $sync?
+                $this->syncManyToMany($property, $relatedEntity, $mapping)
+                :$this->addToManyToMany($property, $relatedEntity, $mapping);
                 break;
             case ClassMetadata::ONE_TO_ONE:
                 $this->addToOneToOne($property, $relatedEntity, $mapping);
@@ -134,13 +158,11 @@ trait RelationShipMethodTrait
         
     }
 
-    protected function addToManyToMany(string $property, $relatedEntity, array $mapping): void
+    protected function addToManyToMany(string $property, $relatedEntity, $mapping): void
     {
         $collection = $this->$property;
-        
         if (!$collection->contains($relatedEntity)) {
             $collection->add($relatedEntity);
-            
             $inverseProperty = $mapping['inversedBy'] ?? $mapping['mappedBy'];
             $inverseCollection = $relatedEntity->$inverseProperty;
             
@@ -246,8 +268,41 @@ trait RelationShipMethodTrait
         }
     }
 
+    protected function syncManyToMany(string $property, array $relatedEntities, $mapping): void
+    {
+        $collection = $this->$property;
+        $newEntities = new ArrayCollection($relatedEntities);
+        
+        foreach ($collection as $existingEntity) {
+            if (!$newEntities->contains($existingEntity)) {
+                $this->removeFromManyToMany($property, $existingEntity, $mapping);
+            }
+        }
+
+        foreach ($newEntities as $newEntity) {
+            if (!$collection->contains($newEntity)) {
+                $this->addToManyToMany($property, $newEntity, $mapping);
+            }
+        }
+
+    }
+
+
     protected function validateEntityType($entity, string $expectedClass): void
     {
+        if(is_array($entity)){
+            foreach($entity as $item){
+                if(!$item instanceof $expectedClass){
+                    throw new \InvalidArgumentException(sprintf(
+                        'Expected entity of type %s, got %s',
+                        $expectedClass,
+                        is_object($item) ? get_class($item) : gettype($item)
+                    ));
+                } 
+            }
+            return;
+        }
+
         if (!$entity instanceof $expectedClass) {
             throw new \InvalidArgumentException(sprintf(
                     'Expected entity of type %s, got %s',

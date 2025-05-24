@@ -61,7 +61,7 @@ class Role extends ModelEntity
     protected Collection $permissions;
 
 
-    #[OneToMany(targetEntity:User::class, mappedBy:'role', cascade:['persist'])]
+    #[OneToMany(targetEntity:User::class, mappedBy:'role')]
     protected Collection $users;
 
 

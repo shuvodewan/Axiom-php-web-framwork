@@ -102,7 +102,6 @@ use Faker\Factory;
     protected function initializeDefaults(): void
     {
         $this->addMappedCollections();
-        $this->faker = \Faker\Factory::create();
         $this->fillables = array_diff($this->getFields(), $this->guarded);
         $this->associats = array_keys($this->getMeta()->associationMappings);
     }
@@ -162,7 +161,7 @@ use Faker\Factory;
             return $repository->$method(...$arguments);
         }
         
-        $builder = new Builder( DB::getEntityManager(), static::class);
+       $builder = self::query();
 
         if (method_exists($builder, $method)) {
             return $builder->$method(...$arguments);
@@ -185,7 +184,7 @@ use Faker\Factory;
      */
     public function __call(string $method, array $args)
     {
-        if (preg_match('/^(add|remove)([A-Z][a-zA-Z0-9]*)$/', $method, $matches)) {
+        if (preg_match('/^(add|remove|sync)([A-Z][a-zA-Z0-9]*)$/', $method, $matches)) {
             $action = $matches[1];
             $property = lcfirst($matches[2]);
 
@@ -319,7 +318,6 @@ use Faker\Factory;
     public function update(array $props)
     {
         $this->fill($props);
-
         if ($this->timestamps) {
             $this->updatedAt = new \DateTime();
         }
@@ -341,8 +339,13 @@ use Faker\Factory;
     {
         foreach ($props as $key => $value) {
             if (property_exists($this, $key) && !$this->checkGuarded($key)) {
-                $setter = 'set' . ucfirst($key);
-                $this->$setter($value);
+
+                if(in_array($key,$this->associats)){
+                    $this->handleRelationshipAction('add',$key,$value);
+                }else{
+                    $setter = 'set' . ucfirst($key);
+                    $this->$setter($value);
+                }
             }
         }
         return $this;
@@ -386,11 +389,27 @@ use Faker\Factory;
      */
     public static function firstOrNew(array $props, array $values = []): static
     {
-        if (!is_null($instance = static::where($props)->first())) {
+        
+        $query = self::query();
+        $meta = DB::getEntityManager()->getClassMetadata(static::class);;
+
+        foreach ($props as $key => $value) {
+            if ($meta->hasAssociation($key)) {
+                $mapping = $meta->getAssociationMapping($key);
+                
+                if ($mapping['isOwningSide'] && $mapping['type'] !== ClassMetadata::MANY_TO_MANY) {
+                    $query->where($key, $value);
+                }
+            } else {
+                $query->where($key, $value);
+            }
+        }
+
+        if ($instance = $query->first()) {
             return $instance;
         }
 
-       return self::new(array_merge($props, $values));
+        return static::create(array_merge($props, $values));
     }
 
     /**
@@ -402,7 +421,22 @@ use Faker\Factory;
      */
     public static function updateOrCreate(array $props, array $values = []): static
     {
-        if (!is_null($instance = static::where($props)->first())) {
+        $query = self::query();
+        $meta = DB::getEntityManager()->getClassMetadata(static::class);;
+
+        foreach ($props as $key => $value) {
+            if ($meta->hasAssociation($key)) {
+                $mapping = $meta->getAssociationMapping($key);
+                
+                if ($mapping['isOwningSide'] && $mapping['type'] !== ClassMetadata::MANY_TO_MANY) {
+                    $query->where($key, $value);
+                }
+            } else {
+                $query->where($key, $value);
+            }
+        }
+
+        if ($instance = $query->first()) {
             $instance->update($values);
             return $instance;
         }

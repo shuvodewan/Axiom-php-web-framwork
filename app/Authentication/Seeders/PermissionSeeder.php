@@ -18,12 +18,66 @@ class PermissionSeeder  extends Seeder
      */
     public function run(){
 
-        // Authorization management
-        $moduleAuthorization = Module::updateOrCreate(['title' => 'Authorization','slug'=>Str::toSlug('Authorization')]);
-        $permission = Permission::new([
-            'title' => 'Select Roles',
-            'slug' => 'roles.select',
-        ])->addModule($moduleAuthorization);
+        // Role management
+        $moduleAppRole = Module::updateOrCreate([
+            'title' => 'Role Management',
+            'slug' => Str::toSlug('Role Management')
+        ]);
+
+        Permission::updateOrCreate([
+            'title' => 'Access Roles',
+            'slug' => 'app.roles.index',
+            'module' => $moduleAppRole
+        ]);
+
+        Permission::updateOrCreate([
+            'title' => 'Create Role',
+            'slug' => 'app.roles.create',
+            'module' => $moduleAppRole
+        ]);
+
+        Permission::updateOrCreate([
+            'title' => 'Edit Role',
+            'slug' => 'app.roles.edit',
+            'module' => $moduleAppRole
+        ]);
+
+        Permission::updateOrCreate([
+            'title' => 'Delete Role',
+            'slug' => 'app.roles.destroy',
+            'module' => $moduleAppRole
+        ]);
+
+
+        // User management
+        $moduleAppUser = Module::updateOrCreate([
+            'title' => 'User Management',
+            'slug' => Str::toSlug('User Management')
+        ]);
+
+        Permission::updateOrCreate([
+            'title' => 'Access Users',
+            'slug' => 'app.users.index',
+            'module' => $moduleAppUser
+        ]);
+
+        Permission::updateOrCreate([
+            'title' => 'Create User',
+            'slug' => 'app.users.create',
+            'module' => $moduleAppUser
+        ]);
+
+        Permission::updateOrCreate([
+            'title' => 'Edit User',
+            'slug' => 'app.users.edit',
+            'module' => $moduleAppUser
+        ]);
+
+        Permission::updateOrCreate([
+            'title' => 'Delete User',
+            'slug' => 'app.users.destroy',
+            'module' => $moduleAppUser
+        ]);
         
     }
 }

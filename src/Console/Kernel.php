@@ -107,7 +107,9 @@ class Kernel
                 'trace' => $e->getTraceAsString(),
             ]);
             
-            Preview::error($e->getMessage());
+            dd($e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
     }
 
