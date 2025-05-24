@@ -20,10 +20,10 @@ class PermissionSeeder  extends Seeder
 
         // Authorization management
         $moduleAuthorization = Module::updateOrCreate(['title' => 'Authorization','slug'=>Str::toSlug('Authorization')]);
-        $permission = Permission::updateOrCreate([
+        $permission = Permission::new([
             'title' => 'Select Roles',
             'slug' => 'roles.select',
-        ]);
+        ])->addModule($moduleAuthorization);
         
     }
 }

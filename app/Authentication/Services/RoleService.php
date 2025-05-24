@@ -2,9 +2,12 @@
 
 namespace App\Authentication\Services;
 
+use App\Authentication\Entities\Module;
+use App\Authentication\Entities\Permission;
 use App\Authentication\Entities\Role;
 use Axiom\Application\Base\ResourceTrait;
 use Axiom\Application\Base\Service;
+use Axiom\Facade\Str;
 
 /**
  * Service layer for domain business logic
@@ -23,7 +26,11 @@ class RoleService extends Service
 
 
     public function index(){  
-        dd(Role::first()->permissions()->get());
+        $moduleAuthorization = Module::updateOrCreate(['title' => 'Authorization','slug'=>Str::toSlug('Authorization')]);
+        $permission = Permission::new([
+            'title' => 'Select Roles',
+            'slug' => 'roles.select',
+        ])->addModule($moduleAuthorization);
     }
 
 }

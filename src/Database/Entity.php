@@ -8,6 +8,7 @@ use Axiom\Database\Relations\BelongsToMany;
 use Axiom\Database\Relations\HasMany;
 use Axiom\Database\Relations\HasOne;
 use Axiom\Database\Relations\Relation;
+use Axiom\Database\Relations\RelationShipMethodTrait;
 use Axiom\Facade\DB;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -29,6 +30,7 @@ use Faker\Factory;
  class Entity
 {
 
+    use RelationShipMethodTrait;
     /**
      * The fully qualified class name of the concrete entity
      * 
@@ -183,6 +185,13 @@ use Faker\Factory;
      */
     public function __call(string $method, array $args)
     {
+        if (preg_match('/^(add|remove)([A-Z][a-zA-Z0-9]*)$/', $method, $matches)) {
+            $action = $matches[1];
+            $property = lcfirst($matches[2]);
+
+            return $this->handleRelationshipAction($action, $property, $args[0] ?? null);
+        }
+
 
         if (in_array($method, $this->associats)) {
             return $this->relation($method);
@@ -411,6 +420,20 @@ use Faker\Factory;
     {
         DB::transaction(function() {
             DB::persist($this);
+        });
+
+        return $this;
+    }
+
+     /**
+     * Save initiated instance.
+     *
+     * @return self
+     */
+    public function flash(): self
+    {
+        DB::transaction(function() {
+            DB::flush($this);
         });
 
         return $this;

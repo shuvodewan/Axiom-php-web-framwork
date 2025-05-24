@@ -75,8 +75,8 @@ class Permission extends ModelEntity
      * Owning side of the Module-Permission relationship
      */
     #[ManyToOne(targetEntity: Module::class, inversedBy: 'permissions')]
-    #[JoinColumn(name: 'module_id', referencedColumnName: 'id', onDelete:'CASCADE')]
-    protected ?Module $module;
+    #[JoinColumn(name: 'module_id', referencedColumnName: 'id', nullable: false, onDelete:'CASCADE')]
+    protected Module $module;
 
     /**
      * Collection of Roles that have this permission

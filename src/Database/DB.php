@@ -104,11 +104,29 @@ class DB
      */
     public function persist(object $entity, bool $flush = true): void
     {
-        if (!$this->entityManager->contains($entity) && !$this->entityManager->getMetadataFactory()->isTransient(get_class($entity))) {
-            throw new \InvalidArgumentException('Entity is not manageable by this EntityManager');
+
+        if (!$this->entityManager->isOpen()) {
+            throw new \RuntimeException('Cannot persist entity - EntityManager is closed');
+        }
+        if ($this->entityManager->contains($entity)) {
+            if ($flush) {
+                $this->flush();
+            }
+            return;
         }
 
+        $classMetadata = $this->entityManager->getMetadataFactory()->getMetadataFor(get_class($entity));
+        if ($classMetadata->isMappedSuperclass || !$classMetadata->isRootEntity()) {
+            throw new \InvalidArgumentException(sprintf(
+                    'Entity of type %s is not persistable', 
+                    get_class($entity)
+                )
+            );
+        }
+
+        // Persist and optionally flush
         $this->entityManager->persist($entity);
+    
         if ($flush) {
             $this->flush();
         }
