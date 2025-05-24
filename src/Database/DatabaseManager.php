@@ -101,7 +101,7 @@ class DatabaseManager
         return ORMSetup::createAttributeMetadataConfiguration(
             paths: (new AppManager())->getEntityDirs(),
             isDevMode: config('app.debug', true),
-            proxyDir: storage_path('doctrine/proxies'),
+            proxyDir: storage_path('/doctrine/proxies'),
             cache: $this->createCacheInstance()
         );
     }
