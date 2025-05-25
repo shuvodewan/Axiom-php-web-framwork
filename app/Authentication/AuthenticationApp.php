@@ -4,6 +4,7 @@ namespace App\Authentication;
 
 use App\Authentication\Seeders\PermissionSeeder;
 use App\Authentication\Seeders\RoleSeeder;
+use App\Authentication\Seeders\UserSeeder;
 use App\Authentication\Transports\Handlers\MailHandler;
 use App\Authentication\Transports\Jobs\MailJob;
 use Axiom\Application\App;
@@ -27,7 +28,8 @@ class AuthenticationApp extends App
      * @var array<class-string> Array of seeder class names
      */
     public array $seeders = [
-        RoleSeeder::class,
         PermissionSeeder::class,
+        RoleSeeder::class,
+        UserSeeder::class,
     ];
 }

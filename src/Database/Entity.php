@@ -22,59 +22,70 @@ use Faker\Factory;
  * Base Entity class providing common database operations
  * 
  * This abstract class serves as the foundation for all Doctrine entities in the system,
- * providing CRUD operations, relationship management, and query building capabilities.
- * Implements active record pattern with Doctrine ORM integration.
+ * implementing an active record pattern with Doctrine ORM integration. It provides:
+ * 
+ * - CRUD operations (create, read, update, delete)
+ * - Relationship management (hasOne, hasMany, belongsTo, belongsToMany)
+ * - Query building capabilities
+ * - Mass assignment protection
+ * - Timestamp management
+ * - Dynamic method handling for getters/setters
+ * - Relationship operations (add/remove/sync)
+ * 
+ * The class uses Doctrine ORM for persistence and provides a fluent interface
+ * for common operations. It supports both static and instance method calls
+ * for query building and relationship management.
  */
 #[ORM\MappedSuperclass]
 #[ORM\HasLifecycleCallbacks]
- class Entity
+class Entity
 {
-
     use RelationShipMethodTrait;
+
     /**
      * The fully qualified class name of the concrete entity
-     * 
      * @var string
      */
     protected static string $entityClass;
 
     /**
-     * Faker to generate fake data
-     * 
-     */
-    protected $faker;
-
-    /**
      * Whether to automatically manage timestamp fields
-     * 
      * @var bool
      */
     protected bool $timestamps = true;
 
     /**
-     * Add list of properties to guarded to prevent users to modify by mistake
-     * 
+     * Properties that cannot be mass-assigned
      * @var array
      */
     protected array $guarded = ['id','createdAt','updatedAt'];
 
+     /**
+     * Properties that cannot be publicly assigned
+     * @var array
+     */
+    protected array $ignore = ['timestamps','ignore','guarded','persist','associats','persist','fillables'];
+
+    /**
+     * Properties that can be mass-assigned
+     * @var array
+     */
     protected array $fillables = [];
 
+    /**
+     * Relationship properties of the entity
+     * @var array
+     */
     protected array $associats = [];
 
+    /**
+     * Whether to automatically persist changes
+     * @var bool
+     */
     protected bool $persist = true;
 
-
-    #[ORM\PostLoad]
-    public function initializeAfterHydration(): void
-    {
-        $this->addMappedCollections();
-        $this->initializeDefaults();
-    }
-    
     /**
      * The creation timestamp of the entity
-     * 
      * @var \DateTimeInterface|null
      */
     #[ORM\Column(type: "datetime", name:'created_at', nullable: true)]
@@ -82,23 +93,36 @@ use Faker\Factory;
     
     /**
      * The last update timestamp of the entity
-     * 
      * @var \DateTimeInterface|null
      */
     #[ORM\Column(type: "datetime", name:'updated_at' ,nullable: true)]
     protected ?\DateTimeInterface $updatedAt = null;
 
     /**
-     * Entity constructor
-     * 
-     * Initializes the EntityManager and sets up collection properties
+     * Initialize the entity with default values and collections
      */
     public function __construct()
     {
         $this->initializeDefaults();
     }
-    
 
+    /**
+     * Post-load initialization hook
+     * 
+     * Called by Doctrine after hydration to ensure proper initialization
+     */
+    #[ORM\PostLoad]
+    public function initializeAfterHydration(): void
+    {
+        $this->addMappedCollections();
+        $this->initializeDefaults();
+    }
+
+    /**
+     * Set up default values for the entity
+     * 
+     * Initializes collections, fillable fields, and association mappings
+     */
     protected function initializeDefaults(): void
     {
         $this->addMappedCollections();
@@ -109,7 +133,7 @@ use Faker\Factory;
     /**
      * Initialize all Collection properties with empty ArrayCollections
      * 
-     * @return self
+     * @return self Returns the entity instance for method chaining
      */
     public function addMappedCollections(): self
     {
@@ -146,7 +170,9 @@ use Faker\Factory;
     }
 
     /**
-     * Handle static method calls
+     * Handle dynamic static method calls
+     * 
+     * Routes calls to either the repository or query builder
      * 
      * @param string $method The method name being called
      * @param array $arguments The method arguments
@@ -155,14 +181,12 @@ use Faker\Factory;
      */
     public static function __callStatic(string $method, array $arguments)
     {
-
         $repository = static::getRepository();
         if (method_exists($repository, $method)) {
             return $repository->$method(...$arguments);
         }
         
-       $builder = self::query();
-
+        $builder = self::query();
         if (method_exists($builder, $method)) {
             return $builder->$method(...$arguments);
         }
@@ -175,7 +199,9 @@ use Faker\Factory;
     }
 
     /**
-     * Handle dynamic method calls on instances
+     * Handle dynamic instance method calls
+     * 
+     * Processes relationship actions, getters/setters, and property access
      * 
      * @param string $method The method name being called
      * @param array $args The method arguments
@@ -187,29 +213,27 @@ use Faker\Factory;
         if (preg_match('/^(add|remove|sync)([A-Z][a-zA-Z0-9]*)$/', $method, $matches)) {
             $action = $matches[1];
             $property = lcfirst($matches[2]);
-
             return $this->handleRelationshipAction($action, $property, $args[0] ?? null);
         }
-
 
         if (in_array($method, $this->associats)) {
             return $this->relation($method);
         }
 
-        // Handle getter methods
         if (str_starts_with($method, 'get')) {
             $property = lcfirst(substr($method, 3));
             return $this->$property ?? null;
         }
 
-        // Handle setter methods
         if (str_starts_with($method, 'set')) {
             $property = lcfirst(substr($method, 3));
-
             if ($this->checkGuarded($property)) {
                 throw new \RuntimeException("Cannot set guarded property: {$property}");
             }
 
+            if ($this->checkIgnore($property)) {
+                throw new \RuntimeException("Cannot set protected property: {$property}");
+            }
             $this->$property = $args[0] ?? null;
             return $this;
         }
@@ -218,40 +242,52 @@ use Faker\Factory;
     }
 
     /**
-     * Get the Doctrine repository instance
+     * Get the Doctrine repository instance for this entity
      * 
-     * @return EntityRepository
+     * @return EntityRepository The repository instance
      */
     protected static function getRepository(): EntityRepository
     {
-        return  DB::getEntityManager()->getRepository(static::class);
+        return DB::getEntityManager()->getRepository(static::class);
     }
 
     /**
-     * Create a new query builder instance
+     * Create a new query builder instance for this entity
      * 
-     * @return Builder
+     * @return Builder A query builder instance
      */
     public static function query(): Builder
     {
-        return new Builder( DB::getEntityManager(), static::class);
+        return new Builder(DB::getEntityManager(), static::class);
     }
 
-     /**
-     * Check property to gurded list before insert to database
+    /**
+     * Check if a property is guarded against mass assignment
      * 
-     * @return boolean
+     * @param string $property The property name to check
+     * @return bool True if the property is guarded
      */
     public function checkGuarded($property): bool
     {
         return in_array($property, $this->guarded);
     }
 
+     /**
+     * Check if a property is guarded against mass assignment
+     * 
+     * @param string $property The property name to check
+     * @return bool True if the property is guarded
+     */
+    public function checkIgnore($property): bool
+    {
+        return in_array($property, $this->ignore);
+    }
+
     /**
-     * Get a relationship query builder
+     * Get a relationship query builder for a relation
      * 
      * @param string $relation The relationship name
-     * @return Relation
+     * @return Relation The relationship instance
      * @throws \RuntimeException If relationship doesn't exist
      */
     public function relation(string $relation): Relation
@@ -262,11 +298,17 @@ use Faker\Factory;
     }
 
     /**
-     * Create the appropriate relation instance
+     * Create the appropriate relation instance based on mapping type
+     * 
+     * @param string $relation The relationship name
+     * @param string $relatedClass The target entity class
+     * @param array $mapping The association mapping
+     * @return Relation The created relationship instance
+     * @throws \RuntimeException For unsupported relationship types
      */
-    protected function createRelation(string $relation, string $relatedClass, $mapping)
+    protected function createRelation(string $relation, string $relatedClass, $mapping): Relation
     {
-        $builder = new Builder( DB::getEntityManager(), $relatedClass, initiation:false);
+        $builder = new Builder(DB::getEntityManager(), $relatedClass, initiation:false);
 
         switch ($mapping['type']) {
             case ClassMetadata::ONE_TO_ONE:
@@ -282,13 +324,11 @@ use Faker\Factory;
         }
     }
 
-
-
     /**
      * Create a new entity and persist it
-     *
+     * 
      * @param array $props The properties to set on the new entity
-     * @return static
+     * @return static The created entity instance
      */
     public static function create(array $props)
     {
@@ -297,8 +337,8 @@ use Faker\Factory;
 
         if ($entity->timestamps) {
             $now = new \DateTime();
-            $entity->createdAt = $now;
-            $entity->updatedAt = $now;
+            $entity->createdAt = isset($props['createdAt']) && $props['createdAt']?$props['createdAt']:$now;
+            $entity->updatedAt = isset($props['updatedAt']) && $props['updatedAt']?$props['updatedAt']:$now;
         }
         
         if($entity->persist){
@@ -310,10 +350,10 @@ use Faker\Factory;
     }
 
     /**
-     * Update an existing entity
-     *
+     * Update an existing entity with new properties
+     * 
      * @param array $props The properties to update
-     * @return $this
+     * @return $this The updated entity instance
      */
     public function update(array $props)
     {
@@ -330,16 +370,17 @@ use Faker\Factory;
     }
 
     /**
-     * Fill entity props (mass assignment)
-     *
-     * @param array $props The props to set
-     * @return $this
+     * Fill entity properties (mass assignment)
+     * 
+     * Only fills non-guarded properties and handles relationships
+     * 
+     * @param array $props The properties to set
+     * @return $this The entity instance
      */
     public function fill(array $props)
     {
         foreach ($props as $key => $value) {
             if (property_exists($this, $key) && !$this->checkGuarded($key)) {
-
                 if(in_array($key,$this->associats)){
                     $this->handleRelationshipAction('add',$key,$value);
                 }else{
@@ -352,46 +393,16 @@ use Faker\Factory;
     }
 
     /**
-     * Find the first entity matching the props or create it.
-     *
-     * @param array $props props to match
-     * @param array $values Additional values to set if creating
-     * @return static
+     * Find the first entity matching criteria or create new one
+     * 
+     * @param array $props Criteria to match
+     * @param array $values Additional values for creation
+     * @return static The found or created entity
      */
     public static function firstOrCreate(array $props, array $values = []): static
     {
-        if (!is_null($instance = static::where($props)->first())) {
-            return $instance;
-        }
-
-        return static::create(array_merge($props, $values));
-    }
-
-    /**
-     * instantiate it (without persisting).
-     *
-     * @param array $props props to match
-     * @return static
-     */
-    public static function new(array $props): static
-    {
-        $instance = new static();
-        $instance->fill($props);
-        return $instance;
-    }
-
-    /**
-     * Find the first entity matching the props or instantiate it (without persisting).
-     *
-     * @param array $props props to match
-     * @param array $values Additional values to set if instantiating
-     * @return static
-     */
-    public static function firstOrNew(array $props, array $values = []): static
-    {
-        
         $query = self::query();
-        $meta = DB::getEntityManager()->getClassMetadata(static::class);;
+        $meta = DB::getEntityManager()->getClassMetadata(static::class);
 
         foreach ($props as $key => $value) {
             if ($meta->hasAssociation($key)) {
@@ -413,16 +424,29 @@ use Faker\Factory;
     }
 
     /**
-     * Update an existing entity or create it if it doesn't exist.
-     *
-     * @param array $props props to match
+     * Create a new entity instance without persisting
+     * 
+     * @param array $props The properties to set
+     * @return static The new entity instance
+     */
+    public static function new(array $props): static
+    {
+        $instance = new static();
+        $instance->fill($props);
+        return $instance;
+    }
+
+    /**
+     * Update existing entity or create new one if not found
+     * 
+     * @param array $props Criteria to match
      * @param array $values Values to update/create with
-     * @return static
+     * @return static The updated or created entity
      */
     public static function updateOrCreate(array $props, array $values = []): static
     {
         $query = self::query();
-        $meta = DB::getEntityManager()->getClassMetadata(static::class);;
+        $meta = DB::getEntityManager()->getClassMetadata(static::class);
 
         foreach ($props as $key => $value) {
             if ($meta->hasAssociation($key)) {
@@ -444,39 +468,35 @@ use Faker\Factory;
         return static::create(array_merge($props, $values));
     }
 
-
-     /**
-     * Save initiated instance.
-     *
-     * @return self
+    /**
+     * Persist the entity to database
+     * 
+     * @return self The entity instance
      */
     public function save(): self
     {
         DB::transaction(function() {
             DB::persist($this);
         });
-
         return $this;
     }
 
-     /**
-     * Save initiated instance.
-     *
-     * @return self
+    /**
+     * Flush the entity changes to database
+     * 
+     * @return self The entity instance
      */
     public function flash(): self
     {
         DB::transaction(function() {
             DB::flush($this);
         });
-
         return $this;
     }
 
-
     /**
-     * Delete the entity from the database
-     *
+     * Delete the entity from database
+     * 
      * @return bool True if deletion was successful
      */
     public function delete(): bool

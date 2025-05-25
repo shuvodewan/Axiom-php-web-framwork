@@ -3,12 +3,16 @@
 namespace App\Authentication\Entities;
 
 use Axiom\Database\Entity as ModelEntity;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\GeneratedValue;
+use Doctrine\ORM\Mapping\InverseJoinColumn;
 use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\JoinTable;
+use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
 
 /**
@@ -71,8 +75,13 @@ class User extends ModelEntity
     protected ?string $avatar = null;
 
 
-    #[ManyToOne(targetEntity:Role::class, inversedBy:'role')]
-    #[JoinColumn(name:'role_id', referencedColumnName:'id', onDelete:'SET NULL')]
-    protected ?Role $role = null;
+      /**
+     * User and roles many to many relationships
+     */
+    #[ManyToMany(targetEntity: Role::class, inversedBy: 'users')]
+    #[JoinTable(name: 'role_user')]
+    #[JoinColumn(name: 'user_id', onDelete: 'CASCADE')]
+    #[InverseJoinColumn(name: 'role_id', onDelete: 'CASCADE')]
+    protected Collection $roles;
 
 }

@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250524164107 extends AbstractMigration
+final class Version20250525084151 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -33,7 +33,10 @@ final class Version20250524164107 extends AbstractMigration
             CREATE TABLE permission_role (role_id INT NOT NULL, permission_id INT NOT NULL, INDEX IDX_6A711CAD60322AC (role_id), INDEX IDX_6A711CAFED90CCA (permission_id), PRIMARY KEY(role_id, permission_id)) DEFAULT CHARACTER SET utf8mb4
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE users (created_at DATETIME DEFAULT NULL, updated_at DATETIME DEFAULT NULL, id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, user_name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, email_verified_at DATETIME DEFAULT NULL, password VARCHAR(255) NOT NULL, remember_token VARCHAR(100) DEFAULT NULL, avatar VARCHAR(2048) DEFAULT NULL, role_id INT DEFAULT NULL, UNIQUE INDEX UNIQ_1483A5E924A232CF (user_name), UNIQUE INDEX UNIQ_1483A5E9E7927C74 (email), INDEX IDX_1483A5E9D60322AC (role_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4
+            CREATE TABLE users (created_at DATETIME DEFAULT NULL, updated_at DATETIME DEFAULT NULL, id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, user_name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, email_verified_at DATETIME DEFAULT NULL, password VARCHAR(255) NOT NULL, remember_token VARCHAR(100) DEFAULT NULL, avatar VARCHAR(2048) DEFAULT NULL, UNIQUE INDEX UNIQ_1483A5E924A232CF (user_name), UNIQUE INDEX UNIQ_1483A5E9E7927C74 (email), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4
+        SQL);
+        $this->addSql(<<<'SQL'
+            CREATE TABLE role_user (user_id INT NOT NULL, role_id INT NOT NULL, INDEX IDX_332CA4DDA76ED395 (user_id), INDEX IDX_332CA4DDD60322AC (role_id), PRIMARY KEY(user_id, role_id)) DEFAULT CHARACTER SET utf8mb4
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE permissions ADD CONSTRAINT FK_2DEDCC6FAFC2B591 FOREIGN KEY (module_id) REFERENCES modules (id) ON DELETE CASCADE
@@ -45,7 +48,10 @@ final class Version20250524164107 extends AbstractMigration
             ALTER TABLE permission_role ADD CONSTRAINT FK_6A711CAFED90CCA FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE users ADD CONSTRAINT FK_1483A5E9D60322AC FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE SET NULL
+            ALTER TABLE role_user ADD CONSTRAINT FK_332CA4DDA76ED395 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE role_user ADD CONSTRAINT FK_332CA4DDD60322AC FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE
         SQL);
     }
 
@@ -62,7 +68,10 @@ final class Version20250524164107 extends AbstractMigration
             ALTER TABLE permission_role DROP FOREIGN KEY FK_6A711CAFED90CCA
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE users DROP FOREIGN KEY FK_1483A5E9D60322AC
+            ALTER TABLE role_user DROP FOREIGN KEY FK_332CA4DDA76ED395
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE role_user DROP FOREIGN KEY FK_332CA4DDD60322AC
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE modules
@@ -78,6 +87,9 @@ final class Version20250524164107 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE users
+        SQL);
+        $this->addSql(<<<'SQL'
+            DROP TABLE role_user
         SQL);
     }
 }

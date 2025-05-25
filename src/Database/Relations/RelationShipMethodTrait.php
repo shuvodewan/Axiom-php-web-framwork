@@ -8,14 +8,23 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use RuntimeException;
 
 /**
- * Provides automatic generation of relationship management methods (addXxx/removeXxx)
+ * Provides automatic generation of relationship management methods (addXxx/removeXxx/syncXxx)
  * with full persistence checking for both host and related entities.
+ * 
+ * This trait handles all relationship operations for Doctrine entities including:
+ * - OneToOne
+ * - OneToMany
+ * - ManyToOne 
+ * - ManyToMany
+ * 
+ * It ensures proper bi-directional relationship management and persistence state validation.
  */
 trait RelationShipMethodTrait
 {
-
     /**
-     * Checks if the entity is persisted in the database.
+     * Checks if the entity is persisted in the database
+     * 
+     * @return bool True if the entity has an ID and is managed by EntityManager
      */
     protected function isPersisted(): bool
     {
@@ -23,13 +32,14 @@ trait RelationShipMethodTrait
     }
 
     /**
-     * Ensures the entity is persisted before relationship operations.
+     * Ensures the entity is persisted before relationship operations
      * 
+     * @param mixed $related Optional related entity to check instead of host
      * @throws RuntimeException When entity is not persisted
      */
-    protected function ensurePersisted($related=null): void
+    protected function ensurePersisted($related = null): void
     {
-        $entity = $related??$this;
+        $entity = $related ?? $this;
         if (!$entity->isPersisted()) {
             throw new RuntimeException(
                 sprintf('Cannot modify relationships on unsaved %s entity', get_class($entity))
@@ -37,6 +47,15 @@ trait RelationShipMethodTrait
         }
     }
 
+    /**
+     * Handles relationship actions (add/remove/sync)
+     * 
+     * @param string $action The action to perform (add/remove/sync)
+     * @param string $property The relationship property name
+     * @param mixed $relatedEntity The related entity/entities
+     * @return self
+     * @throws BadMethodCallException If property is not a relationship
+     */
     protected function handleRelationshipAction(string $action, string $property, $relatedEntity): self
     {
         $meta = $this->getMeta();
@@ -47,11 +66,10 @@ trait RelationShipMethodTrait
 
         $mapping = $meta->getAssociationMapping($property);
         
-        // Verify persistence requirements based on relationship type
         $this->verifyPersistenceRequirements($mapping, $action, $relatedEntity);
 
         if ($action === 'add' || $action === 'sync') {
-            $this->addToRelationship($property, $relatedEntity, $mapping, $action=='sync');
+            $this->addToRelationship($property, $relatedEntity, $mapping, $action == 'sync');
         } else {
             $this->removeFromRelationship($property, $relatedEntity, $mapping);
         }
@@ -62,12 +80,15 @@ trait RelationShipMethodTrait
     }
 
     /**
-     * Verifies persistence requirements for the relationship operation.
+     * Verifies persistence requirements for the relationship operation
+     * 
+     * @param array $mapping The Doctrine association mapping
+     * @param string $action The action being performed
+     * @param mixed $relatedEntity The related entity/entities
+     * @throws RuntimeException For invalid persistence states
      */
-    protected function verifyPersistenceRequirements( $mapping, string $action, $relatedEntity): void
+    protected function verifyPersistenceRequirements($mapping, string $action, $relatedEntity): void
     {
-        
-    
         if ($action === 'sync') {
             if (!is_array($relatedEntity)) {
                 throw new RuntimeException(
@@ -92,7 +113,6 @@ trait RelationShipMethodTrait
             $this->ensurePersisted($relatedEntity);
         }
     
-        // For ManyToMany, both entities must be persisted
         if ($mapping['type'] === ClassMetadata::MANY_TO_MANY) {
             if (!$relatedEntity->isPersisted()) {
                 throw new RuntimeException(
@@ -103,12 +123,26 @@ trait RelationShipMethodTrait
         }
     }
 
+    /**
+     * Checks if this is the owning side of the relationship
+     * 
+     * @param array $mapping The association mapping
+     * @return bool True if this is the owning side
+     */
     protected function isOwningSide($mapping): bool
     {
         return $mapping['isOwningSide'] ?? false;
     }
 
-    protected function addToRelationship(string $property, $relatedEntity, $mapping, $sync=false): void
+    /**
+     * Adds or syncs entities to a relationship
+     * 
+     * @param string $property The relationship property
+     * @param mixed $relatedEntity The entity/entities to add
+     * @param array $mapping The association mapping
+     * @param bool $sync Whether to sync (replace) existing relationships
+     */
+    protected function addToRelationship(string $property, $relatedEntity, $mapping, bool $sync = false): void
     {
         $this->validateEntityType($relatedEntity, $mapping['targetEntity']);
 
@@ -120,9 +154,9 @@ trait RelationShipMethodTrait
                 $this->addToManyToOne($property, $relatedEntity, $mapping);
                 break;
             case ClassMetadata::MANY_TO_MANY:
-                $sync?
-                $this->syncManyToMany($property, $relatedEntity, $mapping)
-                :$this->addToManyToMany($property, $relatedEntity, $mapping);
+                $sync ?
+                    $this->syncManyToMany($property, $relatedEntity, $mapping) :
+                    $this->addToManyToMany($property, $relatedEntity, $mapping);
                 break;
             case ClassMetadata::ONE_TO_ONE:
                 $this->addToOneToOne($property, $relatedEntity, $mapping);
@@ -130,6 +164,13 @@ trait RelationShipMethodTrait
         }
     }
 
+    /**
+     * Adds entity to a OneToMany relationship
+     * 
+     * @param string $property The collection property
+     * @param object $relatedEntity The entity to add
+     * @param array $mapping The association mapping
+     */
     protected function addToOneToMany(string $property, $relatedEntity, $mapping): void
     {
         $collection = $this->$property;
@@ -144,6 +185,13 @@ trait RelationShipMethodTrait
         }
     }
 
+    /**
+     * Adds entity to a ManyToOne relationship
+     * 
+     * @param string $property The reference property
+     * @param object $relatedEntity The entity to set
+     * @param array $mapping The association mapping
+     */
     protected function addToManyToOne(string $property, $relatedEntity, $mapping): void
     {   
         if (isset($mapping['inversedBy'])) {
@@ -155,9 +203,15 @@ trait RelationShipMethodTrait
                 $inverseCollection->add($this);
             }  
         }
-        
     }
 
+    /**
+     * Adds entity to a ManyToMany relationship
+     * 
+     * @param string $property The collection property
+     * @param object $relatedEntity The entity to add
+     * @param array $mapping The association mapping
+     */
     protected function addToManyToMany(string $property, $relatedEntity, $mapping): void
     {
         $collection = $this->$property;
@@ -172,6 +226,13 @@ trait RelationShipMethodTrait
         }
     }
 
+    /**
+     * Adds entity to a OneToOne relationship
+     * 
+     * @param string $property The reference property
+     * @param object $relatedEntity The entity to set
+     * @param array $mapping The association mapping
+     */
     protected function addToOneToOne(string $property, $relatedEntity, array $mapping): void
     {
         $oldValue = $this->$property;
@@ -199,6 +260,13 @@ trait RelationShipMethodTrait
         }
     }
 
+    /**
+     * Removes entity from a relationship
+     * 
+     * @param string $property The relationship property
+     * @param mixed $relatedEntity The entity to remove
+     * @param array $mapping The association mapping
+     */
     protected function removeFromRelationship(string $property, $relatedEntity, array $mapping): void
     {
         $this->validateEntityType($relatedEntity, $mapping['targetEntity']);
@@ -219,6 +287,13 @@ trait RelationShipMethodTrait
         }
     }
 
+    /**
+     * Removes entity from a OneToMany relationship
+     * 
+     * @param string $property The collection property
+     * @param object $relatedEntity The entity to remove
+     * @param array $mapping The association mapping
+     */
     protected function removeFromOneToMany(string $property, $relatedEntity, array $mapping): void
     {
         $collection = $this->$property;
@@ -234,6 +309,12 @@ trait RelationShipMethodTrait
         }
     }
 
+    /**
+     * Removes entity from a ManyToOne relationship
+     * 
+     * @param string $property The reference property
+     * @param array $mapping The association mapping
+     */
     protected function removeFromManyToOne(string $property, array $mapping): void
     {
         $oldValue = $this->$property;
@@ -244,6 +325,13 @@ trait RelationShipMethodTrait
         }
     }
 
+    /**
+     * Removes entity from a ManyToMany relationship
+     * 
+     * @param string $property The collection property
+     * @param object $relatedEntity The entity to remove
+     * @param array $mapping The association mapping
+     */
     protected function removeFromManyToMany(string $property, $relatedEntity, array $mapping): void
     {
         $collection = $this->$property;
@@ -254,6 +342,12 @@ trait RelationShipMethodTrait
         }
     }
 
+    /**
+     * Removes entity from a OneToOne relationship
+     * 
+     * @param string $property The reference property
+     * @param array $mapping The association mapping
+     */
     protected function removeFromOneToOne(string $property, array $mapping): void
     {
         $oldValue = $this->$property;
@@ -268,6 +362,13 @@ trait RelationShipMethodTrait
         }
     }
 
+    /**
+     * Syncs ManyToMany relationship with new set of entities
+     * 
+     * @param string $property The collection property
+     * @param array $relatedEntities The new set of entities
+     * @param array $mapping The association mapping
+     */
     protected function syncManyToMany(string $property, array $relatedEntities, $mapping): void
     {
         $collection = $this->$property;
@@ -284,15 +385,20 @@ trait RelationShipMethodTrait
                 $this->addToManyToMany($property, $newEntity, $mapping);
             }
         }
-
     }
 
-
+    /**
+     * Validates that an entity is of the expected type
+     * 
+     * @param mixed $entity The entity or array of entities to validate
+     * @param string $expectedClass The expected class/interface name
+     * @throws InvalidArgumentException For invalid entity types
+     */
     protected function validateEntityType($entity, string $expectedClass): void
     {
-        if(is_array($entity)){
-            foreach($entity as $item){
-                if(!$item instanceof $expectedClass){
+        if (is_array($entity)) {
+            foreach ($entity as $item) {
+                if (!$item instanceof $expectedClass) {
                     throw new \InvalidArgumentException(sprintf(
                         'Expected entity of type %s, got %s',
                         $expectedClass,
@@ -305,12 +411,10 @@ trait RelationShipMethodTrait
 
         if (!$entity instanceof $expectedClass) {
             throw new \InvalidArgumentException(sprintf(
-                    'Expected entity of type %s, got %s',
-                    $expectedClass,
-                    is_object($entity) ? get_class($entity) : gettype($entity)
-                )
-            );
+                'Expected entity of type %s, got %s',
+                $expectedClass,
+                is_object($entity) ? get_class($entity) : gettype($entity)
+            ));
         }
     }
-
 }

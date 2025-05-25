@@ -21,5 +21,7 @@ class RoleSeeder  extends Seeder
 
         $super = Role::updateOrCreate(['title' => 'Super','slug'=>Str::toSlug('Super')]);
         $super->syncPermissions($permissions);
+
+        $super = Role::updateOrCreate(['title' => 'User','slug'=>Str::toSlug('User')]);
     }
 }

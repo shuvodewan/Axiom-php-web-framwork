@@ -30,7 +30,8 @@ class PopulateSeeder extends Command
     protected function validator(): array
     {
         return [
-            'class' => 'nullable|string'
+            'class' => 'nullable|string',
+            'app' => 'nullable|string'
         ];
     }
 
@@ -71,6 +72,15 @@ class PopulateSeeder extends Command
             }
 
             (new $seeders[$class]())->call();
+        }elseif($app = $this->argument('app')) {
+            $manager = AppManager::getInstance();
+            if (!$manager->isRegistered($app)) {
+                throw new Exception("{$app} not a valid app!");
+            }
+            foreach($manager->getSeedersByApp($app) as $seeder){
+                (new $seeder())->call();
+            }
+           
         } else {
             (new DatabaseSeeder())->run();
         }

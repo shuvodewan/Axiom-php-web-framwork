@@ -98,6 +98,17 @@ class AppManager
         }, $this->getAppsName());
     }
 
+    /**
+     * Gets seeders by applications.
+     *
+     * @return array<string> Array of entity directory paths
+     */
+    public function getSeedersByApp(string $name): array
+    {
+        return self::$apps[$name]->seeders;
+    }
+
+
      /**
      * Gets seeders directories for all applications.
      *

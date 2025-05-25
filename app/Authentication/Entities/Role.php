@@ -61,9 +61,13 @@ class Role extends ModelEntity
     protected Collection $permissions;
 
 
-    #[OneToMany(targetEntity:User::class, mappedBy:'role')]
+    /**
+     * Collection of users that have this role
+     * 
+     * Database relationship: ManyToMany (inverse side)
+     */
+    #[ManyToMany(targetEntity: User::class, mappedBy: 'roles')]
     protected Collection $users;
-
 
 
     //scopes
