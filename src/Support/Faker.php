@@ -2,6 +2,7 @@
 
 namespace Axiom\Support;
 
+use Axiom\Facade\DB;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Faker\Factory;
 use Faker\Generator;
@@ -298,22 +299,26 @@ class Faker
      */
     public function entity(string $entityClass, int $count = 1, ?callable $callback = null)
     {
-        $after = null;
         $entity = new $entityClass();
         $metadata = $entity->getMeta();
-        $fillables = $this->getFillables();
+        $fillables =  $entity->getFillables();
+
 
         for ($i = 0; $i < $count; $i++) {
+            $entity = new $entityClass();
+
             $data = $this->generateEntityData($metadata, $fillables);
-            $after = $callback(null,$data,'before');
+            $after = $callback($data,$this);
 
             $entity = $entity->fill($data);
 
             if ($after && is_callable($after)) {
-                $callback($entity,null,'after');
+                $callback($entity,$data);
             }
-        }
 
+            $entity->save();
+        }
+        
         if($count==1){
             return  $entity;
         }
@@ -404,13 +409,10 @@ class Faker
     {
         $targetEntity = $assocMapping['targetEntity'];
         
-        // For ManyToOne or OneToOne, return a single entity
         if ($assocMapping['type'] === ClassMetadata::MANY_TO_ONE || 
             $assocMapping['type'] === ClassMetadata::ONE_TO_ONE) {
             return $this->getRandomEntity($targetEntity);
         }
-        
-        // For OneToMany or ManyToMany, return an array of entities
         return [$this->getRandomEntity($targetEntity)];
     }
 
@@ -420,7 +422,7 @@ class Faker
      * @param string $entityClass
      * @return Entity
      */
-    protected function getRandomEntity(string $entityClass): Entity
+    protected function getRandomEntity(string $entityClass)
     {
         $repository = DB::getEntityManager()->getRepository($entityClass);
         $existing = $repository->findAll();
@@ -429,7 +431,6 @@ class Faker
             return $this->generator->randomElement($existing);
         }
         
-        // Create new entity if none exist or with 30% chance
         return $this->entity($entityClass);
     }
 }

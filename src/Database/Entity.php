@@ -475,9 +475,15 @@ class Entity
      */
     public function save(): self
     {
-        DB::transaction(function() {
-            DB::persist($this);
-        });
+        if ($this->timestamps) {
+            $now = new \DateTime();
+            if(!$this->isPersisted()){
+                $this->createdAt = $this->createdAt?$this->createdAt:$now;
+            }
+            $this->updatedAt = $this->updatedAt?$this->updatedAt:$now;;
+        }
+
+        DB::persist($this);
         return $this;
     }
 
@@ -488,9 +494,7 @@ class Entity
      */
     public function flash(): self
     {
-        DB::transaction(function() {
-            DB::flush($this);
-        });
+        DB::flush($this);
         return $this;
     }
 
@@ -501,9 +505,7 @@ class Entity
      */
     public function delete(): bool
     {
-        DB::transaction(function() {
-            DB::remove($this);
-        });
+        DB::remove($this);
         return true;
     }
 }

@@ -5,6 +5,7 @@ namespace App\Authentication\Seeders;
 use App\Authentication\Entities\Role;
 use App\Authentication\Entities\User;
 use Axiom\Database\Seeder;
+use Axiom\Facade\Faker;
 use Axiom\Facade\Hash;
 
 class UserSeeder  extends Seeder
@@ -30,6 +31,15 @@ class UserSeeder  extends Seeder
             ['name'=>'User','user_name'=>'user','email'=>'user@mail.com'],
             ['password'=>Hash::make('password'),'roles'=>$userRole]
         );
+
+        Faker::entity(User::class,100,function(&$data,$faker) use($userRole){
+            $data['roles'] = $userRole;
+            $data['name'] = $faker->name();
+            $data['email'] = $faker->email();
+            $data['remember_token'] = null;
+            $data['avatar'] = null;
+            $data['password'] = Hash::make('password');
+        });
         
     }
 }

@@ -24,20 +24,29 @@ abstract class MigrationCommand extends Command
 
     protected function createDependencyFactory(): DependencyFactory
     {
+        $migrationsConfig = config('database.migrations');
+    
+        // Create and configure the migrations table storage
+        $storageConfig = new \Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration();
+        $storageConfig->setTableName($migrationsConfig['table_storage']['table_name']);
+        $storageConfig->setVersionColumnName($migrationsConfig['table_storage']['version_column_name']);
+        $storageConfig->setVersionColumnLength($migrationsConfig['table_storage']['version_column_length']);
+        $storageConfig->setExecutedAtColumnName($migrationsConfig['table_storage']['executed_at_column_name']);
+    
+        // Create main configuration
         $config = new Configuration();
+        $config->setMetadataStorageConfiguration($storageConfig);
         $config->addMigrationsDirectory(
-            key(config('database.migrations.migrations_paths')), 
-            config('database.migrations.migrations_paths')[key(config('database.migrations.migrations_paths'))]
+            key($migrationsConfig['migrations_paths']), 
+            $migrationsConfig['migrations_paths'][key($migrationsConfig['migrations_paths'])]
         );
-        $config->setAllOrNothing(true);
-        $config->setCheckDatabasePlatform(false);
-
-        // Get both the connection and entity manager
+        $config->setAllOrNothing($migrationsConfig['all_or_nothing']);
+        $config->setCheckDatabasePlatform($migrationsConfig['check_database_platform']);
+    
         $dbManager = DatabaseManager::getInstance();
         $connection = $dbManager->getConnection();
         $em = $dbManager->getEntityManager();
-
-        // Use fromEntityManager when available, fallback to fromConnection
+    
         return $em instanceof EntityManager
             ? DependencyFactory::fromEntityManager(
                 new ExistingConfiguration($config),
