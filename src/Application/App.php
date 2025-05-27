@@ -16,6 +16,14 @@ class App
     public string $controllers = "Controllers";
 
     /**
+     * The base directory path where templates are located.
+     * Defaults to "Templates".
+     * 
+     * @var string
+     */
+    public string $templates = "Templates";
+
+    /**
      * The base directory path where entity classes are located.
      * Defaults to "Entities".
      * 

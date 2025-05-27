@@ -143,6 +143,18 @@ class AppManager
         }, $this->getAppsName());
     }
 
+    /**
+     * Gets template directories for all applications.
+     *
+     * @return array<object> Array of application templates dir
+     */
+    public function getTemplatesDirs(): array
+    {
+        return array_map(function (string $app) {
+            return app_path('/' . ucfirst($app) . '/' . self::$apps[$app]->templates);
+        }, $this->getAppsName());
+    }
+
 
     public function getJobs(): array
     {

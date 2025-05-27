@@ -3,7 +3,7 @@
 namespace Axiom\Database;
 
 use Axiom\Console\Preview;
-use Faker\Factory;
+use Axiom\Support\Faker;
 
 /**
  * Abstract Seeder class to provide base functionality for generating fake data
@@ -26,7 +26,7 @@ abstract class Seeder
      */
     public function __construct()
     {
-        $this->faker = Factory::create();  // Create an instance of Faker to generate fake data
+        $this->faker = new Faker();
     }
 
 

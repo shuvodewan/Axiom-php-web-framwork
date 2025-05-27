@@ -172,6 +172,10 @@ class DatabaseManager
                 $this->connection,
                 $this->ormConfig
             );
+
+            $this->entityManager->getEventManager()->addEventSubscriber(
+                new PostGenerateSchemaListener()
+            );
         }
         return $this->entityManager;
     }

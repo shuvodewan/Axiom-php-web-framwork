@@ -35,6 +35,7 @@ class UserSeeder  extends Seeder
         Faker::entity(User::class,100,function(&$data,$faker) use($userRole){
             $data['roles'] = $userRole;
             $data['name'] = $faker->name();
+            $data['user_name'] = $faker->string(6);
             $data['email'] = $faker->email();
             $data['remember_token'] = null;
             $data['avatar'] = null;
