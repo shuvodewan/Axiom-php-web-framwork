@@ -1,6 +1,6 @@
 <?php
 
-namespace Axiom\Form\Fields;
+namespace Axiom\Templating\Form\Fields;
 
 class RangeField extends InputField {
     protected string $inputType = 'range';

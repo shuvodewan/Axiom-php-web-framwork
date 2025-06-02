@@ -2,10 +2,14 @@
 
 namespace Axiom\Database;
 
+use ArrayIterator;
 use Axiom\Facade\Url;
 use Axiom\Http\Request;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
+use Exception;
+use IteratorAggregate;
+use Traversable;
 
 /**
  * Paginator Class
@@ -13,7 +17,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
  * A robust pagination handler that works with Doctrine QueryBuilder,
  * providing metadata and URL generation for paginated results.
  */
-class Paginator
+class Paginator implements IteratorAggregate
 {
     /** @var array The items for the current page */
     private array $items = [];
@@ -74,7 +78,7 @@ class Paginator
         $this->total = $total;
         $this->pageName = $page;
         $this->perPage = $perPage;
-        $this->currentPage = $currentPage ?? $this->request->getQuery($page);
+        $this->currentPage =  $this->request->getQuery($page)??$currentPage;
         $this->lastPage = max((int) ceil($total / $perPage), 1);
 
         if ($this->currentPage <= $this->lastPage) {
@@ -93,17 +97,20 @@ class Paginator
      * @param string $page The query parameter name for pagination
      * @return self
      */
-    public static function fromQueryBuilder(QueryBuilder $queryBuilder, int $perPage = 15, int $currentPage = 0, string $page = 'page'): self
+    public static function fromQueryBuilder(QueryBuilder $queryBuilder, int $perPage = 15, int $currentPage = 1, string $page = 'page'): self
     {
+        if(!$currentPage){
+            throw new Exception('Current page must be grater then 0');
+        }
+
         $query = clone $queryBuilder;
-        
+        $currentPage =  Request::getInstance()->getQuery($page)??$currentPage;
         $query->setFirstResult(($currentPage - 1) * $perPage)
               ->setMaxResults($perPage);
 
         $paginator = new DoctrinePaginator($query, true);
         $total = count($paginator);
         $results = iterator_to_array($paginator);
-
         return new self($results, $total, $perPage, $currentPage, $page);
     }
 
@@ -315,5 +322,14 @@ class Paginator
             'meta' => $this->meta(),
             'links' => $this->links(),
         ];
+    }
+    
+    /**
+     * getIterator
+     *
+     * @return Traversable
+     */
+    public function getIterator(): Traversable {
+        return new ArrayIterator($this->items);
     }
 }

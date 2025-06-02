@@ -1,18 +1,20 @@
 <?php
 
-namespace Axiom\Form\Fields;
+namespace Axiom\Templating\Form\Fields;
 
-class ColorField extends InputField {
-    protected string $inputType = 'color';
-    
+use Axiom\Templating\Form\BaseField;
+
+abstract class InputField extends BaseField {
+    protected string $inputType;
+
     public function render(): string {
         $defaultAttributes = [
             'type' => $this->inputType,
             'name' => $this->name,
-            'value' => $this->value ?? '#000000',
-            'class' => $this->getTheme()->getInputClasses('color'),
+            'value' => $this->value ?? '',
+            'class' => $this->getTheme()->getInputClasses($this->inputType),
         ];
-        
+
         $html = sprintf('<input %s>', $this->buildAttributes($defaultAttributes));
         return $this->wrapField($html);
     }

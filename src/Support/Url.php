@@ -149,11 +149,9 @@ class Url
         if ($this->appUrl) {
             return rtrim($this->appUrl, '/');
         }
-
         $scheme = $this->getScheme();
         $host = $this->getHost();
         $port = $this->getPort();
-
         return $scheme . '://' . $host . ($port && !in_array($port, [80, 443]) ? ":{$port}" : '');
     }
 
@@ -196,8 +194,7 @@ class Url
                 return $host;
             }
         }
-
-        return $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+        return $_SERVER['SERVER_NAME']?? 'localhost';
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Axiom\Form\Fields;
+namespace Axiom\Templating\Form\Fields;
 
 class PasswordField extends InputField {
     protected string $inputType = 'password';

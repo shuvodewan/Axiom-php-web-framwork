@@ -1,6 +1,6 @@
 <?php
 
-namespace Axiom\Form;
+namespace Axiom\Templating\Form;
 
 interface ThemeContract {
     public function wrapField(string $label, string $input, ?string $helpText, array $options = []): string;

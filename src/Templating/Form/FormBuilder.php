@@ -1,8 +1,8 @@
 <?php
 
-namespace Axiom\Form;
+namespace Axiom\Templating\Form;
 
-use Axiom\Form\Themes\TailwindTheme;
+use Axiom\Templating\Form\Themes\TailwindTheme;
 
 class FormBuilder {
     protected array $fields = [];

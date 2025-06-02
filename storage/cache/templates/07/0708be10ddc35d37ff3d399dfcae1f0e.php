@@ -50,8 +50,10 @@ class __TwigTemplate_1b0bae9878b63a5115c1cd16a1eb018e extends Template
                         <span class=\"text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent\">Axiom</span>
                     </a>
                     <div class=\"hidden md:flex space-x-6\">
-                        <a href=\"#\" class=\"font-medium text-primary-700 hover:text-primary-500 transition\">Home</a>
-                        <a href=\"#\" class=\"font-medium text-gray-600 hover:text-primary-500 transition\">Docs</a>
+                        <a href=\"";
+        // line 12
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getFunction('route')->getCallable()("axiom.docs", ["version" => "v1", "page" => "intruduction"]), "html", null, true);
+        yield "\" class=\"font-medium text-gray-600 hover:text-primary-500 transition\">Docs</a>
                         <a href=\"#\" class=\"font-medium text-gray-600 hover:text-primary-500 transition\">Changelog</a>
                         <a href=\"#\" class=\"font-medium text-gray-600 hover:text-primary-500 transition\">Examples</a>
                         <a href=\"#\" class=\"font-medium text-gray-600 hover:text-primary-500 transition\">Blog</a>
@@ -82,9 +84,17 @@ class __TwigTemplate_1b0bae9878b63a5115c1cd16a1eb018e extends Template
     /**
      * @codeCoverageIgnore
      */
+    public function isTraitable(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
     public function getDebugInfo(): array
     {
-        return array (  42 => 1,);
+        return array (  55 => 12,  42 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -100,8 +110,7 @@ class __TwigTemplate_1b0bae9878b63a5115c1cd16a1eb018e extends Template
                         <span class=\"text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent\">Axiom</span>
                     </a>
                     <div class=\"hidden md:flex space-x-6\">
-                        <a href=\"#\" class=\"font-medium text-primary-700 hover:text-primary-500 transition\">Home</a>
-                        <a href=\"#\" class=\"font-medium text-gray-600 hover:text-primary-500 transition\">Docs</a>
+                        <a href=\"{{route('axiom.docs',{version:'v1', page:'intruduction'})}}\" class=\"font-medium text-gray-600 hover:text-primary-500 transition\">Docs</a>
                         <a href=\"#\" class=\"font-medium text-gray-600 hover:text-primary-500 transition\">Changelog</a>
                         <a href=\"#\" class=\"font-medium text-gray-600 hover:text-primary-500 transition\">Examples</a>
                         <a href=\"#\" class=\"font-medium text-gray-600 hover:text-primary-500 transition\">Blog</a>

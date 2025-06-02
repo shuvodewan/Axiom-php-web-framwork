@@ -1,10 +1,9 @@
 <?php
 
-namespace Axiom\Form;
+namespace Axiom\Templating\Form;
 
 use Axiom\Facade\Str;
-use Axiom\Form\Themes\TailwindTheme;
-use Axiom\Form\Themes\ThemeInterface;
+use Axiom\Templating\Form\Themes\TailwindTheme;
 
 abstract class BaseField {
     protected string $name;

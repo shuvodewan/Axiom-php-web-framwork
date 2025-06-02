@@ -1,8 +1,8 @@
 <?php
 
-namespace Axiom\Form\Fields;
+namespace Axiom\Templating\Form\Fields;
 
-use Axiom\Form\BaseField;
+use Axiom\Templating\Form\BaseField;
 
 class TextAreaField extends BaseField {
     protected int $rows = 3;

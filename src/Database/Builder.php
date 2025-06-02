@@ -362,7 +362,7 @@ class Builder
      * @param int $perPage The number of items per page
      * @return $this
      */
-    public function paginate(int $perPage = 15,$page='page', int $currentPage = 0, ): Paginator
+    public function paginate(int $perPage = 15,$page='page', int $currentPage = 1, ): Paginator
     {
         return Paginator::fromQueryBuilder( $this->queryBuilder, $perPage, $currentPage, $page);
     }

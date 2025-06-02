@@ -111,6 +111,8 @@ class Route
         }
 
         $this->cleanGroupData($parent);
+
+        $this->router->groupParent=false;
     }
 
     /**

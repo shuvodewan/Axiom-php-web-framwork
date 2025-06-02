@@ -1,8 +1,8 @@
 <?php
 
-namespace Axiom\Form\Themes;
+namespace Axiom\Templating\Form\Themes;
 
-use Axiom\Form\ThemeContract;
+use Axiom\Templating\Form\ThemeContract;
 
 class BootstrapTheme implements ThemeContract {
     public function formClasses(): string {

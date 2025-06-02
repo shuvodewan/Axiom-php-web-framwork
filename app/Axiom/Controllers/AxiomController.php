@@ -2,6 +2,7 @@
 
 namespace App\Axiom\Controllers;
 
+use App\Authentication\Entities\User;
 use Axiom\Application\Base\Controller;
 use App\Axiom\Services\AxiomService;
 use Axiom\Core\Attribute\Get;
@@ -25,6 +26,7 @@ class AxiomController  extends Controller
 
     #[Get(uri:'/', name:'axiom.home')]
     public function index($request){
+        dd(User::paginate());
        $this->view(template: 'frontend.home');
     }
 
