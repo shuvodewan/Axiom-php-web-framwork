@@ -44,6 +44,15 @@ trait InstanceTrait
     }
 
     /**
+     * reset the instance.
+     */
+    public static function reset(): void
+    {
+        self::$instance = null;
+    }
+
+
+    /**
      * Clear the stored instance.
      *
      * @return void

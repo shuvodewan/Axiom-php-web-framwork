@@ -5,6 +5,7 @@ namespace Axiom\Project;
 use App\Authentication\AuthenticationApp;
 use App\Axiom\AxiomApp;
 use App\Dashboard\DashboardApp;
+use App\Mit\MitApp;
 use Axiom\Application\ProjectRegistry;
 
 /**
@@ -24,7 +25,7 @@ class Registry extends ProjectRegistry
     static $INSTALLED_APPS = [
         AuthenticationApp::class,
         AxiomApp::class,
-        // DashboardApp::class
+        DashboardApp::class,
     ];
 
     /**

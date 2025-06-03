@@ -254,11 +254,11 @@ class Filesystem
     /**
      * Create a directory.
      */
-    public function makeDirectory(string $path): bool
+    public function makeDirectory(string $path, string $permission="public"): bool
     {
         $fullPath = $this->path($path);
 
-        return is_dir($fullPath) || mkdir($fullPath, $this->permissions['dir']['public'], true);
+        return is_dir($fullPath) || mkdir($fullPath, $this->permissions['dir'][$permission], true);
     }
 
     /**

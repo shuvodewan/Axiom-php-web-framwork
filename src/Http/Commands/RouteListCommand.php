@@ -64,6 +64,14 @@ class RouteListCommand extends Command
                         'Middleware'  => $this->formatMiddleware($route['middleware'] ?? []),
                     ];
                 }
+            }else{
+                $tableData[] = [
+                    'Method'      => strtoupper($method),
+                    'URI'         => '---',
+                    'Name'        => '---',
+                    'Action'      => '---',
+                    'Middleware'  => '---',
+                ];
             }
         }
 

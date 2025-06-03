@@ -123,7 +123,6 @@ class Router
 
     public function loadFromApp(): self
     {
-
         if (config('app.mode') === 'production') {
             if ($routes = $this->loadFromCache()) {
                 $this->routes = $routes;

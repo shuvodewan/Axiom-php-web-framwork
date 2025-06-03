@@ -33,7 +33,7 @@ class TwigDriver implements ViewDriverContract
     public function registerTempltes($loader)
     {
         // foreach((new AppManager())->getTemplatesDirs() as $dir){
-        //     $loader->addPath(project_path($dir)); 
+        //     $loader->addPath($dir); 
         // }
     }
 

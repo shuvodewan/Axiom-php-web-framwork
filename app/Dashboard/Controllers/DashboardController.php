@@ -26,7 +26,6 @@ class DashboardController  extends Controller
 
     #[Get(uri:'/', name:'index')]
     public function index($request){
-        dd(new Module());
         $this->view('backend.intruduction');
     }
 }

@@ -106,7 +106,7 @@ trait ApplicationGeneratorTrait
 
         $this->setData($app, $name);
 
-        if ($this->app && !AppManager::getInstance()->isRegistered($this->app)) {
+        if ($this->app && AppManager::getInstance()->isRegistered($this->app)) {
 
             throw new Exception("Invalid app name!");
         }
