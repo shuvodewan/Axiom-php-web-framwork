@@ -7,6 +7,7 @@ use Axiom\Application\Base\Controller;
 use App\Axiom\Services\AxiomService;
 use App\Axiom\Transformers\TestTransformer;
 use Axiom\Core\Attribute\Get;
+use Axiom\Http\ResponseTrait;
 
 /**
  * Controller for handling HTTP requests
@@ -19,6 +20,7 @@ use Axiom\Core\Attribute\Get;
  */
 class AxiomController  extends Controller
 {
+    use ResponseTrait;
     /**
      * @var The service class this controller depends on
      * @see AxiomService
@@ -28,8 +30,8 @@ class AxiomController  extends Controller
     #[Get(uri:'/', name:'axiom.home')]
     public function index($request){
         $users= User::paginate(50);
-        $this->response->json((new TestTransformer($users))->getResource()->value())->send();
-       $this->view(template: 'frontend.home');
+        $this->response((new TestTransformer($users))->getResource()->value());
+    //    $this->view(template: 'frontend.home');
     }
 
 

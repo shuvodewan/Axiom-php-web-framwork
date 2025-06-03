@@ -1,10 +1,10 @@
 <?php
 
-namespace Axiom\Application\Base;
+namespace Axiom\Http;
 
 use Axiom\Http\Response;
 
-class ResponseTrait
+trait ResponseTrait
 {
     /**
      * Standard JSON response structure

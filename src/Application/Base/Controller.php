@@ -72,10 +72,9 @@ class Controller
      * @param array $data Associative array of data to pass to the view
      * @return self Returns the controller instance for method chaining
      */
-    protected function view(string $template, array $data = []): self
+    protected function view(string $template, array $data = []): Response
     {
-        (new $this->view())->render($template, $data);
-        return $this;
+        return (new $this->view())->render($template, $data);
     }
 
     /**
