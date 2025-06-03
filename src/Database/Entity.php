@@ -107,18 +107,6 @@ class Entity
     }
 
     /**
-     * Post-load initialization hook
-     * 
-     * Called by Doctrine after hydration to ensure proper initialization
-     */
-    #[ORM\PostLoad]
-    public function initializeAfterHydration(): void
-    {
-        $this->addMappedCollections();
-        $this->initializeDefaults();
-    }
-
-    /**
      * Set up default values for the entity
      * 
      * Initializes collections, fillable fields, and association mappings

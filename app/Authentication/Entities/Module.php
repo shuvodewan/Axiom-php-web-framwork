@@ -26,6 +26,16 @@ use Doctrine\ORM\Mapping\OneToMany;
 class Module extends ModelEntity
 {
     /**
+     * __construct
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+      Parent::__construct();
+    }
+
+    /**
      * The unique identifier of the module
      * 
      * Database Column: id (INTEGER)

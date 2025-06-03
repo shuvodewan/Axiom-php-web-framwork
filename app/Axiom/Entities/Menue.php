@@ -19,5 +19,13 @@ use Doctrine\ORM\Mapping\GeneratedValue;
 #[Table(name: 'menues')]
 class Menue extends ModelEntity
 {
-    
+    /**
+     * __construct
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+      Parent::__construct();
+    }
 }

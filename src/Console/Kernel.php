@@ -9,6 +9,7 @@ use Axiom\Application\Commands\EntityGeneratorCommand;
 use Axiom\Application\Commands\EntityHelpCommand;
 use Axiom\Application\Commands\SeederGeneratorCommand;
 use Axiom\Application\Commands\ServiceGeneratorCommand;
+use Axiom\Application\Commands\TransformersGeneratorCommand;
 use Axiom\Console\Commands\AppCashClearCommand;
 use Axiom\Console\Commands\AppServeCommand;
 use Axiom\Database\Commands\DiffCommand;
@@ -57,6 +58,7 @@ class Kernel
             'app:service'=> ServiceGeneratorCommand::class,
             'app:controller'=> ControllerGeneratorCommand::class,
             'app:seeder'=>SeederGeneratorCommand::class,
+            'app:transformer'=>TransformersGeneratorCommand::class,
 
             'queue:work'=>WorkerCommand::class,
             

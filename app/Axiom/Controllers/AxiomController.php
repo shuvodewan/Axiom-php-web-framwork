@@ -5,6 +5,7 @@ namespace App\Axiom\Controllers;
 use App\Authentication\Entities\User;
 use Axiom\Application\Base\Controller;
 use App\Axiom\Services\AxiomService;
+use App\Axiom\Transformers\TestTransformer;
 use Axiom\Core\Attribute\Get;
 
 /**
@@ -26,7 +27,8 @@ class AxiomController  extends Controller
 
     #[Get(uri:'/', name:'axiom.home')]
     public function index($request){
-        dd(User::paginate());
+        $users= User::paginate(50);
+        $this->response->json((new TestTransformer($users))->getResource()->value())->send();
        $this->view(template: 'frontend.home');
     }
 

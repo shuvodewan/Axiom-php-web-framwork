@@ -25,6 +25,16 @@ use Doctrine\ORM\Mapping\OneToMany;
 #[Table(name: 'roles')]
 class Role extends ModelEntity
 {
+    /**
+     * __construct
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+      Parent::__construct();
+    }
+
      /**
      * The unique identifier of the module
      */

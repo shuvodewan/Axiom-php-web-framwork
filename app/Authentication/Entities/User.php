@@ -24,6 +24,17 @@ use Doctrine\ORM\Mapping\ManyToOne;
 #[Table(name: 'users')]
 class User extends ModelEntity
 {
+    
+    /**
+     * __construct
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+      Parent::__construct();
+    }
+    
     /**
      * The unique identifier of the user
      */

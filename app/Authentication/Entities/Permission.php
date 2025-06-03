@@ -35,6 +35,16 @@ use Doctrine\ORM\Mapping\ManyToOne;
 class Permission extends ModelEntity
 {
     /**
+     * __construct
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+      Parent::__construct();
+    }
+
+    /**
      * Unique identifier for the permission
      * 
      * Database column: id (INTEGER)
