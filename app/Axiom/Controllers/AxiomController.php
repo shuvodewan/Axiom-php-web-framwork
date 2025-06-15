@@ -8,6 +8,7 @@ use App\Axiom\Services\AxiomService;
 use App\Axiom\Transformers\TestTransformer;
 use Axiom\Core\Attribute\Get;
 use Axiom\Http\ResponseTrait;
+use Axiom\Templating\Table\TableBuilder;
 
 /**
  * Controller for handling HTTP requests
@@ -30,8 +31,29 @@ class AxiomController  extends Controller
     #[Get(uri:'/', name:'axiom.home')]
     public function index($request){
         $users= User::paginate(50);
-        $this->response((new TestTransformer($users))->getResource()->value());
-    //    $this->view(template: 'frontend.home');
+        // $this->response((new TestTransformer($users))->getResource()->value());
+        $transformer = new TestTransformer($users);
+    
+        $table = new TableBuilder('users-table');
+        $table->setData($transformer)
+            ->setPerPage(10)
+            ->addColumn('name', 'Name', ['sortable' => true])
+            ->addColumn('email', 'Email', ['sortable' => true])
+            ->addColumn('roles.title', 'Role', ['sortable' => true])
+            ->addFilter('name', 'text', ['placeholder' => 'Filter by name'])
+            ->addFilter('email', 'text', ['placeholder' => 'Filter by email'])
+            ->addAction('edit', 'Edit', [
+                'url' => '/users/{id}/edit',
+                'icon' => '<svg class="w-4 h-4">...</svg>'
+            ])
+            ->addBulkAction('delete', 'Delete Selected', [
+                'url' => '/users/bulk-delete',
+                'method' => 'DELETE',
+                'confirm' => 'Are you sure you want to delete selected users?'
+            ]);
+        $this->view(template: 'frontend.home',data:[
+            'table' => $table->render()
+        ]);
     }
 
 
