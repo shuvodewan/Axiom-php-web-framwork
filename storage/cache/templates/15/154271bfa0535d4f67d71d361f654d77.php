@@ -93,6 +93,11 @@ class __TwigTemplate_82f131c2c344ccc3637a8202204116b9 extends Template
         </div>
     </section>
 
+";
+        // line 32
+        yield (is_scalar($tmp = ($context["table"] ?? null)) ? new Markup($tmp, $this->env->getCharset()) : $tmp);
+        yield "
+
     <!-- Logo Cloud -->
     <section class=\"py-12 bg-gray-50\">
         <div class=\"container mx-auto px-6\">
@@ -305,7 +310,7 @@ class __TwigTemplate_82f131c2c344ccc3637a8202204116b9 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  70 => 6,  63 => 5,  52 => 3,  41 => 1,);
+        return array (  98 => 32,  70 => 6,  63 => 5,  52 => 3,  41 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -340,6 +345,8 @@ class __TwigTemplate_82f131c2c344ccc3637a8202204116b9 extends Template
             </div>
         </div>
     </section>
+
+{{table|raw}}
 
     <!-- Logo Cloud -->
     <section class=\"py-12 bg-gray-50\">

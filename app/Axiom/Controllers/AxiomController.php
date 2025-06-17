@@ -33,7 +33,7 @@ class AxiomController  extends Controller
         $users= User::paginate(50);
         // $this->response((new TestTransformer($users))->getResource()->value());
         $transformer = new TestTransformer($users);
-    
+        
         $table = new TableBuilder('users-table');
         $table->setData($transformer)
             ->setPerPage(10)
@@ -51,7 +51,9 @@ class AxiomController  extends Controller
                 'method' => 'DELETE',
                 'confirm' => 'Are you sure you want to delete selected users?'
             ]);
-        $this->view(template: 'frontend.home',data:[
+
+            
+        $this->view(template: 'backend.index',data:[
             'table' => $table->render()
         ]);
     }

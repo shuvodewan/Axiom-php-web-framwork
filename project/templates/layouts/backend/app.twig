@@ -3,25 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{config('app.name')}} - {% block title %}{% endblock %}</title>
+    <title>{{config('app.name')}} - Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    {{vite(['project/templates/assets/css/app.css','project/templates/assets/js/app.js'])|raw}}
+    {{vite(['project/templates/assets/css/admin.css','project/templates/assets/js/admin.js'])|raw}}
 </head>
-<body class="bg-gray-50">
-   
-    <!-- sidebar -->
-    {% include 'layouts/backend/partials/sidebar.twig' %}
+<body class="bg-gray-50 font-sans">
+    <!-- Sidebar -->
+    {% include 'layouts/backend/partials/sidebar.twig' %}  
     <!-- Main Content -->
     <div class="main-content min-h-screen">
-        <!-- Topbar -->
-         {% include 'layouts/backend/partials/topbar.twig' %}
-
-        <!-- Dashboard Content -->
-        <main class="p-6">
-          {% block body %}{% endblock %}
+        <!-- Clean Topbar without breadcrumb -->
+        {% include 'layouts/backend/partials/topbar.twig' %}  
+        <!-- Content Area -->
+        <main class="pt-16 pb-16 px-6">
+            <!-- Page Content -->
+            <div class="mb-6">
+                {% block body %}{% endblock %}
+            </div>
         </main>
 
+        <!-- Footer -->
+        {% include 'layouts/backend/partials/footer.twig' %}  
     </div>
 
     <script>
@@ -29,7 +32,24 @@
         document.getElementById('toggleSidebar').addEventListener('click', function() {
             document.querySelector('.sidebar').classList.toggle('collapsed');
         });
-        
+
+        // Toggle user menu
+        document.getElementById('userMenuButton').addEventListener('click', function() {
+            document.getElementById('userMenu').classList.toggle('hidden');
+        });
+
+        // Close user menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('userMenu');
+            const userMenuButton = document.getElementById('userMenuButton');
+            
+            if (!userMenu.contains(event.target)) {
+                if (event.target !== userMenuButton && !userMenuButton.contains(event.target)) {
+                    userMenu.classList.add('hidden');
+                }
+            }
+        });
+
         // Responsive behavior - collapse sidebar on small screens
         function handleResize() {
             if (window.innerWidth < 768) {

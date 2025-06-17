@@ -1,0 +1,43 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+.sidebar {
+    transition: all 0.3s ease;
+}
+.sidebar.collapsed {
+    width: 80px;
+}
+.sidebar.collapsed .sidebar-item-text {
+    display: none;
+}
+.sidebar.collapsed .sidebar-header-text {
+    display: none;
+}
+.sidebar.collapsed .sidebar-item {
+    justify-content: center;
+}
+.main-content {
+    transition: all 0.3s ease;
+    margin-left: 260px;
+}
+.sidebar.collapsed ~ .main-content {
+    margin-left: 80px;
+}
+@media (max-width: 768px) {
+    .sidebar {
+        width: 80px;
+    }
+    .sidebar .sidebar-item-text {
+        display: none;
+    }
+    .sidebar .sidebar-header-text {
+        display: none;
+    }
+    .sidebar .sidebar-item {
+        justify-content: center;
+    }
+    .main-content {
+        margin-left: 80px;
+    }
+}
