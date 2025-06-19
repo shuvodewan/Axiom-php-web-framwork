@@ -205,12 +205,12 @@ class TableBuilder
 
     public function render(): string
     {
-        $html = '<div id="' . $this->id . '-container" x-data="tableComponent()" x-init="initTable()">';
+        $html = '<div id="' . $this->id . '-container" class="' . $this->theme->getContainerClass().'">';
         $html .= $this->renderToolbar();
-        $html .= $this->renderFilters();
-        $html .= $this->renderTable();
-        $html .= $this->renderPagination();
-        $html .= $this->renderScript();
+        // $html .= $this->renderFilters();
+        // $html .= $this->renderTable();
+        // $html .= $this->renderPagination();
+        // $html .= $this->renderScript();
         $html .= '</div>';
 
         return $html;
@@ -252,24 +252,32 @@ class TableBuilder
     {
         if (empty($this->filters)) return '';
 
-        $html = '<div class="' . $this->theme->getFilterWrapperClasses() . ' mb-6">';
+        $html = '<div class="' . $this->theme->getFilterWrapperClasses() . '">';
         
         foreach ($this->filters as $filter) {
             $html .= '<div class="' . $this->theme->getFilterGroupClasses() . '">';
-            $html .= '<label class="' . $this->theme->getFilterLabelClasses() . '">';
-            $html .= htmlspecialchars($filter->getLabel());
-            $html .= '</label>';
+            
+            if ($filter->getType() === 'text') {
+                $html .= '<div class="' . $this->theme->getFilterIconWrapperClasses() . '">';
+                $html .= '<i class="' . $this->theme->getFilterSearchIconClasses() . '"></i>';
+                $html .= '</div>';
+            }
+            
             $html .= $filter->render($this->theme);
+            
+            if ($filter->getType() === 'select') {
+                $html .= '<div class="' . $this->theme->getFilterDropdownIconWrapperClasses() . '">';
+                $html .= '<i class="' . $this->theme->getFilterDropdownIconClasses() . '"></i>';
+                $html .= '</div>';
+            }
+            
             $html .= '</div>';
         }
         
-        $html .= '<div class="col-12 mt-2">';
-        $html .= '<div class="flex gap-2">';
-        $html .= '<button @click="applyFilters" class="' . $this->theme->getButtonClasses() . '">';
-        $html .= $this->config['i18n']['filter'] . '</button>';
-        $html .= '<button @click="resetFilters" class="' . $this->theme->getButtonSecondaryClasses() . '">';
-        $html .= $this->config['i18n']['reset'] . '</button>';
-        $html .= '</div>';
+        $html .= '<div class="' . $this->theme->getFilterActionsWrapperClasses() . '">';
+        $html .= '<button @click="applyFilters" class="' . $this->theme->getFilterActionButtonClasses() . '">';
+        $html .= '<i class="' . $this->theme->getFilterRefreshIconClasses() . '"></i>';
+        $html .= '</button>';
         $html .= '</div>';
         
         $html .= '</div>';
@@ -278,15 +286,14 @@ class TableBuilder
 
     protected function renderTable(): string
     {
-        $tableClasses = $this->theme->getTableClasses();
-        $wrapperClasses = $this->theme->getTableWrapperClasses();
-        
-        $html = '<div class="' . $wrapperClasses . '">';
-        $html .= '<table id="' . $this->id . '" class="' . $tableClasses . '" x-ref="table" ' . $this->buildAttributes($this->tableAttributes) . '>';
+        $html = '<div class="' . $this->theme->getTableWrapperClasses() . '">';
+        $html .= '<div class="' . $this->theme->getTableContainerClasses() . '">';
+        $html .= '<table id="' . $this->id . '" class="' . $this->theme->getTableClasses() . '" ' . $this->buildAttributes($this->tableAttributes) . '>';
         $html .= $this->renderHeader();
         $html .= $this->renderBody();
         $html .= $this->renderFooter();
         $html .= '</table>';
+        $html .= '</div>';
         $html .= '</div>';
         
         return $html;
@@ -294,14 +301,12 @@ class TableBuilder
 
     protected function renderHeader(): string
     {
-        $headerClasses = $this->theme->getHeaderClasses();
-        $html = '<thead class="' . $headerClasses . '" ' . $this->buildAttributes($this->headerAttributes) . '>';
+        $html = '<thead class="' . $this->theme->getHeaderClasses() . '">';
         $html .= '<tr>';
         
-        // Bulk select checkbox
         if ($this->withBulkActions || $this->withRowSelection) {
-            $html .= '<th class="' . $this->theme->getHeaderCellClasses() . ' w-10">';
-            $html .= '<input type="checkbox" @click="toggleAllRows" x-model="selectAll">';
+            $html .= '<th scope="col" class="' . $this->theme->getHeaderCheckboxCellClasses() . '">';
+            $html .= '<input type="checkbox" class="' . $this->theme->getCheckboxClasses() . '" @click="toggleAllRows" x-model="selectAll">';
             $html .= '</th>';
         }
         
@@ -309,9 +314,8 @@ class TableBuilder
             $html .= $column->renderHeader($this->theme);
         }
         
-        // Actions column
         if (!empty($this->actions)) {
-            $html .= '<th class="' . $this->theme->getHeaderCellClasses() . ' text-right">';
+            $html .= '<th scope="col" class="' . $this->theme->getHeaderActionsCellClasses() . '">';
             $html .= $this->config['i18n']['actions'] . '</th>';
         }
         
@@ -319,6 +323,7 @@ class TableBuilder
         $html .= '</thead>';
         return $html;
     }
+
 
     protected function renderBody(): string
     {
@@ -368,24 +373,21 @@ class TableBuilder
 
     protected function renderRow(array $row): string
     {
-        $html = '<tr class="' . $this->theme->getRowClasses() . '" ' . $this->buildAttributes($this->rowAttributes) . '>';
+        $html = '<tr class="' . $this->theme->getRowClasses() . '">';
         
-        // Bulk select checkbox
         if ($this->withBulkActions || $this->withRowSelection) {
             $html .= '<td class="' . $this->theme->getCellClasses() . '">';
-            $html .= '<input type="checkbox" data-row-id="' . ($row['id'] ?? '') . '">';
+            $html .= '<input type="checkbox" class="' . $this->theme->getCheckboxClasses() . '" data-row-id="' . ($row['id'] ?? '') . '">';
             $html .= '</td>';
         }
         
-        // Data columns
         foreach ($this->columns as $column) {
             $html .= $this->renderCell($column, $row);
         }
         
-        // Actions
         if (!empty($this->actions)) {
-            $html .= '<td class="' . $this->theme->getCellClasses() . ' text-right">';
-            $html .= '<div class="flex justify-end gap-2">';
+            $html .= '<td class="' . $this->theme->getActionsCellClasses() . '">';
+            $html .= '<div class="' . $this->theme->getActionsWrapperClasses() . '">';
             foreach ($this->actions as $action) {
                 $html .= $action->render($this->theme, $row);
             }
@@ -397,21 +399,51 @@ class TableBuilder
         return $html;
     }
 
+
     protected function renderCell(Column $column, array $row): string
     {
         $value = $this->getNestedValue($row, $column->getName());
         
-        $html = '<td class="' . $this->theme->getCellClasses() . ' ' . $column->getCellClasses() . '">';
-        
         if ($column->getRenderCallback()) {
-            $html .= call_user_func($column->getRenderCallback(), $value, $row);
-        } else {
-            $html .= htmlspecialchars($value ?? '');
+            return '<td class="' . $this->theme->getCellClasses() . '">' . 
+                   call_user_func($column->getRenderCallback(), $value, $row) . 
+                   '</td>';
         }
         
-        $html .= '</td>';
-        return $html;
+        // Status cell
+        if ($column->getName() === 'status') {
+            $statusClasses = [
+                'active' => $this->theme->getStatusActiveClasses(),
+                'inactive' => $this->theme->getStatusInactiveClasses(),
+                'pending' => $this->theme->getStatusPendingClasses()
+            ];
+            $status = strtolower($value ?? '');
+            $classes = $statusClasses[$status] ?? $this->theme->getStatusDefaultClasses();
+            
+            return '<td class="' . $this->theme->getCellClasses() . '">' .
+                   '<span class="' . $classes . '">' .
+                   htmlspecialchars($value ?? '') . '</span></td>';
+        }
+        
+        // Avatar/Name cell
+        if ($column->getName() === 'name' && isset($row['avatar'])) {
+            return '<td class="' . $this->theme->getCellClasses() . '">' .
+                   '<div class="' . $this->theme->getAvatarWrapperClasses() . '">' .
+                   '<div class="' . $this->theme->getAvatarImageWrapperClasses() . '">' .
+                   '<img class="' . $this->theme->getAvatarImageClasses() . '" src="' . htmlspecialchars($row['avatar']) . '" alt="">' .
+                   '</div>' .
+                   '<div class="' . $this->theme->getAvatarContentClasses() . '">' .
+                   '<div class="' . $this->theme->getAvatarPrimaryTextClasses() . '">' . htmlspecialchars($value ?? '') . '</div>' .
+                   (isset($row['username']) ? '<div class="' . $this->theme->getAvatarSecondaryTextClasses() . '">@' . htmlspecialchars($row['username']) . '</div>' : '') .
+                   '</div>' .
+                   '</div></td>';
+        }
+        
+        // Default cell
+        return '<td class="' . $this->theme->getCellClasses() . '">' .
+               '<div class="' . $this->theme->getCellTextClasses() . '">' . htmlspecialchars($value ?? '') . '</div></td>';
     }
+
 
     protected function renderRowTemplate(string &$html): void
     {
@@ -468,24 +500,27 @@ class TableBuilder
 
     protected function renderPagination(): string
     {
-        $classes = $this->theme->getPaginationClasses();
+        $html = '<div class="' . $this->theme->getPaginationWrapperClasses() . '" x-show="total > 0">';
+        $html .= '<div class="' . $this->theme->getPaginationInfoWrapperClasses() . '">';
+        $html .= $this->config['i18n']['showing'] . ' <span class="' . $this->theme->getPaginationInfoHighlightClasses() . '" x-text="fromItem"></span> ';
+        $html .= $this->config['i18n']['to'] . ' <span class="' . $this->theme->getPaginationInfoHighlightClasses() . '" x-text="toItem"></span> ';
+        $html .= $this->config['i18n']['of'] . ' <span class="' . $this->theme->getPaginationInfoHighlightClasses() . '" x-text="total"></span> ';
+        $html .= $this->config['i18n']['results'] . '</div>';
         
-        $html = '<div class="' . $classes . '" x-show="total > 0">';
-        $html .= '<div class="flex flex-col sm:flex-row justify-between items-center gap-4">';
-        $html .= '<div class="pagination-info text-sm text-gray-600" x-text="paginationInfo"></div>';
-        $html .= '<div class="pagination-links flex gap-1">';
-        $html .= '<button @click="previousPage" :disabled="currentPage === 1" class="' . $this->theme->getPaginationButtonClasses() . '">';
-        $html .= $this->config['i18n']['previous'] . '</button>';
+        $html .= '<div class="' . $this->theme->getPaginationButtonsWrapperClasses() . '">';
+        $html .= '<button @click="previousPage" :disabled="currentPage === 1" class="' . $this->theme->getPaginationButtonClasses() . ' ' . $this->theme->getPaginationButtonDisabledClasses() . '">';
+        $html .= '<i class="' . $this->theme->getPaginationPrevIconClasses() . '"></i>';
+        $html .= '</button>';
         
         $html .= '<template x-for="page in visiblePages" :key="page">';
-        $html .= '<button @click="goToPage(page)" :class="{ \'' . $this->theme->getActivePaginationButtonClasses() . '\': currentPage === page }" class="' . $this->theme->getPaginationButtonClasses() . '">';
+        $html .= '<button @click="goToPage(page)" :class="\'' . $this->theme->getPaginationButtonActiveClasses() . '\': currentPage === page" class="' . $this->theme->getPaginationButtonClasses() . '">';
         $html .= '<span x-text="page"></span>';
         $html .= '</button>';
         $html .= '</template>';
         
         $html .= '<button @click="nextPage" :disabled="currentPage === totalPages" class="' . $this->theme->getPaginationButtonClasses() . '">';
-        $html .= $this->config['i18n']['next'] . '</button>';
-        $html .= '</div>';
+        $html .= '<i class="' . $this->theme->getPaginationNextIconClasses() . '"></i>';
+        $html .= '</button>';
         $html .= '</div>';
         $html .= '</div>';
         

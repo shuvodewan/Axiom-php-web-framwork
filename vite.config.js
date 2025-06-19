@@ -5,7 +5,9 @@ export default defineConfig({
     laravel({
       input: [
         'project/templates/assets/css/app.css',
-        'project/templates/assets/js/app.js'
+        'project/templates/assets/js/app.js',
+        'project/templates/assets/css/admin.css',
+        'project/templates/assets/js/admin.js'
       ],
       refresh: true,
     })
