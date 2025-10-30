@@ -181,17 +181,368 @@ If you're new to the project, try these:
 ## 🏗️ Project Structure Deep Dive
 ```
 axiom-framework/
-├── src/                    # Framework core
-│   ├── Application/        # App scaffolding & management
-│   ├── Console/            # CLI commands system
-│   ├── Database/           # Doctrine ORM + Active Record
-│   ├── Http/               # Routing, middleware, validation
-│   ├── Templating/         # Forms, tables, UI components
-│   └── Views/              # Twig template engine
-├── app/                    # Your application modules
-├── config/                 # Configuration files
-├── database/               # Migrations & seeders
-└── templates/              # Frontend templates
+├── app/
+│   ├── Authentication/
+│   │   ├── Controllers/
+│   │   │   ├── RoleController.php
+│   │   │   └── UserController.php
+│   │   ├── Entities/
+│   │   │   ├── Module.php
+│   │   │   ├── Permission.php
+│   │   │   ├── Role.php
+│   │   │   └── User.php
+│   │   ├── Seeders/
+│   │   │   ├── PermissionSeeder.php
+│   │   │   ├── RoleSeeder.php
+│   │   │   └── UserSeeder.php
+│   │   ├── Services/
+│   │   │   ├── RoleService.php
+│   │   │   └── UserService.php
+│   │   ├── Transports/
+│   │   │   ├── Handlers/
+│   │   │   │   └── MailHandler.php
+│   │   │   ├── Jobs/
+│   │   │   │   └── MailJob.php
+│   │   │   └── Mails/
+│   │   │       └── PasswordResetMail.php
+│   │   └── AuthenticationApp.php
+│   ├── Axiom/
+│   │   ├── Controllers/
+│   │   │   └── AxiomController.php
+│   │   ├── Entities/
+│   │   │   └── Menue.php
+│   │   ├── Services/
+│   │   │   └── AxiomService.php
+│   │   ├── Transformers/
+│   │   │   ├── RoleTransformer.php
+│   │   │   └── TestTransformer.php
+│   │   └── AxiomApp.php
+│   ├── Dashboard/
+│   │   ├── Controllers/
+│   │   │   └── DashboardController.php
+│   │   ├── Services/
+│   │   │   └── DashboardService.php
+│   │   └── DashboardApp.php
+│   └── Test/
+│       ├── Controllers/
+│       │   └── TestController.php
+│       ├── Entities/
+│       │   └── Test.php
+│       ├── Services/
+│       │   └── TestService.php
+│       └── TestApp.php
+├── config/
+│   ├── app.php
+│   ├── cache.php
+│   ├── database.php
+│   ├── filesystem.php
+│   ├── log.php
+│   ├── mail.php
+│   ├── messenger.php
+│   ├── session.php
+│   └── vite.php
+├── database/
+│   ├── Migrations/
+│   └── Seeders/
+│       ├── DatabaseSeeder.php
+│       └── RoleSeeder.php
+├── project/
+│   ├── Exceptions/
+│   │   └── Handler.php
+│   ├── Middlewares/
+│   │   ├── AuthMiddleware.php
+│   │   ├── CsrfProtectionMiddleware.php
+│   │   ├── GuestMiddleware.php
+│   │   ├── Register.php
+│   │   └── StartSessionMiddleware.php
+│   ├── route/
+│   │   └── web.php
+│   ├── templates/
+│   │   ├── assets/
+│   │   │   ├── css/
+│   │   │   │   ├── admin.css
+│   │   │   │   └── app.css
+│   │   │   └── js/
+│   │   │       ├── admin.js
+│   │   │       └── app.js
+│   │   ├── backend/
+│   │   │   ├── dashboard.twig
+│   │   │   ├── index.twig
+│   │   │   └── intruduction.twig
+│   │   ├── errors/
+│   │   │   └── debug.twig
+│   │   ├── frontend/
+│   │   │   ├── docs/
+│   │   │   │   └── v1/
+│   │   │   │       └── intruduction.twig
+│   │   │   ├── documentation.twig
+│   │   │   └── home.twig
+│   │   ├── layouts/
+│   │   │   ├── backend/
+│   │   │   │   ├── partials/
+│   │   │   │   │   ├── footer.twig
+│   │   │   │   │   ├── sidebar.twig
+│   │   │   │   │   └── topbar.twig
+│   │   │   │   └── app.twig
+│   │   │   └── frontend/
+│   │   │       ├── partials/
+│   │   │       │   ├── docheader.twig
+│   │   │       │   ├── footer.twig
+│   │   │       │   ├── header.twig
+│   │   │       │   └── sidebar.twig
+│   │   │       ├── app.twig
+│   │   │       └── documentation.twig
+│   │   └── mails/
+│   │       └── forgetPassword.twig
+│   └── Registry.php
+├── public/
+│   ├── build/
+│   ├── index.php
+├── src/
+│   ├── Application/
+│   │   ├── Actions/
+│   │   │   └── RegisterRoutes.php
+│   │   ├── Base/
+│   │   │   ├── Controller.php
+│   │   │   └── Service.php
+│   │   ├── Commands/
+│   │   │   ├── AppGeneratorCommand.php
+│   │   │   ├── ControllerGeneratorCommand.php
+│   │   │   ├── CreateApplicationCommand.php
+│   │   │   ├── DeleteApplicationCommand.php
+│   │   │   ├── EntityGeneratorCommand.php
+│   │   │   ├── EntityHelpCommand.php
+│   │   │   ├── SeederGeneratorCommand.php
+│   │   │   ├── ServiceGeneratorCommand.php
+│   │   │   └── TransformersGeneratorCommand.php
+│   │   ├── Stubs/
+│   │   │   ├── App.stub
+│   │   │   ├── Controller.stub
+│   │   │   ├── Entity.stub
+│   │   │   ├── Seeder.stub
+│   │   │   ├── Service.stub
+│   │   │   └── Transformer.stub
+│   │   ├── App.php
+│   │   ├── ApplicationGeneratorTrait.php
+│   │   ├── AppManager.php
+│   │   ├── MiddlewareRegistry.php
+│   │   └── ProjectRegistry.php
+│   ├── Cache/
+│   │   ├── Cache.php
+│   │   ├── CacheContract.php
+│   │   ├── CacheTrait.php
+│   │   ├── FileDriver.php
+│   │   └── RedisDriver.php
+│   ├── Console/
+│   │   ├── Commands/
+│   │   │   ├── AppCashClearCommand.php
+│   │   │   └── AppServeCommand.php
+│   │   ├── Command.php
+│   │   ├── Kernel.php
+│   │   └── Preview.php
+│   ├── Core/
+│   │   ├── Attribute/
+│   │   │   ├── Delete.php
+│   │   │   ├── Get.php
+│   │   │   ├── Group.php
+│   │   │   ├── Patch.php
+│   │   │   ├── Post.php
+│   │   │   ├── Put.php
+│   │   │   └── Route.php
+│   │   ├── Enum/
+│   │   │   └── RouteEnum.php
+│   │   ├── Application.php
+│   │   ├── Config.php
+│   │   ├── Container.php
+│   │   ├── EnvironmentTrait.php
+│   │   ├── Log.php
+│   │   └── ServiceProxy.php
+│   ├── Database/
+│   │   ├── Commands/
+│   │   │   ├── DiffCommand.php
+│   │   │   ├── ExecuteMigrationCommand.php
+│   │   │   ├── GenerateMigrationCommand.php
+│   │   │   ├── LatestCommand.php
+│   │   │   ├── ListCommand.php
+│   │   │   ├── ListSeederCommand.php
+│   │   │   ├── MakeSeederCommand.php
+│   │   │   ├── MigrateCommand.php
+│   │   │   ├── MigrationCommand.php
+│   │   │   ├── PopulateSeeder.php
+│   │   │   ├── RollbackCommand.php
+│   │   │   ├── StatusCommand.php
+│   │   │   ├── SyncMetadataCommand.php
+│   │   │   └── VersionCommand.php
+│   │   ├── Relations/
+│   │   │   ├── BelongsTo.php
+│   │   │   ├── BelongsToMany.php
+│   │   │   ├── HasMany.php
+│   │   │   ├── HasOne.php
+│   │   │   ├── Relation.php
+│   │   │   └── RelationShipMethodTrait.php
+│   │   ├── Stubs/
+│   │   │   └── Seeder.stub
+│   │   ├── Builder.php
+│   │   ├── DatabaseManager.php
+│   │   ├── DB.php
+│   │   ├── DoctrineRegistry.php
+│   │   ├── Entity.php
+│   │   ├── Paginator.php
+│   │   ├── PostGenerateSchemaListener.php
+│   │   └── Seeder.php
+│   ├── Exception/
+│   │   ├── Exceptions/
+│   │   │   ├── FileNotFoundException.php
+│   │   │   └── FilesystemException.php
+│   │   ├── templates/
+│   │   │   ├── 400.php
+│   │   │   ├── 404.php
+│   │   │   ├── 500.php
+│   │   │   ├── layout.php
+│   │   │   └── style.css
+│   │   ├── ExceptionHandlerInterface.php
+│   │   ├── Handler.php
+│   │   └── WhoopsHandler.php
+│   ├── Facade/
+│   │   ├── Arr.php
+│   │   ├── Cache.php
+│   │   ├── Config.php
+│   │   ├── Crypt.php
+│   │   ├── DB.php
+│   │   ├── Faker.php
+│   │   ├── Filesystem.php
+│   │   ├── Hash.php
+│   │   ├── Log.php
+│   │   ├── Mail.php
+│   │   ├── Messenger.php
+│   │   ├── Request.php
+│   │   ├── Response.php
+│   │   ├── Storage.php
+│   │   ├── Str.php
+│   │   ├── Url.php
+│   │   └── Vite.php
+│   ├── Filesystem/
+│   │   ├── FileManager.php
+│   │   ├── Filesystem.php
+│   │   ├── FileSystemDriverContract.php
+│   │   ├── LocalDriver.php
+│   │   ├── S3Driver.php
+│   │   └── Upload.php
+│   ├── Helpers/
+│   │   ├── core.php
+│   │   ├── helper.php
+│   │   └── path.php
+│   ├── Http/
+│   │   ├── Commands/
+│   │   │   └── RouteListCommand.php
+│   │   ├── DataTransformerTrait.php
+│   │   ├── FileTrait.php
+│   │   ├── MiddlewareContract.php
+│   │   ├── Request.php
+│   │   ├── Response.php
+│   │   ├── ResponseTrait.php
+│   │   ├── Route.php
+│   │   ├── Router.php
+│   │   ├── Session.php
+│   │   ├── Transformer.php
+│   │   ├── Validator.php
+│   │   └── ValidatorRules.php
+│   ├── Mail/
+│   │   ├── Contracts/
+│   │   │   └── Transport.php
+│   │   ├── Transports/
+│   │   │   ├── MailgunTransport.php
+│   │   │   ├── PostmarkTransport.php
+│   │   │   ├── SendmailTransport.php
+│   │   │   └── SmtpTransport.php
+│   │   ├── Mailable.php
+│   │   ├── MailManager.php
+│   │   └── MailService.php
+│   ├── Messenger/
+│   │   ├── Commands/
+│   │   │   ├── FaildJobList.php
+│   │   │   └── WorkerCommand.php
+│   │   ├── HandlerContract.php
+│   │   ├── MessageManager.php
+│   │   ├── QueueWorker.php
+│   │   ├── RetryStrategy.php
+│   │   ├── TransportFactoryLocator.php
+│   │   └── TransportManager.php
+│   ├── Support/
+│   │   ├── Arr.php
+│   │   ├── Crypt.php
+│   │   ├── DD.php
+│   │   ├── Faker.php
+│   │   ├── Hash.php
+│   │   ├── Str.php
+│   │   ├── Url.php
+│   │   └── Vite.php
+│   ├── Templating/
+│   │   ├── Form/
+│   │   │   ├── Fields/
+│   │   │   │   ├── CheckboxField.php
+│   │   │   │   ├── ColorField.php
+│   │   │   │   ├── DateField.php
+│   │   │   │   ├── DateTimeField.php
+│   │   │   │   ├── EmailField.php
+│   │   │   │   ├── FileField.php
+│   │   │   │   ├── HiddenField.php
+│   │   │   │   ├── InputField.php
+│   │   │   │   ├── NumberField.php
+│   │   │   │   ├── PasswordField.php
+│   │   │   │   ├── RadioField.php
+│   │   │   │   ├── RangeField.php
+│   │   │   │   ├── SelectField.php
+│   │   │   │   ├── TextAreaField.php
+│   │   │   │   └── TextField.php
+│   │   │   ├── Themes/
+│   │   │   │   ├── BootStrapTheme.php
+│   │   │   │   └── TailwindTheme.php
+│   │   │   ├── BaseField.php
+│   │   │   ├── FormBuilder.php
+│   │   │   └── ThemeContract.php
+│   │   └── Table/
+│   │       ├── Filters/
+│   │       │   ├── BooleanFilter.php
+│   │       │   ├── DateFilter.php
+│   │       │   ├── DateRangeFilter.php
+│   │       │   ├── Filter.php
+│   │       │   ├── NumberFilter.php
+│   │       │   ├── SelectFilter.php
+│   │       │   └── TextFilter.php
+│   │       ├── Themes/
+│   │       │   ├── AxiomTable.js
+│   │       │   ├── BootStrapTheme.php
+│   │       │   └── TailwindTheme.php
+│   │       ├── Action.php
+│   │       ├── BulkAction.php
+│   │       ├── Column.php
+│   │       ├── Export.php
+│   │       ├── TableBuilder.php
+│   │       └── ThemeContract.php
+│   ├── Traits/
+│   │   └── InstanceTrait.php
+│   └── Views/
+│       ├── CoreView.php
+│       ├── TwigDriver.php
+│       ├── TwigExtension.php
+│       ├── TwigFilters.php
+│       ├── TwigMethods.php
+│       ├── View.php
+│       └── ViewDriverContract.php
+├── storage/
+│   ├── app/
+│   ├── cache/
+│   ├── doctrine/
+│   └── logs/
+├── axiom
+├── composer.json
+├── package.json
+├── postcss.config.cjs
+├── README.md
+├── tailwind.config.js
+├── tree_generator.php
+├── vite.config.js
 ```
 
 ---
