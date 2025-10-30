@@ -130,8 +130,8 @@ php axiom cache:clear
 ### 1️⃣ Setup Development Environment
 ```bash
 # Clone and install
-git clone https://github.com/your-username/axiom-framework.git
-cd axiom-framework
+git clone https://github.com/shuvodewan/Axiom-php-web-framwork.git
+cd Axiom-php-web-framwork
 
 composer install
 yarn install
