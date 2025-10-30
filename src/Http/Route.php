@@ -2,6 +2,8 @@
 
 namespace Axiom\Http;
 
+use InvalidArgumentException;
+
 /**
  * Route management class.
  *
@@ -95,6 +97,7 @@ class Route
      */
     public function group($params = [], $func = null): void
     {
+        
         $parent = $this->setGroupParent();
 
         if (is_callable($params)) {
@@ -108,9 +111,13 @@ class Route
 
         if (is_callable($func)) {
             call_user_func($func);
+        }else{
+            throw new InvalidArgumentException('group second argument must be a callble function');
         }
 
         $this->cleanGroupData($parent);
+
+        $this->router->groupParent=false;
     }
 
     /**
@@ -246,6 +253,7 @@ class Route
     {
         if ($isParent) {
             $this->router->cleanData();
+            $this->router->groupParent=false;
         }
     }
 }

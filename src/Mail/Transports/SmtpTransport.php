@@ -1,10 +1,12 @@
 <?php
+// Axiom/Mail/Transports/SmtpTransport.php
 
 namespace Axiom\Mail\Transports;
 
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mime\Email;
 use Axiom\Mail\Contracts\Transport;
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 class SmtpTransport implements Transport
 {
@@ -14,64 +16,55 @@ class SmtpTransport implements Transport
     public function __construct(array $config)
     {
         $this->config = $config;
-        $this->mailer = new PHPMailer(true);
-        $this->configureMailer();
+        $transport = new EsmtpTransport(
+            $config['host'],
+            $config['port'],
+            $config['encryption'] === 'tls',
+            null
+        );
+
+        $transport->setUsername($config['username']);
+        $transport->setPassword($config['password']);
+
+        $this->mailer = new Mailer($transport);
     }
 
     public function send(array $message)
     {
-        try {
-            $this->prepareMessage($message);
-            return $this->mailer->send();
-        } catch (PHPMailerException $e) {
-            throw new MailException($e->getMessage(), $e->getCode(), $e);
+        $email = (new Email())
+            ->from($this->formatAddress($message['from']))
+            ->to($this->formatAddress($message['to']))
+            ->subject($message['subject'])
+            ->html($message['html']);
+
+        if (!empty($message['text'])) {
+            $email->text($message['text']);
         }
-    }
-
-    protected function configureMailer()
-    {
-        $this->mailer->isSMTP();
-        $this->mailer->Host = $this->config['host'];
-        $this->mailer->Port = $this->config['port'];
-        $this->mailer->SMTPAuth = $this->config['auth'];
-        $this->mailer->Username = $this->config['username'];
-        $this->mailer->Password = $this->config['password'];
-        $this->mailer->SMTPSecure = $this->config['encryption'];
-        $this->mailer->SMTPOptions = $this->config['options'] ?? [];
-    }
-
-    protected function prepareMessage(array $message)
-    {
-        $this->mailer->setFrom(
-            $message['from']['address'], 
-            $message['from']['name'] ?? ''
-        );
-
-        $this->mailer->addAddress(
-            $message['to']['address'], 
-            $message['to']['name'] ?? ''
-        );
 
         foreach ($message['cc'] as $cc) {
-            $this->mailer->addCC($cc['address'], $cc['name'] ?? '');
+            $email->addCc($this->formatAddress($cc));
         }
 
         foreach ($message['bcc'] as $bcc) {
-            $this->mailer->addBCC($bcc['address'], $bcc['name'] ?? '');
+            $email->addBcc($this->formatAddress($bcc));
         }
-
-        $this->mailer->Subject = $message['subject'];
-        $this->mailer->Body = $message['html'];
-        $this->mailer->AltBody = $message['text'] ?? '';
 
         foreach ($message['attachments'] as $attachment) {
-            $this->mailer->addAttachment(
+            $email->attachFromPath(
                 $attachment['file'],
-                $attachment['options']['name'] ?? '',
-                $attachment['options']['encoding'] ?? 'base64',
-                $attachment['options']['type'] ?? '',
-                $attachment['options']['disposition'] ?? 'attachment'
+                $attachment['options']['name'] ?? null,
+                $attachment['options']['type'] ?? null
             );
         }
+
+        $this->mailer->send($email);
+        return true;
+    }
+
+    protected function formatAddress(array $address): string
+    {
+        return $address['name']
+            ? sprintf('%s <%s>', $address['name'], $address['address'])
+            : $address['address'];
     }
 }

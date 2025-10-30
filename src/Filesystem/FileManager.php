@@ -36,6 +36,7 @@ class FileManager
     protected array $registerDrivers = [
         'local' => LocalDriver::class,
         's3'    => S3Driver::class,
+        'axiom'    => S3Driver::class,
     ];
 
     /**

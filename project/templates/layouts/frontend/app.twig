@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axiom PHP -   {% block title %}{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    {{vite(['project/templates/assets/css/app.css','project/templates/assets/js/app.js'])|raw}}
+</head>
+<body class="bg-gray-50 font-sans antialiased text-gray-800">
+    <!-- Premium Navigation -->
+   {% include 'layouts/frontend/partials/header.twig' %}
+   <!--body-->
+    {% block body %}{% endblock %}
+    <!-- Footer -->
+    {% include 'layouts/frontend/partials/footer.twig' %}
+</body>
+</html>

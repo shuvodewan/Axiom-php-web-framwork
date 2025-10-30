@@ -16,6 +16,14 @@ class App
     public string $controllers = "Controllers";
 
     /**
+     * The base directory path where templates are located.
+     * Defaults to "Templates".
+     * 
+     * @var string
+     */
+    public string $templates = "Templates";
+
+    /**
      * The base directory path where entity classes are located.
      * Defaults to "Entities".
      * 
@@ -47,9 +55,14 @@ class App
      */
     public array $middlewares = [];
 
-
-    public array $jobs=[];
-
+    /**
+     * An array of database seeder classes to run when seeding the application.
+     * 
+     * Seeders will be executed in the order they are defined in this array.
+     *
+     * @var array<class-string> Array of seeder class names
+     */
+    public array $seeders = [];
 
     /**
      * Bootstraps the application by registering container dependencies.
@@ -60,5 +73,10 @@ class App
      */
     public function boot(){
         //register container dependencies
+    }
+
+    public function registerJobs() :array
+    {
+        return [];
     }
 }

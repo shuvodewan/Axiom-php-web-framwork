@@ -2,6 +2,8 @@
 
 namespace Axiom\Messenger;
 
+use App\Authentication\Transports\Handlers\MailHandler;
+use App\Authentication\Transports\Jobs\MailJob;
 use Symfony\Component\Messenger\{
     MessageBus,
     Envelope,
@@ -11,6 +13,7 @@ use Symfony\Component\Messenger\{
 use Axiom\Application\AppManager;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
@@ -19,17 +22,18 @@ use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 class MessageManager
 {
     private $bus;
-    private $transportManager;
+    public $transportManager;
 
     public function __construct()
     {
+        $this->transportManager = new TransportManager(config('messenger'));
         $this->initializeBus();
-        $this->transportManager = new TransportManager(config('messenger'), $this->bus);
     }
 
     private function initializeBus(): void
     {
         $middleware = [
+            new FailedMessageProcessingMiddleware(),
             $this->createSendMessageMiddleware(),
             $this->createHandleMessageMiddleware()
         ];
@@ -49,6 +53,7 @@ class MessageManager
 
     private function createHandleMessageMiddleware(): MiddlewareInterface
     {
+    
         return new HandleMessageMiddleware(
             new HandlersLocator(AppManager::getInstance()->getJobs())
         );
@@ -57,9 +62,9 @@ class MessageManager
     private function createTransportContainer(): ContainerInterface
     {
         return new class($this->transportManager) implements ContainerInterface {
-            private TransportManager $transportManager;
+            private $transportManager;
 
-            public function __construct(TransportManager $transportManager)
+            public function __construct($transportManager)
             {
                 $this->transportManager = $transportManager;
             }
@@ -75,6 +80,7 @@ class MessageManager
             }
         };
     }
+    
 
     public function dispatch(object $message, ?string $transport = null,?int $delayMs = null,array $stamps = []
     ): Envelope {
@@ -122,4 +128,6 @@ class MessageManager
     {
         return $this->transportManager;
     }
+
+    
 }

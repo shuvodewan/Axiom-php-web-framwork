@@ -2,8 +2,6 @@
 
 namespace Axiom\Mail;
 
-use Axiom\Contracts\Mail\Mailer;
-use Axiom\Contracts\Mail\MailQueue;
 use Axiom\Views\TwigDriver;
 
 class MailService
@@ -26,6 +24,7 @@ class MailService
         $this->view = new TwigDriver();
         $this->driver = (new MailManager())->driver();
     }
+
 
     public function to($address, $name = null)
     {
@@ -95,28 +94,16 @@ class MailService
 
     protected function buildMessage()
     {
-        $message =  [
+        return [
             'to' => $this->to,
             'from' => $this->from,
             'subject' => $this->subject,
             'html' => $this->html,
             'text' => $this->text,
+            'cc' => $this->cc,
+            'bcc' => $this->bcc,
+            'attachments' => $this->attachments
         ];
-
-         if (!empty($this->cc)) {
-            $message['cc'] = $this->cc;
-        }
-
-        if (!empty($this->bcc)) {
-            $message['bcc'] = $this->bcc;
-        }
-
-        if (!empty($this->attachments)) {
-            $message['attachments'] = $this->attachments;
-        }
-
-        return $message;
-
     }
 
     protected function normalizeRecipient($address, $name = null)

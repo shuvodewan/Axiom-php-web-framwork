@@ -4,6 +4,7 @@ namespace Axiom\Application\Commands;
 
 use Axiom\Application\AppManager;
 use Axiom\Console\Command;
+use Axiom\Filesystem\Filesystem;
 use Axiom\Filesystem\LocalDriver;
 use Exception;
 
@@ -141,6 +142,7 @@ class CreateApplicationCommand extends Command
         (new EntityGeneratorCommand())->handle($app, $this->argument('entity')??$app);
         (new ServiceGeneratorCommand())->handle($app, $this->argument('service')??$app);
         (new ControllerGeneratorCommand())->handle($app, $this->argument('controller')??$app);
+        // (new Filesystem(app_path('/'. ucfirst($app))))->makeDirectory('Templates');
         return $this;
     }
 }

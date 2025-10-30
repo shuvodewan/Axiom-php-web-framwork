@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Database;
+namespace Axiom\Database;
 
+use Axiom\Database\Paginator;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr\Join;
@@ -18,7 +20,12 @@ class Builder
     protected QueryBuilder $queryBuilder;
 
     /** @var string The root alias used in the query */
-    protected string $alias;
+    public string $alias;
+
+      /** @var EntityManager The root alias used in the query */
+      protected EntityManager $em;
+
+    public $entityClass;   
 
     /** @var array Track of bound parameters */
     protected array $parameters = [];
@@ -30,27 +37,79 @@ class Builder
      * @param string $entityClass The fully-qualified entity class name
      * @param string $alias The alias to use for the root entity (default: 'e')
      */
-    public function __construct(EntityManager $entityManager, string $entityClass, string $alias = 'e')
+    public function __construct(EntityManager $entityManager, string $entityClass, string $alias = 'e',$initiation=true)
     {
         $this->queryBuilder = $entityManager->createQueryBuilder();
+        $this->em = $entityManager;
         $this->alias = $alias;
-        $this->queryBuilder->select($alias)->from($entityClass, $alias);
+        $this->entityClass = $entityClass;
+        if($initiation){
+            $this->queryBuilder->select($alias)->from($entityClass, $alias);
+        }
+    }
+
+
+    protected function setOperator(string &$column, string &$operator, &$value=null)
+    {
+        $column = $column;
+
+        if (func_num_args() === 2) {
+            $value = $operator;
+            $operator = '=';
+        }
+
+        return $this;
     }
 
     /**
-     * Add a basic WHERE clause to the query.
+     * Add a basic WHERE clause to the query with Laravel-style syntax support.
      *
-     * @param string $column The column name
-     * @param string $operator The comparison operator (=, <>, >, etc.)
-     * @param mixed $value The value to compare against
+     * Supports multiple formats:
+     * 1. where('column', 'value') - assumes = operator
+     * 2. where('column', 'operator', 'value')
+     * 3. where(['column' => 'value']) - assumes = operator
+     * 4. where(['column' => ['operator', 'value']])
+     * 
+     * @param string|array $column Column name or array of conditions
+     * @param mixed $operator Operator or value (when using 2-parameter syntax)
+     * @param mixed $value The value to compare against (when using 3-parameter syntax)
      * @return $this
      */
-    public function where(string $column, string $operator, $value): self
+    public function where($column, $operator = null, $value = null): self
     {
-        $param = $this->createParameterName($column);
-        $this->queryBuilder->andWhere("{$this->alias}.{$column} {$operator} :{$param}")
-                           ->setParameter($param, $value);
+        if (is_array($column)) {
+            foreach ($column as $key => $val) {
+                if (is_array($val)) {
+                    $this->addWhereCondition($key, $val[0], $val[1]);
+                } else {
+                    $this->addWhereCondition($key, '=', $val);
+                }
+            }
+            return $this;
+        }
+
+        if (is_null($value)) {
+            $value = $operator;
+            $operator = '=';
+        }
+
+        $this->addWhereCondition($column, $operator, $value);
+        
         return $this;
+    }
+
+    /**
+     * Internal method to add a single where condition.
+     * 
+     * @param string $column
+     * @param string $operator
+     * @param mixed $value
+     */
+    protected function addWhereCondition(string $column, string $operator, $value): void
+    {
+        $param = $this->setOperator($column, $operator, $value)->createParameterName($column);
+        $this->queryBuilder->andWhere("{$this->alias}.{$column} {$operator} :{$param}")
+                        ->setParameter($param, $value);
     }
 
     /**
@@ -63,7 +122,7 @@ class Builder
      */
     public function orWhere(string $column, string $operator, $value): self
     {
-        $param = $this->createParameterName($column);
+        $param = $this->setOperator($column, $operator, $value)->createParameterName($column);
         $this->queryBuilder->orWhere("{$this->alias}.{$column} {$operator} :{$param}")
                            ->setParameter($param, $value);
         return $this;
@@ -127,6 +186,25 @@ class Builder
     public function join(string $relation, string $alias, string $conditionType = Join::INNER_JOIN, ?string $condition = null): self
     {
         $this->queryBuilder->join("{$this->alias}.{$relation}", $alias, $conditionType, $condition);
+        return $this;
+    }
+
+    /**
+     * Add a GROUP BY clause to the query.
+     *
+     * @param string|array $columns The column(s) to group by
+     * @return $this
+     */
+    public function groupBy($columns): self
+    {
+        if (is_array($columns)) {
+            foreach ($columns as $column) {
+                $this->queryBuilder->addGroupBy("{$this->alias}.{$column}");
+            }
+        } else {
+            $this->queryBuilder->groupBy("{$this->alias}.{$columns}");
+        }
+        
         return $this;
     }
 
@@ -284,9 +362,9 @@ class Builder
      * @param int $perPage The number of items per page
      * @return $this
      */
-    public function paginate(int $page, int $perPage): self
+    public function paginate(int $perPage = 15,$page='page', int $currentPage = 1, ): Paginator
     {
-        return $this->offset(($page - 1) * $perPage)->limit($perPage);
+        return Paginator::fromQueryBuilder( $this->queryBuilder, $perPage, $currentPage, $page);
     }
 
     /**
@@ -304,9 +382,10 @@ class Builder
      *
      * @return array
      */
-    public function get(): array
+    public function get(): ArrayCollection
     {
-        return $this->getQuery()->getResult();
+        $results = $this->getQuery()->getResult();
+        return new ArrayCollection($results);
     }
 
     /**
@@ -377,5 +456,52 @@ class Builder
     protected function createParameterName(string $column): string
     {
         return str_replace(['.', ' '], '_', uniqid($column.'_'));
+    }
+
+    
+    /**
+     * Filter entity from the database
+     *
+     * @return self
+     */
+   public function filters(array $params): self
+    {
+        foreach ($params as $method => $paramValue) {
+            $scopeMethod = 'scope' . ucfirst($method);
+            $entityClass = $this->queryBuilder->getRootEntities()[0];
+            
+            if (!method_exists($entityClass, $scopeMethod)) {
+                throw new \BadMethodCallException(sprintf(
+                    'Scope method %s::%s does not exist', 
+                    $entityClass,
+                    $scopeMethod
+                ));
+            }
+
+            (new $entityClass())->$scopeMethod($this, $paramValue);
+        }
+        
+        return $this;
+    }
+
+
+    /**
+     * Get the underlying Doctrine QueryBuilder instance
+     * 
+     * @return QueryBuilder The Doctrine QueryBuilder instance
+     */
+    public function getQueryBuilder(): QueryBuilder
+    {
+        return $this->queryBuilder;
+    }
+
+    /**
+     * Get the EntityManager instance associated with this builder
+     * 
+     * @return EntityManager The Doctrine EntityManager instance
+     */
+    public function getEm(): EntityManager
+    {
+        return $this->em;
     }
 }

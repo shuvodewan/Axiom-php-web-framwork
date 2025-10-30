@@ -29,6 +29,9 @@ class AppServeCommand extends Command
      */
     public function handle(): void
     {
+        $this->draw('bender');
+
+
         $host = $this->argument('host') ?? 'localhost';
         $port = $this->argument('port') ?? 8008;
 

@@ -1,9 +1,10 @@
 <?php
+// Axiom/Mail/MailManager.php
 
 namespace Axiom\Mail;
 
-use Axiom\Config\Repository as Config;
 use Axiom\Mail\Transports\MailgunTransport;
+use Axiom\Mail\Transports\PostmarkTransport;
 use Axiom\Mail\Transports\SendmailTransport;
 use Axiom\Mail\Transports\SmtpTransport;
 use InvalidArgumentException;
@@ -25,8 +26,7 @@ class MailManager
 
     protected function createDriver($driver)
     {
-        $method = 'create'.ucfirst($driver).'Driver';
-
+        $method = 'create' . ucfirst($driver) . 'Driver';
         if (method_exists($this, $method)) {
             return $this->$method();
         }
@@ -36,42 +36,33 @@ class MailManager
 
     protected function createSmtpDriver()
     {
-        $config =config('mail.drivers.smtp');
-        return new SmtpTransport([
-            'host' => $config['host'],
-            'port' => $config['port'],
-            'encryption' => $config['encryption'],
-            'username' => $config['username'],
-            'password' => $config['password'],
-            'timeout' => $config['timeout'],
-            'options' => [
-                'verify_peer' => $config['verify_peer'],
-                'auth_mode' => $config['auth_mode'],
-            ]
-        ]);
+        $config = config('mail.drivers.smtp');
+        return new SmtpTransport($config);
     }
 
     protected function createMailgunDriver()
     {
-        $config =config('mail.drivers.mailgun');
+        $config = config('mail.drivers.mailgun');
+
         return new MailgunTransport([
             'domain' => $config['domain'],
             'secret' => $config['secret'],
-            'endpoint' => $config['endpoint'],
-            'scheme' => $config['scheme'],
-            'api_version' => $config['api_version'],
+            'endpoint' => $config['endpoint'] ?? 'api.mailgun.net',
+            'region' => $config['region'] ?? null // 'us' or 'eu'
         ]);
+    }
+
+    protected function createPostmarkDriver()
+    {
+        $config = config('mail.drivers.postmark');
+        return new PostmarkTransport($config['token']);
     }
 
     protected function createSendmailDriver()
     {
-        $config =config('mail.drivers.sendmail');
-        return new SendmailTransport([
-            'command' => $config['path'] . ' ' . $config['args'],
-            'timeout' => $config['timeout'],
-        ]);
+        $config = config('mail.drivers.sendmail');
+        return new SendmailTransport($config);
     }
-
 
     public function getDefaultDriver()
     {

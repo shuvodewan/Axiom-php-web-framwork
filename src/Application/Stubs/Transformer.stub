@@ -1,0 +1,31 @@
+<?php
+
+namespace App\{{NAMESPACE}}\Transformers;
+
+use Axiom\Http\Transformer;
+
+class {{CLASS_NAME}}  extends Transformer
+{
+    /**
+     * Transform a single user resource into API output format
+     *
+     * @return array Structured user data with nested roles
+     */
+    public function resource(): array
+    {
+        return [];
+    }
+
+    /**
+     * Transform a collection of user resources (alternative format)
+     *
+     * @return array Empty array in this implementation
+     * 
+     * @todo Implement actual collection transformation logic
+     */
+    public function resources(): array
+    {
+        return [];
+    }
+
+}

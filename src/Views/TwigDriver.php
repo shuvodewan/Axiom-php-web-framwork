@@ -2,6 +2,7 @@
 
 namespace Axiom\Views;
 
+use Axiom\Application\AppManager;
 use Axiom\Traits\InstanceTrait;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -19,11 +20,35 @@ class TwigDriver implements ViewDriverContract
      */
     public function __construct()
     {
-        $loader = new FilesystemLoader(project_path('/templates'));
+        $loader = new FilesystemLoader();
+        $loader->addPath(project_path('/templates'));
+        $this->registerTempltes($loader);
         $this->twig = new Environment($loader, [
             'cache' => storage_path('/cache/templates'), 
             'debug' => true,      
         ]);
+        $this->register();
+    }
+
+    public function registerTempltes($loader)
+    {
+        // foreach((new AppManager())->getTemplatesDirs() as $dir){
+        //     $loader->addPath($dir); 
+        // }
+    }
+
+
+    /**
+     * Registers the Twig extension with the environment.
+     *
+     * Adds the custom TwigExtension to provide additional functions and filters.
+     * 
+     * @return self Returns the instance for method chaining.
+     */
+    public function register()
+    {
+        $this->twig->addExtension(new TwigExtension($this->twig));
+        return $this;
     }
 
     /**

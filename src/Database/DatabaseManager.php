@@ -2,7 +2,6 @@
 
 namespace Axiom\Database;
 
-use App\Database\Builder;
 use Axiom\Application\AppManager;
 use Axiom\Traits\InstanceTrait;
 use Doctrine\DBAL\Connection as DBALConnection;
@@ -45,6 +44,13 @@ class DatabaseManager
     protected ?Configuration $ormConfig = null;
 
     /**
+     * Tables to exclude from schema operations
+     */
+    protected array $excludedTables = [
+        'messenger_messages'
+    ];
+
+    /**
      * Constructor - Initializes the database connection automatically
      */
     public function __construct()
@@ -78,6 +84,9 @@ class DatabaseManager
             throw new RuntimeException('Database configuration not found');
         }
 
+        // Get migrations config
+        $migrationsConfig = config('database.migrations');
+
         return array_merge([
             'charset' => 'utf8mb4',
             'driverOptions' => [
@@ -88,10 +97,11 @@ class DatabaseManager
             'defaultTableOptions' => [
                 'charset' => 'utf8mb4',
                 'collate' => 'utf8mb4_unicode_ci',
-            ]
+            ],
+            // Explicitly set migrations table configuration
+            'doctrine.migrations.storage.table_storage' => $migrationsConfig['table_storage']
         ], $config);
     }
-
     /**
      * Create Doctrine ORM configuration
      * 
@@ -99,12 +109,22 @@ class DatabaseManager
      */
     protected function createOrmConfig(): Configuration
     {
-        return ORMSetup::createAttributeMetadataConfiguration(
+        $config = ORMSetup::createAttributeMetadataConfiguration(
             paths: (new AppManager())->getEntityDirs(),
             isDevMode: config('app.debug', true),
-            proxyDir: storage_path('doctrine/proxies'),
+            proxyDir: storage_path('/doctrine/proxies'),
             cache: $this->createCacheInstance()
         );
+
+        // Set schema filter to exclude specified tables
+        $config->setSchemaAssetsFilter(function ($asset) {
+            if ($asset instanceof \Doctrine\DBAL\Schema\Table) {
+                $asset = $asset->getName();
+            }
+            return !in_array($asset, $this->excludedTables);
+        });
+
+        return $config;
     }
 
     /**
@@ -151,6 +171,10 @@ class DatabaseManager
             $this->entityManager = new EntityManager(
                 $this->connection,
                 $this->ormConfig
+            );
+
+            $this->entityManager->getEventManager()->addEventSubscriber(
+                new PostGenerateSchemaListener()
             );
         }
         return $this->entityManager;

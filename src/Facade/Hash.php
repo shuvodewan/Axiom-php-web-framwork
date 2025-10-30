@@ -2,28 +2,28 @@
 
 namespace Axiom\Facade;
 
-use Core\Util\Hash as UtilHash;
+use Axiom\Support\Hash as SupportHash;
 
 /**
  * Hash Facade
  *
- * Provides a static interface to the `UtilHash` class for hashing functionality.
+ * Provides a static interface to the `SupportHash` class for hashing functionality.
  * This facade allows convenient access to hashing methods without needing to
- * manually instantiate the `UtilHash` class.
+ * manually instantiate the `SupportHash` class.
  */
 class Hash implements FacadeContract
 {
     use FacadeTrait;
 
     /**
-     * Get the underlying instance of the `UtilHash` class.
+     * Get the underlying instance of the `SupportHash` class.
      *
-     * @return UtilHash The instance of `UtilHash`
+     * @return SupportHash The instance of `SupportHash`
      */
-    public static function getInstance(): UtilHash
+    public static function getInstance(): SupportHash
     {
         if (!isset(self::$instance)) {
-            self::$instance = new UtilHash();
+            self::$instance = new SupportHash();
         }
 
         return self::$instance;

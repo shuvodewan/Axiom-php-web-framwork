@@ -3,6 +3,10 @@
 namespace Axiom\Project;
 
 use App\Authentication\AuthenticationApp;
+use App\Axiom\AxiomApp;
+use App\Dashboard\DashboardApp;
+use App\Mit\MitApp;
+use Axiom\Application\ProjectRegistry;
 
 /**
  * Application registry that maintains system-wide configurations and components.
@@ -10,7 +14,7 @@ use App\Authentication\AuthenticationApp;
  * This class serves as a central registry for installed applications and route groups,
  * providing static configuration for the entire project.
  */
-class Registry
+class Registry extends ProjectRegistry
 {
     /**
      * An array of installed application classes that should be initialized.
@@ -19,7 +23,9 @@ class Registry
      * @var array<class-string>
      */
     static $INSTALLED_APPS = [
-        AuthenticationApp::class
+        AuthenticationApp::class,
+        AxiomApp::class,
+        DashboardApp::class,
     ];
 
     /**
@@ -39,18 +45,12 @@ class Registry
         'global'=>[
             'middlewares'=>['admin'],
             'prefix'=>'global'
+        ],
+
+        'admin'=>[
+            'middlewares'=>[],
+            'prefix'=>'admin'
         ]
     ];
 
-    /**
-     * Bootstraps the registry by initializing dependencies.
-     * 
-     * This method should be called during system startup to register any required
-     * services or components defined in the registry.
-     * 
-     * @return void
-     */
-    public static function boot(){
-        //register dependencies
-    }
 }

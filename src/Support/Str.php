@@ -191,6 +191,28 @@ class Str
     }
 
     /**
+     * Convert a string to title case (e.g., "user_name" becomes "User Name")
+     *
+     * @param string $string The string to convert
+     * @return string The title-cased string
+     */
+    public function title(string $string): string
+    {
+        return ucwords(str_replace(['_', '-'], ' ', $string));
+    }
+
+    /**
+     * Convert a string to title case without spaces (e.g., "user_name" becomes "UserName")
+     *
+     * @param string $string The string to convert
+     * @return string The title-cased string without spaces
+     */
+    public function studly(string $string): string
+    {
+        return str_replace(' ', '', $this->title($string));
+    }
+
+    /**
      * Convert a word to its plural form.
      *
      * @param string $word The word to pluralize.

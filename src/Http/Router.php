@@ -28,7 +28,7 @@ class Router
     protected array $names = [];
 
     /** @var Request The current request. */
-    public Request $request;
+    public ?Request $request;
 
     /** @var bool Whether the current route is part of a group. */
     public bool $groupParent = false;
@@ -48,7 +48,7 @@ class Router
      *
      * @param Request $request The current request.
      */
-    public function __construct(Request $request)
+    public function __construct(?Request $request = null)
     {
         $this->request = $request;
         self::setInstance($this);
@@ -62,6 +62,43 @@ class Router
         }
 
         return $this->loadFromRoutes();
+    }
+
+    /**
+     * get routes path by name.
+     *
+     * @return string
+     */
+    public function getNameRoute(string $name, array $params=[])
+    {
+        $routePath = $this->routes['names'][$name] ?? null;
+    
+        if ($routePath === null) {
+            throw new Exception("Route [{$name}] not defined.");
+        }
+
+        $usedKeys = [];
+        $path = preg_replace_callback('/\{(\w+)\}/', function ($matches) use ($params, &$usedKeys) {
+            $key = $matches[1];
+            if (!array_key_exists($key, $params)) {
+                return $matches[0]; // Leave unmatched for now
+            }
+            $usedKeys[] = $key;
+            return $params[$key];
+        }, $routePath);
+    
+        // Check for missing parameters and include their names in the error
+        if (preg_match_all('/\{(\w+)\}/', $path, $missingMatches)) {
+            $missingParams = implode(', ', $missingMatches[1]);
+            throw new Exception("Missing parameters [{$missingParams}] for route [{$name}].");
+        }
+    
+        $query = http_build_query(array_diff_key($params, array_flip($usedKeys)));
+        if ($query !== '') {
+            $path .= '?' . $query;
+        }
+
+        return $path;
     }
 
     /**
@@ -86,7 +123,17 @@ class Router
 
     public function loadFromApp(): self
     {
-        AppManager::getInstance()->registerRoute();
+        if (config('app.mode') === 'production') {
+            if ($routes = $this->loadFromCache()) {
+                $this->routes = $routes;
+            } else {
+                AppManager::getInstance()->registerRoute();
+                $this->setRoutesInCache();
+            }
+        } else {
+            AppManager::getInstance()->registerRoute();
+        }
+
         return $this;
     }
 
@@ -145,7 +192,11 @@ class Router
      */
     public function registerRoutes(string $method, Route $route): void
     {
-        if (isset($route->uri, $this->routes[$method][$route->uri])) {
+        $uri = trim($route->uri, '/');
+        $uri = count($this->prefixes) ? trim(implode('/', $this->prefixes), '/') .( $uri? "/{$uri}":'') : $uri;
+
+        if (isset($route->uri, $this->routes[$method][$uri])) {
+
             throw new Exception($route->uri . ' Route already defined');
         }
 
@@ -155,7 +206,6 @@ class Router
             'middleware' => [...$this->middlewares, ...$route->middlewares],
         ];
 
-        $uri = count($this->prefixes) ? trim(implode('/', $this->prefixes), '/') . '/' . $route->uri : trim($route->uri, '/');
         $name = count($this->names) ? implode('', $this->names) . '' . $route->name : $route->name;
         $this->routes[$method][$uri] = $params;
         if ($name) {

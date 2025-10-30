@@ -2,9 +2,14 @@
 
 namespace Axiom\Console;
 
+use Axiom\Application\Commands\ControllerGeneratorCommand;
 use Axiom\Application\Commands\CreateApplicationCommand;
 use Axiom\Application\Commands\DeleteApplicationCommand;
+use Axiom\Application\Commands\EntityGeneratorCommand;
 use Axiom\Application\Commands\EntityHelpCommand;
+use Axiom\Application\Commands\SeederGeneratorCommand;
+use Axiom\Application\Commands\ServiceGeneratorCommand;
+use Axiom\Application\Commands\TransformersGeneratorCommand;
 use Axiom\Console\Commands\AppCashClearCommand;
 use Axiom\Console\Commands\AppServeCommand;
 use Axiom\Database\Commands\DiffCommand;
@@ -12,12 +17,18 @@ use Axiom\Database\Commands\ExecuteMigrationCommand;
 use Axiom\Database\Commands\GenerateMigrationCommand;
 use Axiom\Database\Commands\LatestCommand;
 use Axiom\Database\Commands\ListCommand;
+use Axiom\Database\Commands\ListSeederCommand;
+use Axiom\Database\Commands\MakeSeederCommand;
 use Axiom\Database\Commands\MigrateCommand;
+use Axiom\Database\Commands\PopulateSeeder;
 use Axiom\Database\Commands\RollbackCommand;
 use Axiom\Database\Commands\StatusCommand;
 use Axiom\Database\Commands\SyncMetadataCommand;
 use Axiom\Database\Commands\VersionCommand;
 use Axiom\Facade\Log;
+use Axiom\Http\Commands\RouteListCommand;
+use Axiom\Messenger\Commands\WorkerCommand;
+use Axiom\Messenger\QueueWorker;
 use Exception;
 
 /**
@@ -43,6 +54,13 @@ class Kernel
             'project:start' => AppServeCommand::class,
             'app:create' => CreateApplicationCommand::class,
             'app:delete' => DeleteApplicationCommand::class,
+            'app:entity'=> EntityGeneratorCommand::class,
+            'app:service'=> ServiceGeneratorCommand::class,
+            'app:controller'=> ControllerGeneratorCommand::class,
+            'app:seeder'=>SeederGeneratorCommand::class,
+            'app:transformer'=>TransformersGeneratorCommand::class,
+
+            'queue:work'=>WorkerCommand::class,
             
             //Help
             'help:entity' => EntityHelpCommand::class,
@@ -58,6 +76,16 @@ class Kernel
             'migrations:version' => VersionCommand::class,
             'migrations:execute' => ExecuteMigrationCommand::class,
             'migrations:diff' => DiffCommand::class,
+
+            //seeders
+
+            'seeder:generate'=>MakeSeederCommand::class,
+            'seeder:populate'=>PopulateSeeder::class,
+            'seeder:list'=>ListSeederCommand::class,
+
+            //Routes
+
+            'route:list'=>RouteListCommand::class
         ];
     }
 
@@ -81,7 +109,9 @@ class Kernel
                 'trace' => $e->getTraceAsString(),
             ]);
             
-            Preview::error($e->getMessage());
+            dd($e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
     }
 

@@ -6,6 +6,7 @@ use Axiom\Facade\Config;
 use Axiom\Facade\Hash;
 use Axiom\Facade\Request;
 use Axiom\Filesystem\FileManager;
+use Axiom\Http\Router;
 use Axiom\Http\Session;
 use Axiom\Support\DD;
 use Carbon\Carbon;
@@ -91,6 +92,18 @@ if (! function_exists('assets')) {
      */
     function assets($file_path) {
         return config('app.url').'/'.$file_path;
+    }
+}
+
+if (! function_exists('route')) {
+    /**
+     * Generate a URL for an asset file
+     *
+     * @param string $file_path The asset file path relative to public directory
+     * @return string The full URL to the asset
+     */
+    function route($name, $params=[]) {
+        return config('app.url') . '/' . Router::getInstance()->getNameRoute($name,$params);
     }
 }
 

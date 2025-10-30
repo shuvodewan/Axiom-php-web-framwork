@@ -1,0 +1,94 @@
+<?php
+
+namespace Axiom\Application\Commands;
+
+use Axiom\Application\ApplicationGeneratorTrait;
+use Axiom\Console\Command;
+use Axiom\Facade\Str;
+use Axiom\Filesystem\LocalDriver;
+use Exception;
+
+/**
+ * SeederCommand Class
+ *
+ * A console command for generating model files in the application.
+ * This command uses stubs to create model files with the appropriate namespace and class name.
+ */
+class TransformersGeneratorCommand extends Command
+{
+    use ApplicationGeneratorTrait;
+
+    /** @var string The application name */
+    protected string $app;
+
+    /** @var LocalDriver The filesystem instance */
+    protected LocalDriver $filesystem;
+
+    /** @var string The model name */
+    protected string $name;
+
+    /** @var array The items to generate (e.g., model files) */
+    protected array $items;
+
+    /**
+     * Define validation rules for command arguments.
+     *
+     * @return array The validation rules
+     */
+    protected function validator(): array
+    {
+        return [
+            'app' => [
+                'required'
+            ],
+            'name' => 'required|max:50',
+        ];
+    }
+
+
+    /**
+     * Set the data required for generating the model.
+     *
+     * @param string|null $app The application name
+     * @param string|null $name The model name
+     * @return void
+     */
+    protected function setData(?string $app = null, ?string $name = null): void
+    {
+
+        $this->info('Generating transformers...');
+
+       // Initialize the filesystem instance
+       $this->filesystem = new LocalDriver(['root' => app_path()]);
+
+       // Set the application and model name
+       $this->app = $app ?? $this->argument('app');
+       $this->name = $name ?? $this->argument('name');
+
+        $this->items = [
+            "Transformer" => [
+                "dir" => ucfirst($this->app) . '/Transformers/',
+                "file" => $this->getSingularClassName($this->name) . '.php',
+            ],
+        ];
+    }
+
+
+    protected function closing()
+    {
+        $this->info('Transformer generated');
+    }
+
+    /**
+     * Map the stub variables present in the stub to their values.
+     *
+     * @return array The stub variables as key-value pairs
+     */
+    public function getStubVariables(): array
+    {
+        return [
+            'NAMESPACE' => ucfirst($this->app),
+            'CLASS_NAME' => $this->getSingularClassName($this->name),
+        ];
+    }
+}
